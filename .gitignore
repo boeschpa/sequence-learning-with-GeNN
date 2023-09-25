@@ -1,0 +1,12 @@
+*
+!*/
+!*.*
+
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+*.dat
+*_CODE
+*Makefile
+*generator
+*generator.d
+.DS_Store
