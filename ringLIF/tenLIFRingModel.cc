@@ -38,7 +38,7 @@ void modelDefinition(ModelSpec &model)
     model.addNeuronPopulation<NeuronModels::LIF>("Pop1", 10, p, ini);
 
     WeightUpdateModels::StaticPulse::VarValues s_ini(
-        -6.0); // 0 - conductance
+        -0.0); // 0 - conductance
     PostsynapticModels::ExpCond::ParamValues ps_p(
         1.0,    // 0 - tau_S: decay time constant for S [ms]
         -75.0); // 1 - Erev: Reversal potential
@@ -53,13 +53,20 @@ void modelDefinition(ModelSpec &model)
     NeuronModels::SpikeSourceArray::VarValues stim_ini(
         uninitialisedVar(),     // 0 - startSpike indices
         uninitialisedVar());    // 1 - endSpike indices
+
+    WeightUpdateModels::StaticPulse::VarValues s_stim_ini(
+        -6.0); // 0 - conductance
+    PostsynapticModels::ExpCond::ParamValues ps_stim_p(
+        1.0,    // 0 - tau_S: decay time constant for S [ms]
+        -75.0); // 1 - Erev: Reversal potential
+
     
     model.addNeuronPopulation<NeuronModels::SpikeSourceArray>("Stim", 1, {}, stim_ini);
     model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
         "StimPop1", SynapseMatrixType::SPARSE_GLOBALG, NO_DELAY,
         "Stim", "Pop1",
-        {}, s_ini,
-        ps_p, {},
+        {}, s_stim_ini,
+        ps_stim_p, {},
         initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
 }
 
