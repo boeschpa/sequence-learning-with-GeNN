@@ -21,13 +21,13 @@ void modelDefinition(ModelSpec &model)
     model.setName("tenLIFRing");
 
     NeuronModels::LIF::ParamValues p(
-        0.28,        // 0 - Membrane capacitance (nF?)
-        50.0,       // 1 - Membrane time constant [ms]
+        0.280,        // 0 - Membrane capacitance nF
+        20.0,       // 1 - Membrane time constant [ms]
         -70.0,      // 2 - Resting membrane potential [mV]
         -70.0,       // 3 - Reset voltage [mV]
         -55.0,      // 4 - Spiking threshold [mV]
         -0.0,        // 5 - Offset current
-        10.0        // 6 - refractory time constant tau refrac
+        20.0        // 6 - refractory time constant tau refrac
     );
 
     NeuronModels::LIF::VarValues ini(
@@ -38,13 +38,13 @@ void modelDefinition(ModelSpec &model)
     model.addNeuronPopulation<NeuronModels::LIF>("Pop1", 10, p, ini);
 
     WeightUpdateModels::StaticPulse::VarValues s_ini(
-        -0.0); // 0 - conductance
+        -0.2); // 0 - conductance
     PostsynapticModels::ExpCond::ParamValues ps_p(
-        1.0,    // 0 - tau_S: decay time constant for S [ms]
+        5.0,    // 0 - tau_S: decay time constant for S [ms]
         -75.0); // 1 - Erev: Reversal potential
 
     model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-        "Pop1self", SynapseMatrixType::SPARSE_GLOBALG, 10,
+        "Pop1self", SynapseMatrixType::SPARSE_GLOBALG, 100,
         "Pop1", "Pop1",
         {}, s_ini,
         ps_p, {},
@@ -57,7 +57,7 @@ void modelDefinition(ModelSpec &model)
     WeightUpdateModels::StaticPulse::VarValues s_stim_ini(
         -6.0); // 0 - conductance
     PostsynapticModels::ExpCond::ParamValues ps_stim_p(
-        1.0,    // 0 - tau_S: decay time constant for S [ms]
+        5.0,    // 0 - tau_S: decay time constant for S [ms]
         -75.0); // 1 - Erev: Reversal potential
 
     

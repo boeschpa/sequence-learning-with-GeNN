@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+//#include "spikeRecorder.h"
 
 int main()
 {
@@ -31,10 +32,9 @@ int main()
     //     loops++;
     //     std::cout << "\n" << "  (offset: " << offset << ")\n";
     // }
-    for (int i = 0; i< 30; i++){
-        std::cout << *(indPop1self+i) << "\n";
-    }
-    std::cout << "next value: " << *(indPop1self+offset);
+
+    //rowLengthPop1self[7]=0;
+
     startSpikeStim[0] = 0;
     endSpikeStim[0] = 1;
 
@@ -46,16 +46,26 @@ int main()
 
     //t is current simulation time provided by GeNN in ms
     std::ofstream os("tenHH_output.V.dat");
+    std::ofstream os_spike("tenHH_output.spikes.dat");
     while (t < 1000.0f) {
         stepTime();
-        pullVPop1FromDevice();
+        pullVPop1FromDevice(); //get voltages
+        pullPop1SpikesFromDevice(); // get spikes
+        pullPop1CurrentSpikesFromDevice();
+        //std::cout << "spkQuePtrPop1: " << spkQuePtrPop1 << "\n";
+        //std::cout << "glbSpkCntPop1: " << glbSpkCntPop1[0] << "\n"; 
         os << t << " ";
+        os_spike << t << " ";
         for (int j= 0; j < 10; j++) {
             os << VPop1[j] << " ";
+            
         }
+        os_spike << spikeCount_Pop1 << " ";
         os << std::endl;
+        os_spike << std::endl;
     }
     os.close();
+    os_spike.close();
 
 
     // pullPop1StateFromDevice(); // gets states of neuron population from gpu, does nothing in cpu mode

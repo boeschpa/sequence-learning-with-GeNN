@@ -23,8 +23,8 @@ void modelDefinition(ModelSpec &model)
     const float lateral_prob = 0.25;
 
     SimpleAdEx::ParamValues p_pyramidal(
-        0.28,         // 0 - Membrane capacitance [pF]
-        14.0e-3,      // 1 - Membrane leak conductance [uS]
+        0.28,         // 0 - Membrane capacitance [pF] 280 pf
+        14.0e-3,      // 1 - Membrane leak conductance [uS] 14 ns
         -70.0,        // 2 - Resting membrane potential [mV]
         -70.0,        // 3 - Reset voltage [mV]
         -55.0,        // 4 - Spiking threshold [mV]

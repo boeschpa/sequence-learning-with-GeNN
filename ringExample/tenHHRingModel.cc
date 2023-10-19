@@ -7,9 +7,9 @@ public:
     DECLARE_SNIPPET(Ring, 1);
     SET_ROW_BUILD_STATE_VARS({{"offset", "unsigned int", 1}});
     SET_ROW_BUILD_CODE(
-        "if ($(id_pre)==5) {\n"
-        "   $(endRow);\n"
-        "}\n"
+        // "if ($(id_pre)==5) {\n"
+        // "   $(endRow);\n"
+        // "}\n"
         "unsigned int target = ($(id_pre) + offset) % $(num_post);\n"
         "$(addSynapse, target);\n"
         "offset++;\n"
@@ -82,4 +82,10 @@ void modelDefinition(ModelSpec &model)
         {}, s_ini,
         ps_p, {},
         initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
+
+
+
+    //record spikes
+    //NeuronGroup *pop1 = model.findNeuronGroup("Pop1");
+    //pop1->setSpikeRecordingEnabled(true); // seg fault
 }

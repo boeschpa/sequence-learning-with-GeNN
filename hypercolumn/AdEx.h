@@ -12,15 +12,14 @@ public:
     DECLARE_MODEL(AdEx, 9, 2);
 
     SET_SIM_CODE(
-        // todo add micro steps
         "unsigned int mt;\n"
-        "scalar mdt= DT/25.0;\n"
+        "scalar mdt= DT/10.0;\n"
 
-        "for (mt=0; mt < 25; mt++) {\n"
+        "for (mt=0; mt < 10; mt++) {\n"
         "   $(Iw) = $(Iw) + mdt * $(TauW1) * ( $(a) * ( $(V) - $(Vrest) ) - $(Iw)) ;\n"
-        //   pA   =  pA   + ms  *    1/ms  * (   )
-        "   $(V) = $(V) + mdt * 1.0e3 * $(C1) * ( $(G) * ( $(Vrest) - $(V) ) + $(Vslope) * $(G) * exp( ( $(V) - $(Vthresh) ) * $(Vslope1) ) - $(Iw) + $(Isyn) );\n"  // Isyn includes all synaptic currents + intrinsic excitability
-        //   mV  =  mV  + ms          * 1/pF  * (  uS  *  ( mV  -  mV      ) +  mV       *  uS  * exp( (  mV  -  mV        ) *  1/mV      ) -  pA   +  pA ?    )
+        //   nA   =  nA   + ms  *    1/ms  * ( uS   * (  mV -    mV     ) -   nA  )
+        "   $(V) = $(V) + mdt * $(C1) * ( $(G) * ( $(Vrest) - $(V) ) + $(Vslope) * $(G) * exp( ( $(V) - $(Vthresh) ) * $(Vslope1) ) - $(Iw) + $(Isyn) );\n"  // Isyn includes all synaptic currents + intrinsic excitability
+        //   mV  =  mV  + ms  * 1/nF  * (  uS  *  ( mV  -  mV      ) +  mV       *  uS  * exp( (  mV  -  mV        ) *  1/mV      ) -  nA   +  nA    )
         "}\n"
     );
 
@@ -31,7 +30,7 @@ public:
         "$(Iw) = $(Iw) + $(b) ;\n");
 
     SET_PARAM_NAMES({
-        "C",          // Membrane capacitance [pF]
+        "C",          // Membrane capacitance [nF]
         "G",          // Membrane leak conductance [uS]
         "Vrest",      // Resting membrane potential [mV]
         "Vreset",     // Reset voltage [mV]
@@ -49,7 +48,7 @@ public:
 
     SET_VARS({{"V", "scalar"}, {"Iw", "scalar"}});
 
-    SET_NEEDS_AUTO_REFRACTORY(false);
+    SET_NEEDS_AUTO_REFRACTORY(true);
 };
 
 IMPLEMENT_MODEL(AdEx);
