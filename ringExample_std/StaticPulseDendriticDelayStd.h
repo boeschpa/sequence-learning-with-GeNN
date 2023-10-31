@@ -8,7 +8,7 @@ public:
 
     SET_PARAM_NAMES({"Tau", "U"});
 
-    SET_VARS({{"g", "scalar", VarAccess::READ_ONLY}, {"d", "uint8_t", VarAccess::READ_ONLY}, {"x", "scalar", VarAccess::READ_WRITE}});
+    SET_VARS({{"g", "scalar"}, {"d", "uint16_t"}, {"x", "scalar"}});
     
     SET_DERIVED_PARAMS({
         {"Tau1", [](const std::vector<double> &pars, double){ return 1.0 / pars[0]; }}});  // Tau^-1

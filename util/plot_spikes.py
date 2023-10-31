@@ -5,10 +5,10 @@ import sys
 # Load data from the .dat file
 data = np.loadtxt(sys.argv[1])
 
-# Split the data into time (first column) and voltage (subsequent 10 columns)
+# Split the data into time (first column) and voltage (subsequent N columns)
 time = data[:, 0]
 N= np.shape(data)[1]-1
-spikes = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to 10
+spikes = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
 
 ax = plt.gca()
 # ax.set_prop_cycle('color',plt.cm.Spectral(np.linspace(0,1,N)))
@@ -17,7 +17,8 @@ ax = plt.gca()
 # for i in range(N):
 #     plt.plot(time, [i+1 if spike!=0 else 0.0 for spike in spikes[:, i]], ".")
 
-plt.plot(time[np.where(spikes != 0)[0]], [1]*len(np.where(spikes != 0)[0]),".")
+for i in range(N):
+    plt.plot(time[np.where(spikes[:,i] != 0)[0]], [i]*len(np.where(spikes[:,i] != 0)[0]),".")
 
 # Add labels and a legend
 plt.xlabel('Time')

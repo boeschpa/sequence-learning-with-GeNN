@@ -19,7 +19,7 @@ void modelDefinition(ModelSpec &model)
     const float lateral_prob = 0.25;
     const int hyper_width = 2;
     const int hyper_height = 2;
-    model.setName("hypercolumns_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
+    model.setName("hypercolumns"); //_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
 
     ////////////////////////////
     /// PARAMETERS + INITIAL VALUES
@@ -100,6 +100,24 @@ void modelDefinition(ModelSpec &model)
 
     InitSparseConnectivitySnippet::FixedProbabilityNoAutapse::ParamValues lateralProb(lateral_prob);
 
+    // input neurons local parameters
+    NeuronModels::Poisson::ParamValues p_stim(
+        1.0,    // Refractory period (ms)
+        1.0,    // duration of spike (ms)
+        0.0,    // Membrane potential at spike (mV)
+        -60.0); // Membrane potential at rest (mV)
+    // input neuron initial values
+    NeuronModels::Poisson::VarValues stim_ini(
+        uninitialisedVar(),  // V - Membrane potential
+        uninitialisedVar()); // SpikeTime - Time at which the neuron spiked for the last time
+
+    // input synapse vars and params
+    WeightUpdateModels::StaticPulse::VarValues s_input_ampa(
+        0.00602); // 0 - conductance 6.02 nS
+    PostsynapticModels::ExpCond::ParamValues ps_input_ampa(
+        5.0,  // 0 - tau_S: decay time constant for S [ms]
+        0.0); // 1 - Erev: Reversal potential AMPA
+
     ////////////////////////////
     /// NEURON POPULATIONS
     ////////////////////////////
@@ -108,6 +126,8 @@ void modelDefinition(ModelSpec &model)
     std::string baskets_name = "baskets";
     std::string hypercolumn_basename = "H";
     std::string hypercolumn_name;
+    std::string hypercolumn_name_post;
+    std::string input_basename = "input";
 
     // iterate over hypercolumns
     for (int m = 0; m < hyper_height; m++) // m = row number
@@ -125,6 +145,15 @@ void modelDefinition(ModelSpec &model)
 
             // add basket pop
             model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+
+            // add input neurons
+            for (int i = 0; i < N_minicolumns; i++)
+            {
+                if (i <= 0 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
+                {
+                    model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
+                }
+            }
         }
     }
 
@@ -165,82 +194,158 @@ void modelDefinition(ModelSpec &model)
                     initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(wtaProb));
             }
 
-            // todo add lateral synapses with right connectivity, get from matrix
+            // // AMPA (+positive) lateral connections within hypercolumn
+            // for (int i = 0; i < N_minicolumns; i++) // presynaptic index j
+            // {
+            //     for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
+            //     {
+            //         if (i == j)
+            //         {
+            //             // AMPA recurrent
+            //             model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+            //                 hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+            //                 hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
+            //                 update_params_lateral_ampa, update_vars_lateral_ampa,
+            //                 ps_lateral_ampa, {},
+            //                 initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
+            //         }
+            //         else
+            //         {
+            //             // AMPA non-recurrent (not connected in static model)
+            //             // model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+            //             //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+            //             //      hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
+            //             //     update_params_lateral_ampa, update_vars_lateral_ampa,
+            //             //     ps_lateral_ampa, {},
+            //             //     initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
+            //         }
+            //     }
+            // }
 
-            // AMPA (+positive) lateral connections within hypercolumn
-            for (int i = 0; i < N_minicolumns; i++) // presynaptic index j
-            {
-                for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
-                {
-                    if (i == j)
-                    {
-                        // AMPA recurrent
-                        model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
-                            hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
-                            hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
-                            update_params_lateral_ampa, update_vars_lateral_ampa,
-                            ps_lateral_ampa, {},
-                            initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
-                    }
-                    else
-                    {
-                        // AMPA non-recurrent (not connected in static model)
-                        // model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
-                        //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
-                        //      hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
-                        //     update_params_lateral_ampa, update_vars_lateral_ampa,
-                        //     ps_lateral_ampa, {},
-                        //     initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
-                    }
-                }
-            }
-
-            // AMPA (+positive) lateral connections between hypercolumn
+            // AMPA (+positive) lateral connections between hypercolumn (and within)
             for (int i = 0; i < N_minicolumns; i++) // presynaptic index j
             {
                 for (int mp = 0; mp < hyper_height; mp++) // mp = postsynaptic hypercolum row number
                 {
                     for (int np = 0; np < hyper_width; np++) // np = postsynaptic hypercolum column number
                     {
-                        std::string to_hypercolumn = "to" + std::to_string(mp) + "_" + std::to_string(np) + "_";
-                        if (m == mp && n == np)
+                        hypercolumn_name_post = hypercolumn_basename + std::to_string(mp) + "_" + std::to_string(np) + "_";
+
+                        for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
                         {
-                            for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
+                            if (i == j)
                             {
-                                if (i == j)
+                                if (m != mp && n != np) // if between hypercolumns
                                 {
                                     // AMPA recurrent
                                     model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
-                                        hypercolumn_name + to_hypercolumn + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
-                                        hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
+                                        hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                                        hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
                                         update_params_lateral_ampa, update_vars_lateral_ampa,
                                         ps_lateral_ampa, {},
                                         initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
                                 }
                                 else
                                 {
-                                    // AMPA non-recurrent (not connected in static model)
-                                    // model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
-                                    //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
-                                    //      hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
-                                    //     update_params_lateral_ampa, update_vars_lateral_ampa,
-                                    //     ps_lateral_ampa, {},
-                                    //     initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
+                                    // AMPA recurrent (no autapse)
+                                    model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+                                        hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                                        hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
+                                        update_params_lateral_ampa, update_vars_lateral_ampa,
+                                        ps_lateral_ampa, {},
+                                        initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
                                 }
+                            }
+                            else
+                            {
+                                // AMPA non-recurrent (not connected in static model)
+                                // model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+                                //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                                //      hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
+                                //     update_params_lateral_ampa, update_vars_lateral_ampa,
+                                //     ps_lateral_ampa, {},
+                                //     initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
                             }
                         }
                     }
+                }
+            }
+
+            // NMDA (+positive) lateral connections between hypercolumn (and within)
+            for (int i = 0; i < N_minicolumns; i++) // presynaptic index j
+            {
+                for (int mp = 0; mp < hyper_height; mp++) // mp = postsynaptic hypercolum row number
+                {
+                    for (int np = 0; np < hyper_width; np++) // np = postsynaptic hypercolum column number
+                    {
+                        hypercolumn_name_post = hypercolumn_basename + std::to_string(mp) + "_" + std::to_string(np) + "_";
+
+                        for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
+                        {
+                            // if (i==j) // ring connectivity / next minicolumn  // somehow leads to feedback
+                            // {
+                            //     if (m != mp && n != np) // if between hypercolumns
+                            //     {
+                            //         // NMDA recurrent
+                            //         model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+                            //             hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_nmda_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                            //             hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
+                            //             update_params_lateral_nmda, update_vars_lateral_nmda,
+                            //             ps_lateral_nmda, {},
+                            //             initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
+                            //     }
+                            //     else
+                            //     {
+                            //         // NMDA recurrent (no autapse)
+                            //         model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+                            //             hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_nmda_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                            //             hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
+                            //             update_params_lateral_nmda, update_vars_lateral_nmda,
+                            //             ps_lateral_nmda, {},
+                            //             initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
+                            //     }
+                            // }
+                            // else
+                            // {
+                            //     // NMDA non-recurrent (not connected in static model)
+                            //     // model.addSynapsePopulation<StaticPulseDendriticDelayStd, PostsynapticModels::ExpCond>(
+                            //     //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "to" + std::to_string(j) + "_" + lateral_nmda_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                            //     //      hypercolumn_name + minicolumn_basename + std::to_string(j), hypercolumn_name + minicolumn_basename + std::to_string(i),
+                            //     //     update_params_lateral_nmda, update_vars_lateral_nmda,
+                            //     //     ps_lateral_nmda, {},
+                            //     //     initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
+                            // }
+                        }
+                    }
+                }
+            }
+
+            // add input neurons
+
+            for (int i = 0; i < N_minicolumns; i++)
+            {
+                // input connection
+                if (i <= 0 && n == 0 && m == 0) // only input to minicolumns 1 in hypercolumn_0_0
+                {
+                    // todo fix names
+                    model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
+                        hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename + "_synapse", SynapseMatrixType::SPARSE_GLOBALG, NO_DELAY,
+                        hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, hypercolumn_name + minicolumn_basename + std::to_string(i),
+                        {}, s_input_ampa,
+                        ps_input_ampa, {},
+                        initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
                 }
             }
         }
     }
 
     // todo input neurons
+    // todo background poisson generators
+    // todo distribution for strength and delay!!
+    // todo noisy neurons? ask anders
 
-    // todo loop over hypercolumns, build each independently,
-    //  connect matching minicolumns with positive conductance, rest with 0 or negative
-
-    // then loop again and connect all minicolumn-populations with calculated (euclidian) delay
+    // todo any delay?
+    // todo (euclidian) delay
 }
 
 // // AMPA positive lateral connections
