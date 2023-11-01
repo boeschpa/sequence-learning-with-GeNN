@@ -1,6 +1,6 @@
 #!/bin/bash
 cd $(dirname $0)
-genn-buildmodel.sh -c model.cc;
+genn-buildmodel.sh -cf model.cc;
 genn-create-user-project.sh hypercolumns simulation.cc;
 make;
 ./hypercolumns;

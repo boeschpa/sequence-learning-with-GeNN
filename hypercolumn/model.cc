@@ -108,8 +108,8 @@ void modelDefinition(ModelSpec &model)
         -60.0); // Membrane potential at rest (mV)
     // input neuron initial values
     NeuronModels::Poisson::VarValues stim_ini(
-        uninitialisedVar(),  // V - Membrane potential
-        uninitialisedVar()); // SpikeTime - Time at which the neuron spiked for the last time
+        0.0,  // V - Membrane potential
+        0.0); // SpikeTime - Time at which the neuron spiked for the last time
 
     // input synapse vars and params
     WeightUpdateModels::StaticPulse::VarValues s_input_ampa(
@@ -149,7 +149,7 @@ void modelDefinition(ModelSpec &model)
             // add input neurons
             for (int i = 0; i < N_minicolumns; i++)
             {
-                if (i <= 0 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
+                if (i <= 1 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
                 {
                     model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
                 }
@@ -320,12 +320,12 @@ void modelDefinition(ModelSpec &model)
                 }
             }
 
-            // add input neurons
+            // add input synapses
 
             for (int i = 0; i < N_minicolumns; i++)
             {
                 // input connection
-                if (i <= 0 && n == 0 && m == 0) // only input to minicolumns 1 in hypercolumn_0_0
+                if (i <= 0 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
                 {
                     // todo fix names
                     model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(

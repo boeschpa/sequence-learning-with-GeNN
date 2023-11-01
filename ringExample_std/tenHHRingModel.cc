@@ -60,7 +60,7 @@ void modelDefinition(ModelSpec &model)
 
     StaticPulseDendriticDelayStd::VarValues update_vars(
         -0.2,                     // 0 - conductance
-        0.0,                      // 1 - delay in ms?
+        2,                      // 1 - delay in ms?
         1.0);                     // 2 - STD depletion variable
     StaticPulseDendriticDelayStd::ParamValues update_params(
         800.0, // 0 tau recovery time [ms]
