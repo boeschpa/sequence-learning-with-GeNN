@@ -13,5 +13,5 @@ genn-create-user-project.sh hypercolumns simulation.cc;
 make;
 ./hypercolumns;
 #python3 ../util/plot_output.py output.V.dat&
-python3 ../util/plot_spikes.py output.spikes.dat &
-wait
+#python3 ../util/plot_spikes.py output.spikes.dat &
+#wait

@@ -17,8 +17,8 @@ for i in range(N):
     plt.plot(time, voltages[:, i], label=f'Voltage {i+1} (mV)')
 
 # Add labels and a legend
-plt.xlabel('Time')
-plt.ylabel('Voltage')
+plt.xlabel('Time (ms)')
+plt.ylabel('Voltage (mV)')
 plt.legend()
 plt.title('Voltage vs. Time')
 

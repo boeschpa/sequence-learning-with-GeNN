@@ -7,16 +7,16 @@ int main()
     allocateMem(); // allocate memory for all neuron variables
     initialize();  // initialize variables and start cpu/gpu kernel
 
-    int N_pyramidal = 10;
+    int N_pyramidal = 10; // usually = N_pyramidal
     allocatefiringProbH0_0_M0_input(N_pyramidal);
-    //allocatefiringProbH0_0_M1_input(N_pyramidal);
+    allocatefiringProbH0_0_M1_input(N_pyramidal);
     for (int i = 0; i < N_pyramidal; i++)
     {
-        firingProbH0_0_M0_input[i] = 1.0 / 10.0;
-        //firingProbH0_0_M1_input[i] = 0.0 / 10.0;
+        firingProbH0_0_M0_input[i] = 0.1 * 1e-3 * 1000.0; // dT (ms) / 1000 ms * average spike frequency
+        firingProbH0_0_M1_input[i] = 0.1 * 1e-3 * 10.0;
     }
     pushfiringProbH0_0_M0_inputToDevice(N_pyramidal);
-    // pushfiringProbH0_0_M1_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M1_inputToDevice(N_pyramidal);
 
     initializeSparse();
 
@@ -26,15 +26,15 @@ int main()
     bool switched1 = false;
     while (t < 1000.0f)
     {
-        if (t > 20.0f && !switched1)
+        if (t > 50.0f && !switched1)
         {
             for (int i = 0; i < N_pyramidal; i++)
             {
                 firingProbH0_0_M0_input[i] = 0.0;
-                //firingProbH0_0_M1_input[i] = 0.0;
+                firingProbH0_0_M1_input[i] = 0.0;
             }
             pushfiringProbH0_0_M0_inputToDevice(N_pyramidal); // argument 0: count
-            //pushfiringProbH0_0_M1_inputToDevice(N_pyramidal);
+            pushfiringProbH0_0_M1_inputToDevice(N_pyramidal);
             switched1 = true;
         }
 
@@ -71,6 +71,7 @@ int main()
         os_spike << spikeCount_H0_1_M0 << " ";
         os_spike << spikeCount_H1_0_M0 << " ";
         os_spike << spikeCount_H1_1_M0 << " ";
+        os_spike << spikeCount_H0_0_M1_input << " ";
         os_spike << spikeCount_H0_0_M1 << " ";
         os_spike << spikeCount_H0_1_M1 << " ";
         os_spike << spikeCount_H1_0_M1 << " ";

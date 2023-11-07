@@ -1,20 +1,24 @@
 // tenLIFRingModel simulation code
-#include "ringAdEx_CODE/definitions.h"
+#include "example_CODE/definitions.h"
 #include <fstream>
+#include <iostream>
+#include <string>
+//#include "spikeRecorder.h"
 
 int main()
 {
-    int N = 20;
     allocateMem(); // allocate memory for all neuron variables
     initialize(); // initialize variables and start cpu/gpu kernel
-    
+
     startSpikeStim[0] = 0;
-    endSpikeStim[0] = 1;
+    endSpikeStim[0] = 3;
 
     initializeSparse();
 
     allocatespikeTimesStim(1);
     spikeTimesStim[0] = 0.0f;
+    spikeTimesStim[1] = 233.0f;
+    spikeTimesStim[2] = 466.0f;
     pushspikeTimesStimToDevice(1);
 
     //t is current simulation time provided by GeNN in ms
@@ -25,11 +29,10 @@ int main()
         pullVPop1FromDevice(); //get voltages
         pullPop1SpikesFromDevice(); // get spikes
         pullPop1CurrentSpikesFromDevice();
-        //std::cout << "spkQuePtrPop1: " << spkQuePtrPop1 << "\n";
-        //std::cout << "glbSpkCntPop1: " << glbSpkCntPop1[0] << "\n"; 
+
         os << t << " ";
         os_spike << t << " ";
-        for (int j= 0; j < N; j++) {
+        for (int j= 0; j < 1; j++) {
             os << VPop1[j] << " ";
             
         }
@@ -40,16 +43,5 @@ int main()
     os.close();
     os_spike.close();
 
-
-    // pullPop1StateFromDevice(); // gets states of neuron population from gpu, does nothing in cpu mode
-    // for (int j= 0; j < 10; j++) {  
-    //     std::cout << VPop1[j] << " ";
-    //     std::cout << RefracTimePop1[j] << std::endl;
-    // }
-
     return 0;
 }
-
-// build simulator makefile "genn-create-user-project.sh tenLIFRing tenLIFRingSimulation.cc"
-// build simulator "make"
-//run simulator "./tenLIFModel"

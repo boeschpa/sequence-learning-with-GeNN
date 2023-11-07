@@ -17,8 +17,8 @@ void modelDefinition(ModelSpec &model)
     const int N_pyramidal = 10;
     const float wta_prob = 0.7;
     const float lateral_prob = 0.25;
-    const int hyper_width = 2;
-    const int hyper_height = 2;
+    const int hyper_width = 1;
+    const int hyper_height = 1;
     model.setName("hypercolumns"); //_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
 
     ////////////////////////////
@@ -129,7 +129,7 @@ void modelDefinition(ModelSpec &model)
 
     // input synapse vars and params
     WeightUpdateModels::StaticPulse::VarValues s_input_ampa(
-        0.005); // 0 - conductance 5 nS
+        0.00602); // 0 - conductance 6.02 nS
     PostsynapticModels::ExpCond::ParamValues ps_input_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA
@@ -165,7 +165,7 @@ void modelDefinition(ModelSpec &model)
             // add input neurons
             for (int i = 0; i < N_minicolumns; i++)
             {
-                if (i <= 1 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
+                if (i == 0 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
                 {
                     model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
                 }
@@ -345,15 +345,15 @@ void modelDefinition(ModelSpec &model)
             for (int i = 0; i < N_minicolumns; i++)
             {
                 // input connection
-                if (i <= 1 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
+                if (i == 0 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
                 {
                     // todo fix names
-                    model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-                        hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename + "_synapse", SynapseMatrixType::SPARSE_GLOBALG, NO_DELAY,
-                        hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, hypercolumn_name + minicolumn_basename + std::to_string(i),
-                        {}, s_input_ampa,
-                        ps_input_ampa, {},
-                        initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
+                    // model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
+                    //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename + "_synapse", SynapseMatrixType::SPARSE_GLOBALG, NO_DELAY,
+                    //     hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, hypercolumn_name + minicolumn_basename + std::to_string(i),
+                    //     {}, s_input_ampa,
+                    //     ps_input_ampa, {},
+                    //     initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
                 }
             }
         }

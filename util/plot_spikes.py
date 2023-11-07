@@ -21,7 +21,7 @@ for i in range(N):
     plt.plot(time[np.where(spikes[:,i] != 0)[0]], [i]*len(np.where(spikes[:,i] != 0)[0]),".")
 
 # Add labels and a legend
-plt.xlabel('Time')
+plt.xlabel('Time (ms)')
 plt.ylabel('Neuron')
 plt.title('Spikes of Neuron N vs. Time')
 

@@ -13,9 +13,9 @@ public:
 
     SET_SIM_CODE(
         "unsigned int mt;\n"
-        "scalar mdt= DT/25.0;\n"
+        "scalar mdt= DT/10.0;\n"
 
-        "for (mt=0; mt < 25; mt++) {\n"
+        "for (mt=0; mt < 10; mt++) {\n"
         "   $(Iw) = $(Iw) + mdt * $(TauW1) * ( $(a) * ( $(V) - $(Vrest) ) - $(Iw)) ;\n"
         //   nA   =  nA   + ms  *    1/ms  * ( uS   * (  mV -    mV     ) -   nA  )
         "   $(V) = $(V) + mdt * $(C1) * ( $(G) * ( $(Vrest) - $(V) ) + $(Vslope) * $(G) * exp( ( $(V) - $(Vthresh) ) * $(Vslope1) ) - $(Iw) + $(Isyn) );\n"  // Isyn includes all synaptic currents + intrinsic excitability
