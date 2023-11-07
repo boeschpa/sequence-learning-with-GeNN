@@ -20,7 +20,7 @@ public:
     // delay leads to invalid % operation with float (d is float?)
     SET_SIM_CODE(
         "$(addToInSyn, $(g));\n"
-        //"$(x) = $(x) - $(U) * 1.0;\n"  // x is not a variable but a constant 1.0
+        "$(x) = $(x) - $(U) * 1.0;\n"  // x is not a variable but a constant 1.0
     );
 };
 

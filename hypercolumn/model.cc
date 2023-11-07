@@ -149,7 +149,7 @@ void modelDefinition(ModelSpec &model)
             // add input neurons
             for (int i = 0; i < N_minicolumns; i++)
             {
-                if (i <= 1 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
+                if (i <= 0 && n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
                 {
                     model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
                 }

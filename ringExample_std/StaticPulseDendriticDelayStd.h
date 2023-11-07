@@ -8,19 +8,19 @@ public:
 
     SET_PARAM_NAMES({"Tau", "U"});
 
-    SET_VARS({{"g", "scalar"}, {"d", "uint16_t"},{"x", "scalar"}});
+    SET_VARS({{"g", "scalar"}, {"d", "uint16_t"}, {"x", "scalar"}});
     
     SET_DERIVED_PARAMS({
         {"Tau1", [](const std::vector<double> &pars, double){ return 1.0 / pars[0]; }}});  // Tau^-1
 
-    // SET_SYNAPSE_DYNAMICS_CODE(
-    //     "$(x) = $(x) + DT * $(Tau1) * (1.0 - $(x));\n"
-    // )
+    SET_SYNAPSE_DYNAMICS_CODE(
+        "$(x) = $(x) + DT * $(Tau1) * (1.0 - $(x));\n"
+    )
 
     // delay leads to invalid % operation with float (d is float?)
     SET_SIM_CODE(
-        "$(addToInSynDelay, $(g), $(d));\n"
-        "$(x)= 1.0;\n"//($(x) - $(U) * 1.0);\n"  // x is not a variable but a constant 1.0
+        "$(addToInSynDelay, $(x)*$(g), $(d));\n"
+        "$(x)=($(x) - $(U)*$(x));\n"  // x is not a variable but a constant 1.0
     );
 };
 

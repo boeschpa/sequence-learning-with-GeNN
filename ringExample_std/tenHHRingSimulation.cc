@@ -3,64 +3,55 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-//#include "spikeRecorder.h"
+// #include "spikeRecorder.h"
 
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    initialize(); // initialize variables and start cpu/gpu kernel
+    initialize();  // initialize variables and start cpu/gpu kernel
 
-    // init connectivity debug
-    //pullPop1selfConnectivityFromDevice();
-    
-    int offset = 0;
-    int row = 0;
-    int loops = 1;
-
-// try with more neurons, how to know when its done? number of pre neurons!!
-// try to build this array.
-// check with more empty rows
-
-
-    // while (indPop1self+offset != 0 && loops < 15){
-    //     std::cout << "Row " << row << ": " ;
-    //     for (int i = 0; i < *(rowLengthPop1self+offset); i++) {
-    //         std::cout << *(indPop1self+i+offset) << ", ";
-    //     }
-    //     offset += *(rowLengthPop1self+offset);
-    //     row++;
-    //     loops++;
-    //     std::cout << "\n" << "  (offset: " << offset << ")\n";
-    // }
-
-    //rowLengthPop1self[7]=0;
+    int n_stim = 20;
+    float period = 20.0;
+    float break_time = 200.0;
 
     startSpikeStim[0] = 0;
-    endSpikeStim[0] = 3;
+    endSpikeStim[0] = n_stim;
 
     initializeSparse();
 
-    allocatespikeTimesStim(1);
-    spikeTimesStim[0] = 0.0f;
-    spikeTimesStim[1] = 233.0f;
-    spikeTimesStim[2] = 466.0f;
-    pushspikeTimesStimToDevice(1);
+    allocatespikeTimesStim(n_stim);
+    for (int i = 0; i < n_stim; i++)
+    {
+        if (i < n_stim / 2)
+        {
+            spikeTimesStim[i] = period * i;
+        }
+        else
+        {
+            spikeTimesStim[i] = break_time + period * i;
+        }
+    }
 
-    //t is current simulation time provided by GeNN in ms
+    pushspikeTimesStimToDevice(n_stim);
+
+    // t is current simulation time provided by GeNN in ms
     std::ofstream os("tenHH_output.V.dat");
     std::ofstream os_spike("tenHH_output.spikes.dat");
-    while (t < 1000.0f) {
+    while (t < 1000.0f)
+    {
         stepTime();
-        pullVPop1FromDevice(); //get voltages
+        pullVPop1FromDevice();      // get voltages
         pullPop1SpikesFromDevice(); // get spikes
+        pullxStimPop1FromDevice(); // get x std variable
         pullPop1CurrentSpikesFromDevice();
-        //std::cout << "spkQuePtrPop1: " << spkQuePtrPop1 << "\n";
-        //std::cout << "glbSpkCntPop1: " << glbSpkCntPop1[0] << "\n"; 
+        // std::cout << "spkQuePtrPop1: " << spkQuePtrPop1 << "\n";
+        // std::cout << "glbSpkCntPop1: " << glbSpkCntPop1[0] << "\n";
         os << t << " ";
         os_spike << t << " ";
-        for (int j= 0; j < 10; j++) {
+        for (int j = 0; j < 1; j++)
+        {
             os << VPop1[j] << " ";
-            
+            os << xStimPop1[j]*100.0 << " ";
         }
         os_spike << spikeCount_Pop1 << " ";
         os << std::endl;
@@ -69,9 +60,8 @@ int main()
     os.close();
     os_spike.close();
 
-
     // pullPop1StateFromDevice(); // gets states of neuron population from gpu, does nothing in cpu mode
-    // for (int j= 0; j < 10; j++) {  
+    // for (int j= 0; j < 10; j++) {
     //     std::cout << VPop1[j] << " ";
     //     std::cout << RefracTimePop1[j] << std::endl;
     // }
@@ -81,17 +71,14 @@ int main()
 
 // build simulator makefile "genn-create-user-project.sh tenLIFRing tenLIFRingSimulation.cc"
 // build simulator "make"
-//run simulator "./tenLIFModel"
-
-
-
+// run simulator "./tenLIFModel"
 
 // uninitializedParam U
-    // // Download GPU-initialized 'b' parameter values from device
-    // pullbPInhFromDevice();
+// // Download GPU-initialized 'b' parameter values from device
+// pullbPInhFromDevice();
 
-    // // Manually initially U of inhibitory population
-    // std::transform(&bPInh[0], &bPInh[nInh], &UPInh[0],
-    //                [](float b){ return b * -65.0f; });
+// // Manually initially U of inhibitory population
+// std::transform(&bPInh[0], &bPInh[nInh], &UPInh[0],
+//                [](float b){ return b * -65.0f; });
 
-    // initializeSparse();
+// initializeSparse();
