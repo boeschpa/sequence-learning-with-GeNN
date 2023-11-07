@@ -10,13 +10,37 @@ int main()
     int N_pyramidal = 10; // usually = N_pyramidal
     allocatefiringProbH0_0_M0_input(N_pyramidal);
     allocatefiringProbH0_0_M1_input(N_pyramidal);
+    allocatefiringProbH0_0_M2_input(N_pyramidal);
+    allocatefiringProbH0_0_M3_input(N_pyramidal);
+    allocatefiringProbH0_0_M4_input(N_pyramidal);
+    allocatefiringProbH0_0_M5_input(N_pyramidal);
+    allocatefiringProbH0_0_M6_input(N_pyramidal);
+    allocatefiringProbH0_0_M7_input(N_pyramidal);
+    allocatefiringProbH0_0_M8_input(N_pyramidal);
+    allocatefiringProbH0_0_M9_input(N_pyramidal);
     for (int i = 0; i < N_pyramidal; i++)
     {
-        firingProbH0_0_M0_input[i] = 0.1 * 1e-3 * 1000.0; // dT (ms) / 1000 ms * average spike frequency
-        firingProbH0_0_M1_input[i] = 0.1 * 1e-3 * 10.0;
+        firingProbH0_0_M0_input[i] = 0.1 * 1e-3 * 10000.0; // dT (ms) / 1000 ms * average spike frequency
+        firingProbH0_0_M1_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M2_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M3_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M4_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M5_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M6_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M7_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M8_input[i] = 0.1 * 1e-3 * 350.0;
+        firingProbH0_0_M9_input[i] = 0.1 * 1e-3 * 350.0;
     }
     pushfiringProbH0_0_M0_inputToDevice(N_pyramidal);
     pushfiringProbH0_0_M1_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M2_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M3_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M4_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M5_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M6_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M7_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M8_inputToDevice(N_pyramidal);
+    pushfiringProbH0_0_M9_inputToDevice(N_pyramidal);
 
     initializeSparse();
 
@@ -24,17 +48,15 @@ int main()
     std::ofstream os("output.V.dat");
     std::ofstream os_spike("output.spikes.dat");
     bool switched1 = false;
-    while (t < 1000.0f)
+    while (t < 200.0f)
     {
-        if (t > 50.0f && !switched1)
+        if (t > 20.0f && !switched1)
         {
             for (int i = 0; i < N_pyramidal; i++)
             {
-                firingProbH0_0_M0_input[i] = 0.0;
-                firingProbH0_0_M1_input[i] = 0.0;
+                firingProbH0_0_M0_input[i] = 0.1 * 1e-3 * 350.0;
             }
             pushfiringProbH0_0_M0_inputToDevice(N_pyramidal); // argument 0: count
-            pushfiringProbH0_0_M1_inputToDevice(N_pyramidal);
             switched1 = true;
         }
 
@@ -49,10 +71,12 @@ int main()
         pullH0_1_M0CurrentSpikesFromDevice();
         pullH1_0_M0CurrentSpikesFromDevice();
         pullH1_1_M0CurrentSpikesFromDevice();
+        pullH0_0_M1_inputCurrentSpikesFromDevice();
         pullH0_0_M1CurrentSpikesFromDevice();
         pullH0_1_M1CurrentSpikesFromDevice();
         pullH1_0_M1CurrentSpikesFromDevice();
         pullH1_1_M1CurrentSpikesFromDevice();
+        pullH0_0_M2_inputCurrentSpikesFromDevice();
         pullH0_0_M2CurrentSpikesFromDevice();
         pullH0_1_M2CurrentSpikesFromDevice();
         pullH1_0_M2CurrentSpikesFromDevice();
@@ -76,6 +100,7 @@ int main()
         os_spike << spikeCount_H0_1_M1 << " ";
         os_spike << spikeCount_H1_0_M1 << " ";
         os_spike << spikeCount_H1_1_M1 << " ";
+        os_spike << spikeCount_H0_0_M2_input << " ";
         os_spike << spikeCount_H0_0_M2 << " ";
         os_spike << spikeCount_H0_1_M2 << " ";
         os_spike << spikeCount_H1_0_M2 << " ";
