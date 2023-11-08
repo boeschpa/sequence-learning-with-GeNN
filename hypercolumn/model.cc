@@ -165,7 +165,7 @@ void modelDefinition(ModelSpec &model)
             // add input neurons
             for (int i = 0; i < N_minicolumns; i++)
             {
-                if (n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0  // todo find way to initialize in loop or to not have to initialize
+                if (true) // only input to minicolumns 1 in hypercolumn_0_0  // todo find way to initialize in loop or to not have to initialize
                 {
                     model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
                 }
@@ -274,7 +274,7 @@ void modelDefinition(ModelSpec &model)
 
                         for (int j = 0; j < N_minicolumns; j++) // postsynaptic index j
                         {
-                            if (i+1==j) // ring connectivity / next minicolumn  // somehow leads to feedback
+                            if ((i+1)%N_minicolumns==j) // ring connectivity / next minicolumn  // somehow leads to feedback
                             {
                                 if (m != mp && n != np) // if between hypercolumns
                                 {
@@ -319,7 +319,7 @@ void modelDefinition(ModelSpec &model)
             for (int i = 0; i < N_minicolumns; i++)
             {
                 // input connection
-                if (n <= 0 && m <= 0) // only input to minicolumns 1 in hypercolumn_0_0
+                if (true) // only input to minicolumns 1 in hypercolumn_0_0
                 {
                     // todo fix names
                     model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
