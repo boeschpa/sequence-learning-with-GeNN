@@ -333,7 +333,7 @@ void modelDefinition(ModelSpec &model)
         }
     }
     
-    // todo input neurons, better way to test
+    // todo input neurons, better way to test: array of pointer generator
     // todo background poisson generators, what is meant here; ask anders
     // todo distribution for strength and delay, values; ask anders
     // todo noisy neurons? ask anders

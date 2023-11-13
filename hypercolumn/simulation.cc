@@ -2,6 +2,8 @@
 #include "hypercolumns_CODE/definitions.h"
 #include <fstream>
 
+typedef void (*allocatefiringProb)(unsigned int);
+
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
@@ -12,9 +14,17 @@ int main()
     float stim_time = 10.0;
     float background_freq = 100.0;
 
-    allocatefiringProbH0_0_M0_input(N_pyramidal);
-    allocatefiringProbH0_0_M1_input(N_pyramidal);
-    allocatefiringProbH0_0_M2_input(N_pyramidal);
+    // allocatefiringProbH0_0_M0_input(N_pyramidal);
+    // allocatefiringProbH0_0_M1_input(N_pyramidal);
+    // allocatefiringProbH0_0_M2_input(N_pyramidal);
+
+    allocatefiringProb firingProbs[] = {allocatefiringProbH0_0_M0_input, allocatefiringProbH0_0_M1_input, 
+                                        allocatefiringProbH0_0_M2_input};
+
+    for (int i = 0; i < 3; i++){
+        firingProbs[i](N_pyramidal);
+    }
+
     allocatefiringProbH0_0_M3_input(N_pyramidal);
     allocatefiringProbH0_0_M4_input(N_pyramidal);
     allocatefiringProbH0_0_M5_input(N_pyramidal);
