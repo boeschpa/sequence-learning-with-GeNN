@@ -41,7 +41,7 @@ axes[0].plot(pre_times, pre_z, label="Zi", color="red")
 axes[0].plot(post_times, post_z, label="Zj", color="blue")
 axes[1].plot(pre_times, pre_p, label="Pi", color="red")
 axes[1].plot(post_times, post_p, label="Pj", color="blue")
-axes[1].plot(times, pij, label="Pij", color="black")
+axes[1].plot(times, pij, label="g_raw", color="black")
 axes[2].plot(times, w, label="g", color="black")
 
 #axes[0].set_ylabel("Neuron number")
@@ -62,4 +62,4 @@ for ax in axes:
 if len(sys.argv)<=1 or sys.argv[1] != "-noshow":
     plt.show()
 
-plt.savefig("plot_example.pdf")
+plt.savefig("plot_example_stdp.pdf")

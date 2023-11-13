@@ -71,7 +71,7 @@ std::vector<bool> createSpikeVector(const std::vector<bool> (&data)[N], float fm
     for(const auto &p : data) {
         for(bool a : p) {
             // Get firing frequency for pattern and corresponding threshold
-            const float freq = a ? fmax : 5.0f;
+            const float freq = a ? fmax : 0.0f;
             const float thresh = freq * 0.001f;
 
             // Generate spike vector
@@ -163,9 +163,14 @@ int main()
 
         #ifdef stdp
           
-        fprintf(preTrace, "%f, %f, %f, %f\n", t, 0.0, 0.0, 1000.0*gPreToPost[0]);
-        fprintf(postTrace, "%f, %f, %f, %f\n", t, 0.0, 0.0, 1000.0*gPreToPost[0]);
+        fprintf(preTrace, "%f, nan, nan, %f, %f\n", t, 1000.0*gPreToPost[0], gRawPreToPost[0]);
+        fprintf(postTrace, "%f, nan, nan, %f, %f\n", t, 1000.0*gPreToPost[0], gRawPreToPost[0]);
         
+        #endif
+
+        #ifdef bcpnn
+        fprintf(preTrace, "%f, %f, %f, %f, %f\n", t, ZiPreToPost[0], PiPreToPost[0], 1000.0*gPreToPost[0], PijPreToPost[0]);
+        fprintf(postTrace, "%f, %f, %f, %f, %f\n", t, ZjPreToPost[0], PjPreToPost[0], 1000.0*gPreToPost[0], PijPreToPost[0]);
         #endif
 
         // Record pre and post traces next timestep if there was a spike this timestep

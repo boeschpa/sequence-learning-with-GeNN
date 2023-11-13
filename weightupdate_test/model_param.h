@@ -1,2 +1,3 @@
-//#define stdp
-#define bcpnn_simple
+#define stdp
+//#define bcpnn_simple
+//#define bcpnn
