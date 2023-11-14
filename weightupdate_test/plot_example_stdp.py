@@ -37,10 +37,10 @@ pij = pij[order]
 # Create plot
 figure, axes = plt.subplots(3,1)
 
-axes[0].plot(pre_times, pre_z, label="Zi", color="red")
-axes[0].plot(post_times, post_z, label="Zj", color="blue")
-axes[1].plot(pre_times, pre_p, label="Pi", color="red")
-axes[1].plot(post_times, post_p, label="Pj", color="blue")
+#axes[0].plot(pre_times, pre_z, label="Zi", color="red")
+#axes[0].plot(post_times, post_z, label="Zj", color="blue")
+#axes[1].plot(pre_times, pre_p, label="Pi", color="red")
+#axes[1].plot(post_times, post_p, label="Pj", color="blue")
 axes[1].plot(times, pij, label="g_raw", color="black")
 axes[2].plot(times, w, label="g", color="black")
 
