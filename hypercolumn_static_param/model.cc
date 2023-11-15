@@ -5,22 +5,17 @@
 #include "SimpleAdEx.h"
 #include "AdEx.h"
 #include "StaticPulseDendriticDelayStd.h"
+#include "model_param.h"
 
 #include <string>
 
 void modelDefinition(ModelSpec &model)
 {
     // definition of model
-    model.setDT(0.1); // time step in ms
-    const int N_minicolumns = 10;
-    const int N_basket = 30;
-    const int N_pyramidal = 10;
-    const float wta_prob = 0.7;
-    const float lateral_prob = 0.25;
-    const int hyper_width = 2;
-    const int hyper_height = 2;
-    model.setName("hypercolumns"); //_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
-
+    const std::string model_name = "hypercolumn";
+    model.setDT(time_step);           // time step in ms
+    model.setName(model_name); //_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
+    
     ////////////////////////////
     /// PARAMETERS + INITIAL VALUES
     ////////////////////////////
@@ -108,7 +103,7 @@ void modelDefinition(ModelSpec &model)
 
     StaticPulseDendriticDelayStd::ParamValues update_params_lateral_nmda(
         800.0, // 0 tau recovery time [ms]
-        0.25);  // 1 spike depletion fraction
+        0.25); // 1 spike depletion fraction
 
     PostsynapticModels::ExpCond::ParamValues ps_lateral_nmda(
         150.0, // 0 - tau_S: decay time constant for S [ms]
@@ -138,12 +133,8 @@ void modelDefinition(ModelSpec &model)
     /// NEURON POPULATIONS
     ////////////////////////////
 
-    std::string minicolumn_basename = "M";
-    std::string baskets_name = "baskets";
-    std::string hypercolumn_basename = "H";
     std::string hypercolumn_name;
     std::string hypercolumn_name_post;
-    std::string input_basename = "input";
 
     // iterate over hypercolumns
     for (int m = 0; m < hyper_height; m++) // m = row number
@@ -156,18 +147,21 @@ void modelDefinition(ModelSpec &model)
             // add minicolumns
             for (int i = 0; i < N_minicolumns; i++)
             {
-                model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
+                auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
+                pop->setSpikeRecordingEnabled(true);
             }
 
             // add basket pop
-            model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            pop->setSpikeRecordingEnabled(true);
 
             // add input neurons
             for (int i = 0; i < N_minicolumns; i++)
             {
                 if (true) // only input to minicolumns 1 in hypercolumn_0_0  // todo find way to initialize in loop or to not have to initialize
                 {
-                    model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
+                    auto *pop = model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
+                    pop->setSpikeRecordingEnabled(true);
                 }
             }
         }
@@ -176,11 +170,6 @@ void modelDefinition(ModelSpec &model)
     ////////////////////////////
     /// Synapse POPULATIONS
     ////////////////////////////
-
-    std::string wta_ampa_name = "wta_ampa";
-    std::string wta_gaba_name = "wta_gaba";
-    std::string lateral_ampa_name = "lateral_ampa";
-    std::string lateral_nmda_name = "lateral_nmda";
 
     // iterate over hypercolumns
     for (int m = 0; m < hyper_height; m++) // m = row number
@@ -274,7 +263,7 @@ void modelDefinition(ModelSpec &model)
 
                         for (int j = 0; j < N_minicolumns; j++) // postsynaptic index j
                         {
-                            if ((i+1)%N_minicolumns==j) // ring connectivity / next minicolumn  // somehow leads to feedback
+                            if ((i + 1) % N_minicolumns == j) // ring connectivity / next minicolumn  // somehow leads to feedback
                             {
                                 if (m != mp && n != np) // if between hypercolumns
                                 {
@@ -332,7 +321,7 @@ void modelDefinition(ModelSpec &model)
             }
         }
     }
-    
+
     // todo input neurons, better way to test: array of pointer generator
     // todo background poisson generators, what is meant here; ask anders
     // todo distribution for strength and delay, values; ask anders

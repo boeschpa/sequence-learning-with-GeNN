@@ -10,3 +10,6 @@
 *generator
 *generator.d
 .DS_Store
+*.csv
+*.pdf
+*.png
