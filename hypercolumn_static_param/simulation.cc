@@ -5,6 +5,7 @@
 #include <typeinfo>
 #include "model_param.h"
 #include "spikeRecorder.h"
+#include"spikeArrayRecorder.h"
 
 int main()
 {
@@ -51,7 +52,7 @@ int main()
     }
 
     pullRecordingBuffersFromDevice();
-    writeTextSpikeRecording("output.spikes.csv", recordSpkH0_0_M0,
+    writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                             N_pyramidal, int(sim_time/time_step), time_step);
 
     return 0;

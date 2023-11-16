@@ -69,6 +69,14 @@ for i in range(param.hyper_height):
             firingProb += "    &firingProbH" + str(i) + "_" + str(j) + "_M" + str(m) + "_input,\n"
 firingProb += "};\n"
 
+
+recordSpk = "uint32_t** recordSpkArray[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for m in range(param.N_minicolumns):
+            recordSpk += "    &recordSpkH" + str(i) + "_" + str(j) + "_M" + str(m) + ",\n"
+recordSpk += "};\n"
+
 # pullCurrentSpikesFromDevice = "typedef void (*pullCurrentSpikeFromDevice)(); \n"
 # pullCurrentSpikesFromDevice += "pullCurrentSpikeFromDevice pullCurrentSpikesFromDevice[] = {\n"
 # for i in range(param.hyper_height):
@@ -88,6 +96,7 @@ cpp_interface += cpp_interface_head
 cpp_interface += allocatefiringProb
 cpp_interface += pushfiringProbToDevice
 cpp_interface += firingProb
+cpp_interface += recordSpk
 # cpp_interface += pullCurrentSpikesFromDevice
 # cpp_interface += spikeCount
 

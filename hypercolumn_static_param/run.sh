@@ -13,5 +13,5 @@ python3 generate_code_interface.py
 genn-create-user-project.sh hypercolumn simulation.cc;
 make;
 ./hypercolumn;
-python3 ../util/plot_spikes_new.py output.spikes.csv &
-wait
+python3 ../util/plot_spikes_new.py output.spikes.csv -noshow
+code -r plot_spikes_hypercolumn.png;
