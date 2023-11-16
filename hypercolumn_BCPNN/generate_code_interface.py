@@ -69,7 +69,6 @@ for i in range(param.hyper_height):
             firingProb += "    &firingProbH" + str(i) + "_" + str(j) + "_M" + str(m) + "_input,\n"
 firingProb += "};\n"
 
-
 recordSpk = "uint32_t** recordSpkArray[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
@@ -77,28 +76,72 @@ for i in range(param.hyper_height):
             recordSpk += "    &recordSpkH" + str(i) + "_" + str(j) + "_M" + str(m) + ",\n"
 recordSpk += "};\n"
 
-# pullCurrentSpikesFromDevice = "typedef void (*pullCurrentSpikeFromDevice)(); \n"
-# pullCurrentSpikesFromDevice += "pullCurrentSpikeFromDevice pullCurrentSpikesFromDevice[] = {\n"
-# for i in range(param.hyper_height):
-#     for j in range(param.hyper_width):
-#         for m in range(param.N_minicolumns):
-#             pullCurrentSpikesFromDevice += "    pullH" + str(i) + "_" + str(j) + "_M" + str(m) + "CurrentSpikesFromDevice,\n"
-# pullCurrentSpikesFromDevice += "};\n"
+wGain = "scalar** wGains[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for m in range(param.N_minicolumns):
+            for ip in range(param.hyper_height):
+                for jp in range(param.hyper_width):
+                    for mp in range(param.N_minicolumns):
+                        wGain +=   "    &wGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"     # wGainH0_0_to_H0_0_M0to_0_lateral_nmda
+                        wGain +=   "    &wGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+wGain += "};\n"
 
-# spikeCount = "unsigned int* spikeCounts[] = {\n"
-# for i in range(param.hyper_height):
-#     for j in range(param.hyper_width):
-#         for m in range(param.N_minicolumns):
-#             spikeCount += "    &spikeCount_H" + str(i) + "_" + str(j) + "_M" + str(m) + ",\n"
-# spikeCount += "};\n"
+kappa = "scalar** kappas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for m in range(param.N_minicolumns):
+            for ip in range(param.hyper_height):
+                for jp in range(param.hyper_width):
+                    for mp in range(param.N_minicolumns):
+                        kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"     # wGainH0_0_to_H0_0_M0to_0_lateral_nmda
+                        kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+kappa += "};\n"
+
+pushwGain = "typedef void (*pushwGain)(bool); \n"
+pushwGain += "pushwGain pushwGains[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for m in range(param.N_minicolumns):
+            for ip in range(param.hyper_height):
+                for jp in range(param.hyper_width):
+                    for mp in range(param.N_minicolumns):
+                        pushwGain +=   "    pushwGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmdaToDevice,\n"     # pushwGainH0_0_to_H0_0_M0to_0_lateral_ampaToDevice
+                        pushwGain +=   "    pushwGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampaToDevice,\n"
+pushwGain += "};\n"
+
+pushkappa = "typedef void (*pushkappa)(bool); \n"
+pushkappa += "pushkappa pushkappas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for m in range(param.N_minicolumns):
+            for ip in range(param.hyper_height):
+                for jp in range(param.hyper_width):
+                    for mp in range(param.N_minicolumns):
+                        pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmdaToDevice,\n"     # pushkappaH0_0_to_H0_0_M0to_0_lateral_ampaToDevice
+                        pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampaToDevice,\n"
+pushkappa += "};\n"
+
+
 
 cpp_interface += cpp_interface_head
 cpp_interface += allocatefiringProb
 cpp_interface += pushfiringProbToDevice
 cpp_interface += firingProb
 cpp_interface += recordSpk
-# cpp_interface += pullCurrentSpikesFromDevice
-# cpp_interface += spikeCount
+cpp_interface += wGain
+cpp_interface += kappa
+cpp_interface += pushwGain
+cpp_interface += pushkappa
+
 
 
 

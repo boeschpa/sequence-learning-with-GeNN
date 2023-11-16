@@ -46,9 +46,21 @@ void setOnlyBasicStimulation(float frequency, int minicolumn)
     }
 }
 
+void setGainAndKappa(float gain, float kappa)
+{
+    for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
+    {
+        (*wGains[i])[i] = gain;
+        (*kappas[i])[i] = kappa;
+        pushwGains[i](false);
+        pushkappas[i](false);
+    }
+}
+
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
+    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_time;
     allocateRecordingBuffers(int(sim_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -65,8 +77,9 @@ int main()
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms
-    assert(sim_time > epochs * N_minicolumns * (pattern_break + pattern_time));
     float t_start;
+    setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
+
     for (int ep = 0; ep < epochs; ep++)
     {
         for (int mc = 0; mc < N_minicolumns; mc++)
@@ -74,25 +87,27 @@ int main()
             // set training pattern
             setOnlyBasicStimulation(training_freq, mc);
             t_start = t;
-            while(t - t_start < pattern_time){
+            while (t - t_start < pattern_time)
+            {
                 stepTime();
             }
 
             // set training break
             setAllStimulation(0);
             t_start = t;
-            while(t - t_start < pattern_break){
+            while (t - t_start < pattern_break)
+            {
                 stepTime();
             }
         }
     }
 
-    // SIMULATION
-    while (t < sim_time)
+    // RECALL
+    setGainAndKappa(1.0, 0.0); // set weight and learning rate
+    setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
+    t_start = t;
+    while (t < recall_time)
     {
-        // set recall frequencies               todo save and load training state
-        setAllStimulation(background_freq);
-
         stepTime();
     }
 

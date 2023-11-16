@@ -35,7 +35,7 @@ pij = np.hstack((pre_pij, post_pij))
 pij = pij[order]
 
 # Create plot
-figure, axes = plt.subplots(3,1)
+figure, axes = plt.subplots(4,1,sharex = True)
 
 axes[0].plot(pre_times, pre_z, label="Zi", color="red")
 axes[0].plot(post_times, post_z, label="Zj", color="blue")
@@ -47,13 +47,14 @@ axes[2].plot(times, w, label="g", color="black")
 #axes[0].set_ylabel("Neuron number")
 #axes[1].set_ylabel("Mean firing rate [Hz]")
 
-axes[2].vlines(pre_spike_times, -5.0, -4.0, color="red", label="Pre spikes")
-axes[2].vlines(post_spike_times, -4.75, -3.75, color="blue", label="Post spikes")
+axes[3].vlines(pre_spike_times, -5.0, -4.0, color="red", label="Pre spikes")
+axes[3].vlines(post_spike_times, -4.75, -3.75, color="blue", label="Post spikes")
 
-axes[2].set_xlabel("Time [ms]")
+axes[3].set_xlabel("Time [ms]")
 axes[0].legend()
 axes[1].legend()
 axes[2].legend()
+axes[3].legend()
 
 for ax in axes:
     ax.grid()

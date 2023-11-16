@@ -106,8 +106,8 @@ int main()
     const auto post2 = createInactivePattern(numPatterns);
 
     // Create spike vectors
-    const std::vector<bool> pre[] = {corr1, indep1, anti1, both1, post1};
-    const std::vector<bool> post[] = {corr2, indep2, anti2, both2, post2};
+    const std::vector<bool> pre[] = {corr1, indep1, anti1, both1, post1,corr1, indep1, anti1, both1, post1};
+    const std::vector<bool> post[] = {corr2, indep2, anti2, both2, post2, both2, both2, both2, both2, both2};
     const auto preSpikeVector = createSpikeVector(pre, 50.0f, 20, 180, generator);
     const auto postSpikeVector = createSpikeVector(post, 50.0f, 20, 180, generator);
     assert(preSpikeVector.size() == postSpikeVector.size());
@@ -127,8 +127,24 @@ int main()
     // Loop through timesteps
     bool recordPreTrace = false;
     bool recordPostTrace = false;
+    bool recall = false;
     for(unsigned int i = 0; i < preSpikeVector.size(); i++)
     {
+        // change weight and learning rate
+        if (!recall && i > preSpikeVector.size()/2){
+            recall = true;
+            
+            *wGainPreToPost = 1.0;
+            pushwGainPreToPostToDevice();
+
+            *kappaPreToPost = 0.0;
+            pushkappaPreToPostToDevice();
+        }
+
+
+
+
+
         // Apply input specified by spike vector
         glbSpkCntPreStim[0] = 0;
         glbSpkCntPostStim[0] = 0;
@@ -169,8 +185,8 @@ int main()
         #endif
 
         #ifdef bcpnn
-        fprintf(preTrace, "%f, %f, %f, %f, %f\n", t, ZiPreToPost[0], PiPreToPost[0], 1000.0*gPreToPost[0], PijPreToPost[0]);
-        fprintf(postTrace, "%f, %f, %f, %f, %f\n", t, ZjPreToPost[0], PjPreToPost[0], 1000.0*gPreToPost[0], PijPreToPost[0]);
+        fprintf(preTrace, "%f, %f, %f, %f, %f\n", t, ZiPreToPost[0], PiPreToPost[0], gPreToPost[0], PijPreToPost[0]);
+        fprintf(postTrace, "%f, %f, %f, %f, %f\n", t, ZjPreToPost[0], PjPreToPost[0], gPreToPost[0], PijPreToPost[0]);
         #endif
 
         // Record pre and post traces next timestep if there was a spike this timestep

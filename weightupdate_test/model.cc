@@ -37,15 +37,15 @@ void modelDefinition(NNmodel &model)
 
     // STDP values
     WeightUpdateModels::PiecewiseSTDP::ParamValues stdp_p(
-        100.0,     // 0 - TLRN: time scale of learning changes
-        100.0,     // 1 - TCHNG: width of learning window
-        1000.0,  // 2 - TDECAY: time scale of synaptic strength decay
-        500.0, // 3 - TPUNISH10: Time window of suppression in response to 1/0
-        500.0,    // 4 - TPUNISH01: Time window of suppression in response to 0/1
+        100.0,  // 0 - TLRN: time scale of learning changes
+        100.0,  // 1 - TCHNG: width of learning window
+        1000.0, // 2 - TDECAY: time scale of synaptic strength decay
+        500.0,  // 3 - TPUNISH10: Time window of suppression in response to 1/0
+        500.0,  // 4 - TPUNISH01: Time window of suppression in response to 0/1
         1.0,    // 5 - GMAX: Maximal conductance achievable
-        0.5,   // 6 - GMID: Midpoint of sigmoid g filter curve
+        0.5,    // 6 - GMID: Midpoint of sigmoid g filter curve
         6.0,    // 7 - GSLOPE: slope of sigmoid g filter curve
-        0.0,     // 8 - TAUSHIFT: shift of learning curve
+        0.0,    // 8 - TAUSHIFT: shift of learning curve
         0.001); // 9 - GSYN0: value of syn conductance g decays to
 
     InitVarSnippet::NormalClippedDelay::ParamValues gDist(
@@ -86,20 +86,23 @@ void modelDefinition(NNmodel &model)
         10.0,   // 1 - Time constant of postsynaptic primary trace (ms)
         1000.0, // 2 - Time constant of probability trace
         50.0,   // 3 - Maximum firing frequency (Hz)
-        0.001,    // 4 - weight gain
         1.0,    // 5 - spike duration (ms)
         0.01,   // 6 - epsilon
-        false,  // 7 - Should weights get applied to synapses
-        true);  // 8 - Should weights be updated
+        800.0,  // 7 - short term depression time constant
+        0.25);  // 7 - depletion fraction
 
     BCPNN::VarValues bcpnn_ini(
-        0.1,                                   // 0 - g
-        0.1,                                   // 1 - PijStar
-        std::numeric_limits<float>::lowest(),   // 2 - lastUpdateTime
-        0.1,
-        0.1,
-        0.1,
-        0.1); 
+        0.1,                                  // 0 - g
+        0.5,                                  // 1 - PijStar
+        0.1,                                  // Zi
+        0.5,                                  // Pi
+        0.1,                                  // Zj
+        0.5,                                  // Pj
+        0.00602,                              // w_gain_base
+        0.0,                                  // w_gain
+        1.0,                                  // kappa
+        0.0,                                  // delay d
+        1.0);                                 // x
 
     // Exponential current parameters
     PostsynapticModels::ExpCond::ParamValues ps_p(
