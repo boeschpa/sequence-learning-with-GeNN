@@ -10,12 +10,12 @@ const int N_pyramidal = 10;
 const float wta_prob = 0.7;
 const float lateral_prob = 0.25;
 const int hyper_width = 2;
-const int hyper_height = 1;
+const int hyper_height = 2;
 
 // simulation params
 const int record_buffer = 1000;
-const float recall_time = 5000.0;
-const float background_freq = 200.0;
+const float recall_time = 10000.0;
+const float background_freq = 350.0;
 
 // training params
 const float training_freq = 150.0;

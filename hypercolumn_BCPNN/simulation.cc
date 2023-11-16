@@ -82,6 +82,7 @@ int main()
 
     for (int ep = 0; ep < epochs; ep++)
     {
+        std::cout << "Training epoch " << ep << std::endl;
         for (int mc = 0; mc < N_minicolumns; mc++)
         {
             // set training pattern
