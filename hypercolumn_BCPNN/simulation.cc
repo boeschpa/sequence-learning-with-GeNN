@@ -107,7 +107,7 @@ int main()
     setGainAndKappa(1.0, 0.0); // set weight and learning rate
     setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
     t_start = t;
-    while (t < recall_time)
+    while (t - t_start < recall_time)
     {
         stepTime();
     }
@@ -122,3 +122,7 @@ int main()
 // build simulator makefile "genn-create-user-project.sh tenLIFRing tenLIFRingSimulation.cc"
 // build simulator "make"
 // run simulator "./tenLIFModel"
+
+// todo debug: only one pattern!!
+//plot weights ampa 0_0 --> high; 0_5 --> low/negative; etc
+// 
