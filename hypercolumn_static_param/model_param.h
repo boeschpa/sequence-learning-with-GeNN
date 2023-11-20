@@ -1,16 +1,15 @@
 #include <string>
 
 const float time_step = 0.1;
-const int N_minicolumns = 10;
+const int N_minicolumns = 5;
 const int N_basket = 30;
 const int N_pyramidal = 10;
 const float wta_prob = 0.7;
-const float lateral_prob = 0.25;
+const float lateral_prob = 0.750;
 const int hyper_width = 2;
-const int hyper_height = 2;
+const int hyper_height = 1;
 
-const int record_buffer = 1000;
-const float sim_time = 5000.0;
+const float sim_time = 1000.0;
 
 const std::string minicolumn_basename = "M";
 const std::string baskets_name = "baskets";

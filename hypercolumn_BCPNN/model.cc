@@ -79,10 +79,10 @@ void modelDefinition(ModelSpec &model)
         maxDelay); // 3 - max
 
     BCPNN::ParamValues update_params_lateral_ampa(
-        10.0,   // 0 - Time constant of presynaptic primary trace (ms)
-        10.0,   // 1 - Time constant of postsynaptic primary trace (ms)
-        1000.0, // 2 - Time constant of probability trace
-        50.0,   // 3 - Maximum firing frequency (Hz)
+        5.0,   // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,   // 1 - Time constant of postsynaptic primary trace (ms)
+        5000.0, // 2 - Time constant of probability trace
+        20.0,   // 3 - Maximum firing frequency (Hz)
         1.0,    // 5 - spike duration (ms)
         0.01,   // 6 - epsilon
         800.0,  // 7 - short term depression time constant
@@ -106,10 +106,10 @@ void modelDefinition(ModelSpec &model)
         0.0); // 1 - Erev: Reversal potential AMPA
 
     BCPNN::ParamValues update_params_lateral_nmda(
-        10.0,   // 0 - Time constant of presynaptic primary trace (ms)
-        10.0,   // 1 - Time constant of postsynaptic primary trace (ms)
-        1000.0, // 2 - Time constant of probability trace
-        50.0,   // 3 - Maximum firing frequency (Hz)                todo set right
+        150.0,   // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,   // 1 - Time constant of postsynaptic primary trace (ms)
+        5000.0, // 2 - Time constant of probability trace
+        20.0,   // 3 - Maximum firing frequency (Hz)                todo set right
         1.0,    // 5 - spike duration (ms)
         0.01,   // 6 - epsilon
         800.0,  // 7 - short term depression time constant

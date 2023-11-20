@@ -39,7 +39,7 @@ public:
         {"epsilon_post", [](const std::vector<double> &pars, double){ return pars[5]/ pars[1]; }}});  // epsilon= 1000/(fmax*tauP)
 
     SET_SIM_CODE(
-        "$(addToInSynDelay, $(x)*$(g), $(d));\n"
+        "$(addToInSynDelay, $(wGain)*$(x)*$(g), $(d));\n"
         "$(x)=($(x) - $(U)*$(x));\n"
         "$(Zi) = $(Zi) + DT*$(spikePre);\n"
         "\n");
@@ -55,7 +55,7 @@ public:
         "$(Pi) = $(Pi) + DT * $(kappa) * $(tauP_1) * ($(Zi) - $(Pi));"  
         "$(Pj) = $(Pj) + DT * $(kappa) * $(tauP_1) * ($(Zj) - $(Pj));"
         "$(Pij) = $(Pij) + DT * $(kappa) * $(tauP_1) * ($(Zj)*$(Zi) - $(Pij));"
-        "$(g) = $(wGain)*$(wGainBase)*log($(Pij)/($(Pi)*$(Pj)));"
+        "$(g) = $(wGainBase)*log($(Pij)/($(Pi)*$(Pj)));"
         "\n");
 
     SET_NEEDS_PRE_SPIKE_TIME(true);

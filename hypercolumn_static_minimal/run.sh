@@ -5,12 +5,13 @@ rm generator
 rm generator.d
 rm hypercolumn
 rm Makefile
-rm output.spikes.csv
+rm output.spikes.dat
+rm output.V.dat
 
 genn-buildmodel.sh -cf model.cc;
 python3 generate_code_interface.py
 genn-create-user-project.sh hypercolumn simulation.cc;
 make;
 ./hypercolumn;
-python3 plot_spikes_hypercolumn.py output.spikes.csv #-noshow
+python3 plot_spikes_hypercolumn.py output.spikes.csv -noshow
 code -r plot_spikes.png;

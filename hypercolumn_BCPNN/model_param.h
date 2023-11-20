@@ -4,23 +4,23 @@
 
 // model params
 const float time_step = 0.1;
-const int N_minicolumns = 10;
+const int N_minicolumns = 5;
 const int N_basket = 30;
 const int N_pyramidal = 10;
 const float wta_prob = 0.7;
-const float lateral_prob = 0.25;
+const float lateral_prob = 0.75;
 const int hyper_width = 2;
-const int hyper_height = 2;
+const int hyper_height = 1;
 
 // simulation params
-const int record_buffer = 1000;
 const float recall_time = 10000.0;
-const float background_freq = 350.0;
+const float recall_break = 10000.0;
+const float background_freq = 500.0;
 
 // training params
 const float training_freq = 150.0;
 const float pattern_time = 200.0; // (ms) 10 attr/s
-const float pattern_break = 0.0; // (ms) 0 for sequence learning
+const float pattern_break = 1000.0; // (ms) 0 for sequence learning
 const int epochs = 10; // number of training passes
 
 

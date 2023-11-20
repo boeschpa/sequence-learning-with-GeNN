@@ -12,9 +12,10 @@
 void modelDefinition(ModelSpec &model)
 {
     // definition of model
-    model.setDT(DT);           // time step in ms
+    const std::string model_name = "hypercolumn";
+    model.setDT(time_step);           // time step in ms
     model.setName(model_name); //_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
-
+    
     ////////////////////////////
     /// PARAMETERS + INITIAL VALUES
     ////////////////////////////
@@ -146,18 +147,21 @@ void modelDefinition(ModelSpec &model)
             // add minicolumns
             for (int i = 0; i < N_minicolumns; i++)
             {
-                model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
+                auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
+                pop->setSpikeRecordingEnabled(true);
             }
 
             // add basket pop
-            model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            pop->setSpikeRecordingEnabled(true);
 
             // add input neurons
             for (int i = 0; i < N_minicolumns; i++)
             {
                 if (true) // only input to minicolumns 1 in hypercolumn_0_0  // todo find way to initialize in loop or to not have to initialize
                 {
-                    model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
+                    auto *pop = model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
+                    pop->setSpikeRecordingEnabled(true);
                 }
             }
         }

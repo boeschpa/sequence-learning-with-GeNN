@@ -46,6 +46,29 @@ void setOnlyBasicStimulation(float frequency, int minicolumn)
     }
 }
 
+void setHalfStimulation(float frequency, bool half)
+{
+    for (int i = 0; i < N_pyramidal; i++)
+    {
+        for (int j = 0; j < std::end(firingProbs) - std::begin(firingProbs); j++)
+        {
+            int local_minicolumn = j % N_minicolumns; // get local minicolumn number of global index j
+            if ((local_minicolumn >= N_minicolumns / 2) == half)
+            {
+                (*firingProbs[j])[i] = time_step * 1e-3 * frequency; // dT (ms) / 1000 ms * average spike frequency
+            }
+            else
+            {
+                (*firingProbs[j])[i] = 0.0;
+            }
+        }
+    }
+    for (int i = 0; i < std::end(pushfiringProbsToDevice) - std::begin(pushfiringProbsToDevice); i++)
+    {
+        pushfiringProbsToDevice[i](N_pyramidal);
+    }
+}
+
 void setGainAndKappa(float gain, float kappa)
 {
     for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
@@ -60,10 +83,11 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_time;
+    float sim_time = recall_time + recall_break + epochs * 2.0 * (pattern_break + pattern_time) + recall_break + recall_time;
     allocateRecordingBuffers(int(sim_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
+    float t_start;
 
     // initialize firingProbs to 0
 
@@ -75,36 +99,87 @@ int main()
 
     initializeSparse();
 
+    // RECALL before training
+    setGainAndKappa(1.0, 0.0);          // set weight and learning rate
+    setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
+    t_start = t;
+    while (t - t_start < recall_time)
+    {
+        stepTime();
+    }
+
+    // RECALL BREAK
+    setAllStimulation(0.0);
+    t_start = t;
+    while (t - t_start < recall_break)
+    {
+        stepTime();
+    }
+
     // TRAINING
     // t is current simulation time provided by GeNN in ms
-    float t_start;
     setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
 
     for (int ep = 0; ep < epochs; ep++)
     {
-        std::cout << "Training epoch " << ep << std::endl;
-        for (int mc = 0; mc < N_minicolumns; mc++)
+        std::cout << "Training epoch " << ep + 1 << std::endl;
+        setHalfStimulation(training_freq, 1);
+        t_start = t;
+        while (t - t_start < pattern_time)
         {
-            // set training pattern
-            setOnlyBasicStimulation(training_freq, mc);
-            t_start = t;
-            while (t - t_start < pattern_time)
-            {
-                stepTime();
-            }
-
-            // set training break
-            setAllStimulation(0);
-            t_start = t;
-            while (t - t_start < pattern_break)
-            {
-                stepTime();
-            }
+            stepTime();
         }
+
+        t_start = t;
+        while (t - t_start < pattern_break)
+        {
+            stepTime();
+        }
+
+        setHalfStimulation(training_freq, 0);
+        t_start = t;
+        while (t - t_start < pattern_time)
+        {
+            stepTime();
+        }
+
+        t_start = t;
+        while (t - t_start < pattern_break)
+        {
+            stepTime();
+        }
+
+        // for (int mc = 0; mc < N_minicolumns; mc++)
+        // {
+        //     // set training pattern
+        //     setOnlyBasicStimulation(training_freq, mc);
+        //     t_start = t;
+        //     while (t - t_start < pattern_time)
+        //     {
+        //         stepTime();
+        //     }
+
+        //     // set training break
+        //     setAllStimulation(0);
+        //     t_start = t;
+        //     while (t - t_start < pattern_break)
+        //     {
+        //         stepTime();
+        //     }
+        // }
+    }
+
+    // RECALL BREAK
+    setGainAndKappa(1.0, 0.0);
+    setAllStimulation(0.0);
+    t_start = t;
+    while (t - t_start < recall_break)
+    {
+        stepTime();
     }
 
     // RECALL
-    setGainAndKappa(1.0, 0.0); // set weight and learning rate
+    setGainAndKappa(1.0, 0.0);          // set weight and learning rate
     setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
     t_start = t;
     while (t - t_start < recall_time)
@@ -124,5 +199,5 @@ int main()
 // run simulator "./tenLIFModel"
 
 // todo debug: only one pattern!!
-//plot weights ampa 0_0 --> high; 0_5 --> low/negative; etc
-// 
+// plot weights ampa 0_0 --> high; 0_5 --> low/negative; etc
+//
