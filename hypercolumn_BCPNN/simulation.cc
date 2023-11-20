@@ -7,6 +7,8 @@
 #include "spikeRecorder.h"
 #include "spikeArrayRecorder.h"
 
+#define RECORD_TRACE fprintf(trace, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_ampa[0], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_ampa[0], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_ampa[0],PiH0_0_to_H0_0_M0to_0_lateral_ampa[0],PjH0_0_to_H0_0_M0to_0_lateral_ampa[0],PijH0_0_to_H0_0_M0to_0_lateral_ampa[0],ZiH0_0_to_H0_0_M0to_0_lateral_ampa[0],ZjH0_0_to_H0_0_M0to_0_lateral_ampa[0])
+
 void setAllStimulation(float frequency)
 {
     float firingProbability = time_step * 1e-3 * frequency;
@@ -14,6 +16,7 @@ void setAllStimulation(float frequency)
     {
         for (int j = 0; j < std::end(firingProbs) - std::begin(firingProbs); j++)
         {
+
             (*firingProbs[j])[i] = firingProbability; // dT (ms) / 1000 ms * average spike frequency
         }
     }
@@ -73,8 +76,8 @@ void setGainAndKappa(float gain, float kappa)
 {
     for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
     {
-        (*wGains[i])[i] = gain;
-        (*kappas[i])[i] = kappa;
+        (*wGains[i])[0] = gain;
+        (*kappas[i])[0] = kappa;
         pushwGains[i](false);
         pushkappas[i](false);
     }
@@ -83,7 +86,7 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float sim_time = recall_time + recall_break + epochs * 2.0 * (pattern_break + pattern_time) + recall_break + recall_time;
+    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_break + recall_time;
     allocateRecordingBuffers(int(sim_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -99,74 +102,83 @@ int main()
 
     initializeSparse();
 
-    // RECALL before training
-    setGainAndKappa(1.0, 0.0);          // set weight and learning rate
-    setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
-    t_start = t;
-    while (t - t_start < recall_time)
-    {
-        stepTime();
-    }
+    // trace recording
+    FILE *trace = fopen("trace.csv", "w");
 
-    // RECALL BREAK
-    setAllStimulation(0.0);
-    t_start = t;
-    while (t - t_start < recall_break)
-    {
-        stepTime();
-    }
+    // // RECALL before training
+    // setGainAndKappa(1.0, 0.0);          // set weight and learning rate
+    // setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
+    // t_start = t;
+    // while (t - t_start < recall_time)
+    // {
+    //     stepTime();
+    // }
+
+    // // RECALL BREAK
+    // setAllStimulation(0.0);
+    // t_start = t;
+    // while (t - t_start < recall_break)
+    // {
+    //     stepTime();
+    // }
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms
     setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
-
     for (int ep = 0; ep < epochs; ep++)
     {
         std::cout << "Training epoch " << ep + 1 << std::endl;
-        setHalfStimulation(training_freq, 1);
-        t_start = t;
-        while (t - t_start < pattern_time)
-        {
-            stepTime();
-        }
 
-        t_start = t;
-        while (t - t_start < pattern_break)
-        {
-            stepTime();
-        }
-
-        setHalfStimulation(training_freq, 0);
-        t_start = t;
-        while (t - t_start < pattern_time)
-        {
-            stepTime();
-        }
-
-        t_start = t;
-        while (t - t_start < pattern_break)
-        {
-            stepTime();
-        }
-
-        // for (int mc = 0; mc < N_minicolumns; mc++)
+        // setHalfStimulation(training_freq, 1);
+        // t_start = t;
+        // while (t - t_start < pattern_time)
         // {
-        //     // set training pattern
-        //     setOnlyBasicStimulation(training_freq, mc);
-        //     t_start = t;
-        //     while (t - t_start < pattern_time)
-        //     {
-        //         stepTime();
-        //     }
-
-        //     // set training break
-        //     setAllStimulation(0);
-        //     t_start = t;
-        //     while (t - t_start < pattern_break)
-        //     {
-        //         stepTime();
-        //     }
+        //     stepTime();
         // }
+
+        // t_start = t;
+        // while (t - t_start < pattern_break)
+        // {
+        //     stepTime();
+        // }
+
+        // setHalfStimulation(training_freq, 0);
+        // t_start = t;
+        // while (t - t_start < pattern_time)
+        // {
+        //     stepTime();
+        // }
+
+        // t_start = t;
+        // while (t - t_start < pattern_break)
+        // {
+        //     stepTime();
+        // }
+
+        for (int mc = 0; mc < N_minicolumns; mc++)
+        {
+            // set training pattern
+            setOnlyBasicStimulation(training_freq, mc);
+            t_start = t;
+            while (t - t_start < pattern_time)
+            {
+                stepTime();
+                pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
+                pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+                RECORD_TRACE;
+            }
+
+            // set training break
+            setAllStimulation(0);
+            t_start = t;
+            while (t - t_start < pattern_break)
+            {
+                stepTime();
+                pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
+                pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+                RECORD_TRACE;
+            }
+        }
     }
 
     // RECALL BREAK
@@ -176,6 +188,9 @@ int main()
     while (t - t_start < recall_break)
     {
         stepTime();
+        pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
+        pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+        RECORD_TRACE;
     }
 
     // RECALL
@@ -185,8 +200,12 @@ int main()
     while (t - t_start < recall_time)
     {
         stepTime();
+        pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
+        pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+        RECORD_TRACE;
     }
 
+    fclose(trace);
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_pyramidal, int(sim_time / time_step), time_step);

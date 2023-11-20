@@ -86,15 +86,15 @@ void modelDefinition(ModelSpec &model)
         1.0,    // 5 - spike duration (ms)
         0.01,   // 6 - epsilon
         800.0,  // 7 - short term depression time constant
-        0.25);  // 7 - depletion fraction
+        0.1);  // 7 - depletion fraction
 
     BCPNN::VarValues update_vars_lateral_ampa(
-        0.1,                                                // 0 - g
-        0.5,                                                // 1 - PijStar
-        0.1,                                                // Zi
-        0.5,                                                // Pi
-        0.1,                                                // Zj
-        0.5,                                                // Pj
+        0.0,                                                // 0 - g
+        0.0,                                               // 1 - PijStar
+        0.0,                                                // Zi
+        0.0,                                                // Pi
+        0.0,                                                // Zj
+        0.0,                                                // Pj
         lateral_ampa_conductance,                           // w_gain_base
         0.0,                                                // w_gain
         1.0,                                                // kappa
