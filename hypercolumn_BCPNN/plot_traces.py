@@ -76,7 +76,7 @@ plt.xlabel('Time (ms)')
 
 
 # Show plot
-if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
+if len(sys.argv)<=3 or sys.argv[3] != "-noshow":
     plt.show()
 
-plt.savefig("plot_traces.png")
+plt.savefig(sys.argv[2])

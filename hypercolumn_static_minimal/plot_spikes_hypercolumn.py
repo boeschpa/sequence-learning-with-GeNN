@@ -72,8 +72,12 @@ for m in range(param.hyper_height):
 
 ax = plt.gca()
 
-for i in range(N):
-    plt.plot(time, spikes,".")
+
+plt.plot(time, spikes,".")
+
+for i in range(param.hyper_height*param.hyper_width-1):
+    plt.axhline(y = (i+1)*param.N_pyramidal*param.N_minicolumns, color = 'k', linestyle = '-') 
+  
 
 # Add labels and a legend
 plt.xlabel('Time (ms)')

@@ -44,7 +44,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
         150.0,                        // 6 - adaption time constant [ms]
-        0.0                           // 7 - adatpion current per spike [nA]
+        0.150                           // 7 - adatpion current per spike [nA]
     );
 
     SimpleAdEx::VarValues ini_basket(

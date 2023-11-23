@@ -29,7 +29,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
         150.0,   // 6 - adaption time constant [ms]
-        0.150    // 7 - adatpion current per spike [nA]  (150 pA)
+        0.0//0.150    // 7 - adatpion current per spike [nA]  (150 pA)
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
@@ -54,21 +54,21 @@ void modelDefinition(ModelSpec &model)
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
-        0.00602); // 0 - conductance 6.02 nS
+        3*0.00602); // 0 - conductance 6.02 nS
     PostsynapticModels::ExpCond::ParamValues ps_wta_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_gaba(
-        0.00602); // 0 - conductance TODO
+        3*0.00602); // 0 - conductance TODO
     PostsynapticModels::ExpCond::ParamValues ps_wta_gaba(
         5.0,    // 0 - tau_S: decay time constant for S [ms]
         -70.0); // 1 - Erev: Reversal potential GABA
 
     InitSparseConnectivitySnippet::FixedProbabilityNoAutapse::ParamValues wtaProb(wta_prob);
 
-    float lateral_ampa_conductance = 0.00602; // 6.02 nS
-    float lateral_nmda_conductance = 0.00122; // 1.22 nS
+    float lateral_ampa_conductance = 0.0005; //0.00602; // 6.02 nS
+    float lateral_nmda_conductance = 0.00025; //0.00122; // 1.22 nS
 
     // Build distribution for delay parameters
     float maxDelay = 10.0;
@@ -84,7 +84,7 @@ void modelDefinition(ModelSpec &model)
         5000.0, // 2 - Time constant of probability trace
         20.0,   // 3 - Maximum firing frequency (Hz)
         1.0,    // 5 - spike duration (ms)
-        0.01,   // 6 - epsilon
+        0.001,   // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.1);  // 7 - depletion fraction
 
@@ -111,17 +111,17 @@ void modelDefinition(ModelSpec &model)
         5000.0, // 2 - Time constant of probability trace
         20.0,   // 3 - Maximum firing frequency (Hz)                todo set right
         1.0,    // 5 - spike duration (ms)
-        0.01,   // 6 - epsilon
+        0.001,   // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.25);  // 7 - depletion fraction
 
     BCPNN::VarValues update_vars_lateral_nmda(
-        0.1,                                                // 0 - g
-        0.5,                                                // 1 - PijStar
-        0.1,                                                // Zi
-        0.5,                                                // Pi
-        0.1,                                                // Zj
-        0.5,                                                // Pj
+        0.0,                                                // 0 - g
+        0.0,                                                // 1 - PijStar
+        0.0,                                                // Zi
+        0.0,                                                // Pi
+        0.0,                                                // Zj
+        0.0,                                                // Pj
         lateral_nmda_conductance,                           // w_gain_base
         0.0,                                                // w_gain
         1.0,                                                // kappa
@@ -147,7 +147,7 @@ void modelDefinition(ModelSpec &model)
 
     // input synapse vars and params
     WeightUpdateModels::StaticPulse::VarValues s_input_ampa(
-        0.005); // 0 - conductance 5 nS
+        0.01); // 0 - conductance 5 nS
     PostsynapticModels::ExpCond::ParamValues ps_input_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA

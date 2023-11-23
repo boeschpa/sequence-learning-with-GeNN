@@ -14,9 +14,6 @@ int main()
 
     initialize();  // initialize variables and start cpu/gpu kernel
 
-    int N_pyramidal = 10; // usually = N_pyramidal
-    float background_freq = 100.0;
-
     // for (int i = 0; i < 4; i++)
     // {
     //     std::cout << (spikeCounts[i]) << std::endl;

@@ -69,16 +69,20 @@ for m in range(param.hyper_height):
             indices = np.where((local_mini == i) & (hyper_n == n) & (hyper_m == m))
             spikes_new[m,n,i,:]=spikes[indices].resize(8)
 
-
+plt.figure().set_figwidth(15)
 ax = plt.gca()
 
+
 plt.plot(time, spikes,".")
+
+for i in range(param.hyper_height*param.hyper_width-1):
+    plt.axhline(y = (i+1)*param.N_pyramidal*param.N_minicolumns, color = 'k', linestyle = '-') 
+  
 
 # Add labels and a legend
 plt.xlabel('Time (ms)')
 plt.ylabel('Neuron')
 plt.title('Spikes of Neuron N vs. Time')
-
 
 # Show plot
 if len(sys.argv)<=2 or sys.argv[2] != "-noshow":

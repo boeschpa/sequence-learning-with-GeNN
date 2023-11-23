@@ -1,7 +1,7 @@
 #include <string>
 
 const float time_step = 0.1;
-const int N_minicolumns = 5;
+const int N_minicolumns = 10;
 const int N_basket = 30;
 const int N_pyramidal = 10;
 const float wta_prob = 0.7;

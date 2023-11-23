@@ -7,7 +7,9 @@
 #include "spikeRecorder.h"
 #include "spikeArrayRecorder.h"
 
-#define RECORD_TRACE fprintf(trace, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_ampa[0], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_ampa[0], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_ampa[0],PiH0_0_to_H0_0_M0to_0_lateral_ampa[0],PjH0_0_to_H0_0_M0to_0_lateral_ampa[0],PijH0_0_to_H0_0_M0to_0_lateral_ampa[0],ZiH0_0_to_H0_0_M0to_0_lateral_ampa[0],ZjH0_0_to_H0_0_M0to_0_lateral_ampa[0])
+#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_ampa[0], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_ampa[0], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_ampa[0], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_ampa[0],PiH0_0_to_H0_0_M0to_0_lateral_ampa[0],PjH0_0_to_H0_0_M0to_0_lateral_ampa[0],PijH0_0_to_H0_0_M0to_0_lateral_ampa[0],ZiH0_0_to_H0_0_M0to_0_lateral_ampa[0],ZjH0_0_to_H0_0_M0to_0_lateral_ampa[0])
+#define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_nmda[0], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_nmda[0], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_nmda[0], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_nmda[0], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_nmda[0], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_nmda[0],PiH0_0_to_H0_0_M0to_0_lateral_nmda[0],PjH0_0_to_H0_0_M0to_0_lateral_nmda[0],PijH0_0_to_H0_0_M0to_0_lateral_nmda[0],ZiH0_0_to_H0_0_M0to_0_lateral_nmda[0],ZjH0_0_to_H0_0_M0to_0_lateral_nmda[0])
+#define RECORD_TRACE RECORD_TRACE_AMPA; RECORD_TRACE_NMDA
 
 void setAllStimulation(float frequency)
 {
@@ -103,7 +105,8 @@ int main()
     initializeSparse();
 
     // trace recording
-    FILE *trace = fopen("trace.csv", "w");
+    FILE *traceAmpa = fopen("trace_ampa.csv", "w");
+    FILE *traceNmda = fopen("trace_nmda.csv", "w");
 
     // // RECALL before training
     // setGainAndKappa(1.0, 0.0);          // set weight and learning rate
@@ -205,7 +208,8 @@ int main()
         RECORD_TRACE;
     }
 
-    fclose(trace);
+    fclose(traceAmpa);
+    fclose(traceNmda);
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_pyramidal, int(sim_time / time_step), time_step);
