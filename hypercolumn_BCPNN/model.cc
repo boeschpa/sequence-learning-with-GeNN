@@ -29,7 +29,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
         150.0,   // 6 - adaption time constant [ms]
-        0.0//0.150    // 7 - adatpion current per spike [nA]  (150 pA)
+        0.150    // 7 - adatpion current per spike [nA]  (150 pA)
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
@@ -45,7 +45,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
         150.0,                        // 6 - adaption time constant [ms]
-        0.0                           // 7 - adatpion current per spike [nA]
+        0.15                           // 7 - adatpion current per spike [nA]
     );
 
     SimpleAdEx::VarValues ini_basket(
@@ -54,21 +54,21 @@ void modelDefinition(ModelSpec &model)
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
-        3*0.00602); // 0 - conductance 6.02 nS
+        0.00602); // 0 - conductance 6.02 nS
     PostsynapticModels::ExpCond::ParamValues ps_wta_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_gaba(
-        3*0.00602); // 0 - conductance TODO
+        0.00602); // 0 - conductance TODO
     PostsynapticModels::ExpCond::ParamValues ps_wta_gaba(
         5.0,    // 0 - tau_S: decay time constant for S [ms]
         -70.0); // 1 - Erev: Reversal potential GABA
 
     InitSparseConnectivitySnippet::FixedProbabilityNoAutapse::ParamValues wtaProb(wta_prob);
 
-    float lateral_ampa_conductance = 0.0005; //0.00602; // 6.02 nS
-    float lateral_nmda_conductance = 0.00025; //0.00122; // 1.22 nS
+    float lateral_ampa_conductance = 0.001; //0.00602; // 6.02 nS
+    float lateral_nmda_conductance = 0.0005; //0.00122; // 1.22 nS
 
     // Build distribution for delay parameters
     float maxDelay = 10.0;

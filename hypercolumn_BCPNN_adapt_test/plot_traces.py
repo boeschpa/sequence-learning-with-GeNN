@@ -50,23 +50,14 @@ time = data[:, 0]
 N= np.shape(data)[1]-1
 traces = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
 
-figure, axes = plt.subplots(4,1,sharex = True)
-labels=["g 0-0", "g 0-0", "g 0-1", "g 0-1", "g 1-0", "g 1-0"]
-labels_p = ["pi", "pj", "pij"]
-labels_z = ["zi", "zj"]
-assert(len(labels)+len(labels_p)+len(labels_z)==N)
+figure, axes = plt.subplots(2,1,sharex = True)
+labels = ["Iw", "V_mem"]
 
 for i in range(len(labels)):
-    axes[0].plot(time, traces[:,i],label=labels[i])
-for i in range(len(labels_p)):
-    axes[1].plot(time, traces[:,i+len(labels)],label=labels_p[i])
-axes[2].plot(time, traces[:,0+len(labels)+len(labels_p)],label=labels_z[0])
-axes[3].plot(time, traces[:,1+len(labels)+len(labels_p)],label=labels_z[1])
-
+    axes[i].plot(time, traces[:,i],label=labels[i])
+                 
 axes[0].legend()
 axes[1].legend()
-axes[2].legend()
-axes[3].legend()
 
 
 # Add labels and a legend

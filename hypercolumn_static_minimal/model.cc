@@ -2,7 +2,7 @@
 
 #include "modelSpec.h"
 #include <neuronModels.h>
-#include "SimpleAdEx.h"
+#include "CAdEx.h"
 #include "AdEx.h"
 #include "StaticPulseDendriticDelayStd.h"
 #include "model_param.h"
@@ -13,43 +13,51 @@ void modelDefinition(ModelSpec &model)
 {
     // definition of model
     const std::string model_name = "hypercolumn";
-    model.setDT(time_step);           // time step in ms
+    model.setDT(time_step);    // time step in ms
     model.setName(model_name); //_" + std::to_string(hyper_width) + "by" + std::to_string(hyper_height));
-    
+
     ////////////////////////////
     /// PARAMETERS + INITIAL VALUES
     ////////////////////////////
 
-    SimpleAdEx::ParamValues p_pyramidal(
-        0.28,    // 0 - Membrane capacitance [pF] 280 pf
-        14.0e-3, // 1 - Membrane leak conductance [uS] 14 ns
-        -70.0,   // 2 - Resting membrane potential [mV]
-        -70.0,   // 3 - Reset voltage [mV]
-        -55.0,   // 4 - Spiking threshold [mV]
-        3.0,     // 5 - spike upstroke slopefactor [mV]
-        150.0,   // 6 - adaption time constant [ms]
-        0.150    // 7 - adatpion current per spike [nA]  (150 pA)
+    CAdEx::ParamValues p_pyramidal( //
+        0.28,                       // 0 - Membrane capacitance [pF]
+        14.0e-3,                    // 1 - Membrane leak conductance [uS]  14 nS
+        -70.0,                      // 2 - Resting membrane potential [mV]
+        -70.0,                      // 3 - Reset voltage [mV]
+        -55.0,                      // 4 - Spiking threshold [mV]
+        3.0,                        // 5 - spike upstroke slopefactor [mV]
+        15,                        // 6 adaptation time constant [ms]
+        0.0005,                      // 7 adaptation conductance per spike [uS]
+        -70.0,                      // 8 adaptation reversal potential (mV)
+        0.0,                        // 9 subthreshold adaptation activation voltage (mV)
+        1.0,                        // 10 slope of subthreshold adaptation (mV)
+        0.0                         // 11 max subthreshold adaptation conductance (uS)
     );
 
-    SimpleAdEx::VarValues ini_pyramidal(
+    CAdEx::VarValues ini_pyramidal(
         -70.0, // 0 - membrane potential V [mV]
-        0.0    // 1 - Iw adaption current [pA]
+        0.0    // 1 - Ga adaption conductance [uS]
     );
 
-    SimpleAdEx::ParamValues p_basket( // no adaption
-        0.28,                         // 0 - Membrane capacitance [pF]
-        14.0e-3,                      // 1 - Membrane leak conductance [uS]  14 nS
-        -70.0,                        // 2 - Resting membrane potential [mV]
-        -70.0,                        // 3 - Reset voltage [mV]
-        -55.0,                        // 4 - Spiking threshold [mV]
-        3.0,                          // 5 - spike upstroke slopefactor [mV]
-        150.0,                        // 6 - adaption time constant [ms]
-        0.0                          // 7 - adatpion current per spike [nA]
+    CAdEx::ParamValues p_basket( // 
+        0.28,                    // 0 - Membrane capacitance [pF]
+        14.0e-3,                 // 1 - Membrane leak conductance [uS]  14 nS
+        -70.0,                   // 2 - Resting membrane potential [mV]
+        -70.0,                   // 3 - Reset voltage [mV]
+        -55.0,                   // 4 - Spiking threshold [mV]
+        3.0,                     // 5 - spike upstroke slopefactor [mV]
+        15,                     // 6 adaptation time constant [ms]
+        0.0005,                   // 7 adaptation conductance per spike [uS]
+        -70.0,                   // 8 adaptation reversal potential (mV)
+        0.0,                     // 9 subthreshold adaptation activation voltage (mV)
+        1.0,                     // 10 slope of subthreshold adaptation (mV)
+        0.0                      // 11 max subthreshold adaptation conductance (uS)
     );
 
-    SimpleAdEx::VarValues ini_basket(
+    CAdEx::VarValues ini_basket(
         -70.0, // 0 - membrane potential V [mV]
-        0.0    // 1 - Iw adaption current [pA]
+        0.0    // 1 - Ga adaption conductance [uS]
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
@@ -90,7 +98,7 @@ void modelDefinition(ModelSpec &model)
 
     StaticPulseDendriticDelayStd::ParamValues update_params_lateral_ampa(
         800.0, // 0 tau recovery time [ms]
-        0.25); // 1 spike depletion fraction
+        0.1); // 1 spike depletion fraction
 
     PostsynapticModels::ExpCond::ParamValues ps_lateral_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
@@ -103,7 +111,7 @@ void modelDefinition(ModelSpec &model)
 
     StaticPulseDendriticDelayStd::ParamValues update_params_lateral_nmda(
         800.0, // 0 tau recovery time [ms]
-        0.25); // 1 spike depletion fraction
+        0.1); // 1 spike depletion fraction
 
     PostsynapticModels::ExpCond::ParamValues ps_lateral_nmda(
         150.0, // 0 - tau_S: decay time constant for S [ms]
@@ -147,12 +155,12 @@ void modelDefinition(ModelSpec &model)
             // add minicolumns
             for (int i = 0; i < N_minicolumns; i++)
             {
-                auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
+                auto *pop = model.addNeuronPopulation<CAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
                 pop->setSpikeRecordingEnabled(true);
             }
 
             // add basket pop
-            auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            auto *pop = model.addNeuronPopulation<CAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
             pop->setSpikeRecordingEnabled(true);
 
             // add input neurons

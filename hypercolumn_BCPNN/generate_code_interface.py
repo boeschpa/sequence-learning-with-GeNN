@@ -130,6 +130,29 @@ for i in range(param.hyper_height):
                                         "_M" + str(m) + "to_" + str(mp) + "_lateral_ampaToDevice,\n"
 pushkappa += "};\n"
 
+# gH0_0_to_H0_0_M0to_0_lateral_ampa
+g_nmda = "scalar** g_nmda[] = {\n"
+for mp in range(param.N_minicolumns):
+    for m in range(param.N_minicolumns):
+        for i in range(param.hyper_height):
+            for j in range(param.hyper_width):
+                for ip in range(param.hyper_height):
+                    for jp in range(param.hyper_width):
+                        g_nmda +=   "    &gH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"
+g_nmda += "};\n"
+
+g_ampa = "scalar** g_ampa[] = {\n"
+for mp in range(param.N_minicolumns):
+    for m in range(param.N_minicolumns):
+        for i in range(param.hyper_height):
+            for j in range(param.hyper_width):
+                for ip in range(param.hyper_height):
+                    for jp in range(param.hyper_width):
+                        g_ampa +=   "    &gH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+g_ampa += "};\n"
+
 
 
 cpp_interface += cpp_interface_head
@@ -141,6 +164,8 @@ cpp_interface += wGain
 cpp_interface += kappa
 cpp_interface += pushwGain
 cpp_interface += pushkappa
+cpp_interface += g_nmda
+cpp_interface += g_ampa
 
 
 
