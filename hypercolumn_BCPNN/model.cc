@@ -45,7 +45,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
         150.0,                        // 6 - adaption time constant [ms]
-        0.15                           // 7 - adatpion current per spike [nA]
+        0.15                          // 7 - adatpion current per spike [nA]
     );
 
     SimpleAdEx::VarValues ini_basket(
@@ -67,30 +67,34 @@ void modelDefinition(ModelSpec &model)
 
     InitSparseConnectivitySnippet::FixedProbabilityNoAutapse::ParamValues wtaProb(wta_prob);
 
-    float lateral_ampa_conductance = 0.001; //0.00602; // 6.02 nS
-    float lateral_nmda_conductance = 0.0005; //0.00122; // 1.22 nS
+    float lateral_ampa_conductance = 0.001;  // 0.00602; // 6.02 nS
+    float lateral_nmda_conductance = 0.0005; // 0.00122; // 1.22 nS
 
-    // Build distribution for delay parameters
-    float maxDelay = 10.0;
+    // delay parameters
+    float maxDelay = 20.0;
+    float d_norm = 0.75;               // mm
+    float d_V = 0.2;                   // mm/ms
+    float d_mean = 1.0 + d_norm / d_V; // ms
+
     InitVarSnippet::NormalClippedDelay::ParamValues dDist(
-        2.0,       // 0 - mean
-        0.5,       // 1 - sd
-        0.0,       // 2 - min
-        maxDelay); // 3 - max
+        d_mean,       // 0 - mean
+        d_mean * 0.1, // 1 - sd
+        0.0,          // 2 - min
+        maxDelay);    // 3 - max
 
     BCPNN::ParamValues update_params_lateral_ampa(
-        5.0,   // 0 - Time constant of presynaptic primary trace (ms)
-        5.0,   // 1 - Time constant of postsynaptic primary trace (ms)
+        5.0,    // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         5000.0, // 2 - Time constant of probability trace
         20.0,   // 3 - Maximum firing frequency (Hz)
         1.0,    // 5 - spike duration (ms)
-        0.001,   // 6 - epsilon
+        0.001,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant
-        0.1);  // 7 - depletion fraction
+        0.1);   // 7 - depletion fraction
 
     BCPNN::VarValues update_vars_lateral_ampa(
         0.0,                                                // 0 - g
-        0.0,                                               // 1 - PijStar
+        0.0,                                                // 1 - PijStar
         0.0,                                                // Zi
         0.0,                                                // Pi
         0.0,                                                // Zj
@@ -106,12 +110,12 @@ void modelDefinition(ModelSpec &model)
         0.0); // 1 - Erev: Reversal potential AMPA
 
     BCPNN::ParamValues update_params_lateral_nmda(
-        150.0,   // 0 - Time constant of presynaptic primary trace (ms)
-        5.0,   // 1 - Time constant of postsynaptic primary trace (ms)
+        150.0,  // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         5000.0, // 2 - Time constant of probability trace
         20.0,   // 3 - Maximum firing frequency (Hz)                todo set right
         1.0,    // 5 - spike duration (ms)
-        0.001,   // 6 - epsilon
+        0.001,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.25);  // 7 - depletion fraction
 
@@ -230,10 +234,43 @@ void modelDefinition(ModelSpec &model)
                     for (int np = 0; np < hyper_width; np++) // np = postsynaptic hypercolum column number
                     {
                         hypercolumn_name_post = hypercolumn_basename + std::to_string(mp) + "_" + std::to_string(np) + "_";
+                        // calculate distance dependent delay
+                        d_mean = 1 + (d_norm * sqrt((m - mp) * (m - mp) + (n - np) * (n - np))) / d_V; // ms
+                        InitVarSnippet::NormalClippedDelay::ParamValues dDist(
+                            d_mean,       // 0 - mean
+                            d_mean * 0.1, // 1 - sd
+                            0.0,          // 2 - min
+                            maxDelay);    // 3 - max
+
+                        BCPNN::VarValues update_vars_lateral_nmda(
+                            0.0,                                                // 0 - g
+                            0.0,                                                // 1 - PijStar
+                            0.0,                                                // Zi
+                            0.0,                                                // Pi
+                            0.0,                                                // Zj
+                            0.0,                                                // Pj
+                            lateral_nmda_conductance,                           // w_gain_base
+                            0.0,                                                // w_gain
+                            1.0,                                                // kappa
+                            initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
+                            1.0);                                               // x
+
+                        BCPNN::VarValues update_vars_lateral_ampa(
+                            0.0,                                                // 0 - g
+                            0.0,                                                // 1 - PijStar
+                            0.0,                                                // Zi
+                            0.0,                                                // Pi
+                            0.0,                                                // Zj
+                            0.0,                                                // Pj
+                            lateral_ampa_conductance,                           // w_gain_base
+                            0.0,                                                // w_gain
+                            1.0,                                                // kappa
+                            initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
+                            1.0);                                               // x
 
                         for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
                         {
-                            if (m != mp && n != np) // if between hypercolumns
+                            if (m != mp || n != np || i != j) // if between hypercolumns
                             {
                                 // AMPA recurrent
                                 auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
@@ -273,7 +310,7 @@ void modelDefinition(ModelSpec &model)
                         for (int j = 0; j < N_minicolumns; j++) // postsynaptic index j
                         {
 
-                            if (m != mp && n != np) // if between hypercolumns
+                            if (m != mp || n != np || i != j) // if between hypercolumns
                             {
                                 // NMDA recurrent
                                 auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
