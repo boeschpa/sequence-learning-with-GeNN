@@ -50,20 +50,21 @@ param = parse_cpp_header(cpp_param)
 data = np.loadtxt(sys.argv[1],delimiter=",")
 N2_hyper = param.hyper_width*param.hyper_height*param.hyper_width*param.hyper_height
 data = np.reshape(data.T,(param.N_pyramidal*param.N_pyramidal,N2_hyper,param.N_minicolumns,param.N_minicolumns),order='F')
-data = np.transpose(data, (2, 3, 0, 1))
+data = np.transpose(data, (2, 3, 1, 0))
 
 # make squares square
-onesquare=data[0,1,:,:]
+onesquare=data[0,0,:,:]
 side = int(np.ceil(np.sqrt(param.N_pyramidal*param.N_pyramidal*N2_hyper)))
-data = np.pad(data,((0,0),(0,0),(0,0),(0,side*side-(param.N_pyramidal*param.N_pyramidal*N2_hyper))))
+data = np.reshape(data,(param.N_minicolumns,param.N_minicolumns,param.N_pyramidal*param.N_pyramidal*N2_hyper))
+data = np.pad(data,((0,0),(0,0),(0,side*side-(param.N_pyramidal*param.N_pyramidal*N2_hyper))))
 data = np.reshape(data,(param.N_minicolumns,param.N_minicolumns,side,side))
 
 #plot
 grid = np.hstack(np.hstack(data))
 range = np.max([np.max(grid),-np.min(grid)])
-range = np.max([np.max(onesquare),-np.min(onesquare)])
-im = plt.imshow(onesquare.T,cmap='RdBu',vmin = -range, vmax=range,interpolation='none')
-cbar = plt.colorbar(im, extend='both',orientation='horizontal')
+#range = np.max([np.max(onesquare),-np.min(onesquare)])
+im = plt.imshow(grid,cmap='RdBu',vmin = -range, vmax=range,interpolation='none')
+cbar = plt.colorbar(im, extend='both')#,orientation='horizontal')
 cbar.minorticks_on()
 # Add labels and a legend
 plt.savefig("weights.png")
