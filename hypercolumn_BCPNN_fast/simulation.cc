@@ -131,6 +131,10 @@ void setPattern(float frequency, int *pattern)
                 (*firingProbs[i])[j] = 0.0;
             }
         }
+    }    
+    for (int i = 0; i < std::end(pushfiringProbsToDevice) - std::begin(pushfiringProbsToDevice); i++)
+    {
+        pushfiringProbsToDevice[i](N_minicolumns * N_pyramidal);
     }
 }
 
