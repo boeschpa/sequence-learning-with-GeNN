@@ -8,12 +8,12 @@ const int N_minicolumns = 10;
 const int N_basket = 30;
 const int N_pyramidal = 10;
 const float wta_prob = 0.7;
-const float lateral_prob = 0.75;
+const float lateral_prob = 0.5;
 const int hyper_width = 2;
 const int hyper_height = 1;
 
 // simulation params
-const float recall_time = 4000.0;
+const float recall_time = 2000.0;
 const float recall_break = 100.0;
 const float background_freq = 350.0;
 
