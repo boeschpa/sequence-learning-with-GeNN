@@ -53,108 +53,104 @@ allocatefiringProb = "typedef void (*allocatefiringProb)(unsigned int); \n"
 allocatefiringProb += "allocatefiringProb allocatefiringProbs[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            allocatefiringProb += "    allocatefiringProbH" + str(i) + "_" + str(j) + "_M" + str(m) + "_input,\n"
+        allocatefiringProb += "    allocatefiringProbH" + str(i) + "_" + str(j) + "_input,\n"
 allocatefiringProb += "};\n"
 
 pushfiringProbToDevice = "typedef void (*pushfiringProbToDevice)(unsigned int); \n"
 pushfiringProbToDevice += "pushfiringProbToDevice pushfiringProbsToDevice[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            pushfiringProbToDevice += "    pushfiringProbH" + str(i) + "_" + str(j) + "_M" + str(m) + "_inputToDevice,\n"
+        pushfiringProbToDevice += "    pushfiringProbH" + str(i) + "_" + str(j) + "_inputToDevice,\n"
 pushfiringProbToDevice += "};\n"
 
 firingProb = "scalar** firingProbs[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            firingProb += "    &firingProbH" + str(i) + "_" + str(j) + "_M" + str(m) + "_input,\n"
+        firingProb += "    &firingProbH" + str(i) + "_" + str(j) + "_input,\n"
 firingProb += "};\n"
 
 recordSpk = "uint32_t** recordSpkArray[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            recordSpk += "    &recordSpkH" + str(i) + "_" + str(j) + "_M" + str(m) + ",\n"
+        recordSpk += "    &recordSpkH" + str(i) + "_" + str(j) + ",\n"
 recordSpk += "};\n"
 
 wGain = "scalar** wGains[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            for ip in range(param.hyper_height):
-                for jp in range(param.hyper_width):
-                    for mp in range(param.N_minicolumns):
-                        wGain +=   "    &wGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"     # wGainH0_0_to_H0_0_M0to_0_lateral_nmda
-                        wGain +=   "    &wGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                wGain +=   "    &wGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_nmda,\n"     # wGainH0_0_to_H0_0_lateral_nmda
+                wGain +=   "    &wGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_ampa,\n"
 wGain += "};\n"
 
 kappa = "scalar** kappas[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            for ip in range(param.hyper_height):
-                for jp in range(param.hyper_width):
-                    for mp in range(param.N_minicolumns):
-                        kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"     # wGainH0_0_to_H0_0_M0to_0_lateral_nmda
-                        kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_nmda,\n"     # wGainH0_0_to_H0_0_lateral_nmda
+                kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_ampa,\n"
 kappa += "};\n"
 
 pushwGain = "typedef void (*pushwGain)(bool); \n"
 pushwGain += "pushwGain pushwGains[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            for ip in range(param.hyper_height):
-                for jp in range(param.hyper_width):
-                    for mp in range(param.N_minicolumns):
-                        pushwGain +=   "    pushwGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmdaToDevice,\n"     # pushwGainH0_0_to_H0_0_M0to_0_lateral_ampaToDevice
-                        pushwGain +=   "    pushwGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampaToDevice,\n"
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                pushwGain +=   "    pushwGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_nmdaToDevice,\n"     # pushwGainH0_0_to_H0_0_lateral_ampaToDevice
+                pushwGain +=   "    pushwGainH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_ampaToDevice,\n"
 pushwGain += "};\n"
 
 pushkappa = "typedef void (*pushkappa)(bool); \n"
 pushkappa += "pushkappa pushkappas[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        for m in range(param.N_minicolumns):
-            for ip in range(param.hyper_height):
-                for jp in range(param.hyper_width):
-                    for mp in range(param.N_minicolumns):
-                        pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmdaToDevice,\n"     # pushkappaH0_0_to_H0_0_M0to_0_lateral_ampaToDevice
-                        pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampaToDevice,\n"
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_nmdaToDevice,\n"     # pushkappaH0_0_to_H0_0_lateral_ampaToDevice
+                pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_ampaToDevice,\n"
 pushkappa += "};\n"
 
 # gH0_0_to_H0_0_M0to_0_lateral_ampa
 g_nmda = "scalar** g_nmda[] = {\n"
-for mp in range(param.N_minicolumns):
-    for m in range(param.N_minicolumns):
-        for i in range(param.hyper_height):
-            for j in range(param.hyper_width):
-                for ip in range(param.hyper_height):
-                    for jp in range(param.hyper_width):
-                        g_nmda +=   "    &gH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                g_nmda +=   "    &gH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                            "_lateral_nmda,\n"
 g_nmda += "};\n"
 
 g_ampa = "scalar** g_ampa[] = {\n"
-for mp in range(param.N_minicolumns):
-    for m in range(param.N_minicolumns):
-        for i in range(param.hyper_height):
-            for j in range(param.hyper_width):
-                for ip in range(param.hyper_height):
-                    for jp in range(param.hyper_width):
-                        g_ampa +=   "    &gH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
-                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                g_ampa +=   "    &gH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                            "_lateral_ampa,\n"
 g_ampa += "};\n"
+
+maxRowLength = "const unsigned int* maxRowLengths[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                maxRowLength +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_nmda,\n"
+                maxRowLength +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_ampa,\n"
+maxRowLength += "};\n"
+
 
 
 
@@ -169,6 +165,7 @@ cpp_interface += pushwGain
 cpp_interface += pushkappa
 cpp_interface += g_nmda
 cpp_interface += g_ampa
+cpp_interface += maxRowLength
 
 
 

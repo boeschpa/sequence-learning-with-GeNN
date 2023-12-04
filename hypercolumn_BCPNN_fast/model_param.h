@@ -19,17 +19,18 @@ const float background_freq = 350.0;
 
 // training params
 const float training_freq = 150.0;
-const float pattern_time = 200.0; // (ms) 10 attr/s
+const int N_patterns = 10;
+const float pattern_time = 100.0; // (ms) 10 attr/s
 const float pattern_break = 0.0; // (ms) 0 for sequence learning
 const int epochs = 2; // number of training passes
 
 
 const std::string minicolumn_basename = "M";
-const std::string baskets_name = "baskets";
+const std::string baskets_name = "_baskets";
 const std::string hypercolumn_basename = "H";
-const std::string input_basename = "input";
+const std::string input_basename = "_input";
 
-const std::string wta_ampa_name = "wta_ampa";
-const std::string wta_gaba_name = "wta_gaba";
-const std::string lateral_ampa_name = "lateral_ampa";
-const std::string lateral_nmda_name = "lateral_nmda";
+const std::string wta_ampa_name = "_wta_ampa";
+const std::string wta_gaba_name = "_wta_gaba";
+const std::string lateral_ampa_name = "_lateral_ampa";
+const std::string lateral_nmda_name = "_lateral_nmda";

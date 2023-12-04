@@ -191,7 +191,8 @@ int main()
         for (int mc = 0; mc < N_minicolumns; mc++)
         {
             // set training pattern
-            setOnlyBasicStimulation(training_freq, mc);
+            //setOnlyBasicStimulation(training_freq, mc);
+            setAllStimulation(training_freq);
             t_start = t;
             while (t - t_start < pattern_time)
             {

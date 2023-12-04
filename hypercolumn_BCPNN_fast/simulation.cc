@@ -6,28 +6,33 @@
 #include "model_param.h"
 #include "spikeRecorder.h"
 #include "spikeArrayRecorder.h"
+#include <iostream>
+#include <cstdlib>
+#include <random>
 
-#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_ampa[1], PiH0_0_to_H0_0_M0to_0_lateral_ampa[1], PjH0_0_to_H0_0_M0to_0_lateral_ampa[1], PijH0_0_to_H0_0_M0to_0_lateral_ampa[1], ZiH0_0_to_H0_0_M0to_0_lateral_ampa[1], ZjH0_0_to_H0_0_M0to_0_lateral_ampa[1])
-#define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_nmda[1], PiH0_0_to_H0_0_M0to_0_lateral_nmda[1], PjH0_0_to_H0_0_M0to_0_lateral_nmda[1], PijH0_0_to_H0_0_M0to_0_lateral_nmda[1], ZiH0_0_to_H0_0_M0to_0_lateral_nmda[1], ZjH0_0_to_H0_0_M0to_0_lateral_nmda[1])
+#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
+#define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_lateral_nmda[10], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_0_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], PiH0_0_to_H0_0_lateral_nmda[1], PjH0_0_to_H0_0_lateral_nmda[1], PijH0_0_to_H0_0_lateral_nmda[1], ZiH0_0_to_H0_0_lateral_nmda[1], ZjH0_0_to_H0_0_lateral_nmda[1])
 #define RECORD_TRACE   \
     RECORD_TRACE_AMPA; \
     RECORD_TRACE_NMDA
 
-
-void recordWeights(){
+void recordWeights()
+{
     FILE *weightsAmpa = fopen("weights_ampa.csv", "w");
     FILE *weightsNmda = fopen("weights_nmda.csv", "w");
     for (int i = 0; i < std::end(g_nmda) - std::begin(g_nmda); i++)
     {
-        for (int j = 0; j < N_pyramidal*N_pyramidal; j++)
+        for (int j = 0; j < N_minicolumns * N_pyramidal * N_minicolumns * N_pyramidal; j++)
         {
-            if(j==0){
-                fprintf(weightsNmda, "%f",1000.0*(*g_nmda[i])[j]);
-                fprintf(weightsAmpa, "%f",1000.0*(*g_ampa[i])[j]);
+            if (j == 0)
+            {
+                fprintf(weightsNmda, "%f", 1000.0 * (*g_nmda[i])[j]);
+                fprintf(weightsAmpa, "%f", 1000.0 * (*g_ampa[i])[j]);
             }
-            else{
-                fprintf(weightsNmda, ", %f",1000.0*(*g_nmda[i])[j]);
-                fprintf(weightsAmpa, ", %f",1000.0*(*g_ampa[i])[j]);
+            else
+            {
+                fprintf(weightsNmda, ", %f", 1000.0 * (*g_nmda[i])[j]);
+                fprintf(weightsAmpa, ", %f", 1000.0 * (*g_ampa[i])[j]);
             }
         }
         fprintf(weightsNmda, "\n");
@@ -40,7 +45,7 @@ void recordWeights(){
 void setAllStimulation(float frequency)
 {
     float firingProbability = time_step * 1e-3 * frequency;
-    for (int i = 0; i < N_pyramidal; i++)
+    for (int i = 0; i < N_minicolumns * N_pyramidal; i++)
     {
         for (int j = 0; j < std::end(firingProbs) - std::begin(firingProbs); j++)
         {
@@ -50,53 +55,82 @@ void setAllStimulation(float frequency)
     }
     for (int i = 0; i < std::end(pushfiringProbsToDevice) - std::begin(pushfiringProbsToDevice); i++)
     {
-        pushfiringProbsToDevice[i](N_pyramidal);
+        pushfiringProbsToDevice[i](N_minicolumns * N_pyramidal);
     }
 }
 
-void setOnlyBasicStimulation(float frequency, int minicolumn)
+// Function to generate a random pattern with a specified seed
+int *generateRandomPattern(int N_hypercolumns, int N_minicolumns, unsigned int seed)
 {
-    for (int i = 0; i < N_pyramidal; i++)
+    // Use the provided seed to seed the random number generator
+    std::mt19937 gen(seed);
+
+    // Create a distribution to generate random integers
+    std::uniform_int_distribution<int> distribution(0, N_minicolumns);
+
+    int *random_pattern = new int[N_hypercolumns];
+
+    // Fill the array with random minicolumn indices
+    for (int i = 0; i < N_hypercolumns; ++i)
     {
-        for (int j = 0; j < std::end(firingProbs) - std::begin(firingProbs); j++)
-        {
-            int local_minicolumn = j % N_minicolumns; // get local minicolumn number of global index j
-            if (local_minicolumn == minicolumn)
-            {
-                (*firingProbs[j])[i] = time_step * 1e-3 * frequency; // dT (ms) / 1000 ms * average spike frequency
-            }
-            else
-            {
-                (*firingProbs[j])[i] = 0.0;
-            }
-        }
+        random_pattern[i] = distribution(gen);
     }
-    for (int i = 0; i < std::end(pushfiringProbsToDevice) - std::begin(pushfiringProbsToDevice); i++)
-    {
-        pushfiringProbsToDevice[i](N_pyramidal);
-    }
+
+    return random_pattern;
 }
 
-void setHalfStimulation(float frequency, bool half)
+// Function to generate a trivial diagonal pattern
+int *generateDiagonalPattern(int N_hypercolumns, int minicolumn)
 {
-    for (int i = 0; i < N_pyramidal; i++)
+    int *pattern = new int[N_hypercolumns];
+
+    // Fill the array with random minicolumn indices
+    for (int i = 0; i < N_hypercolumns; ++i)
     {
-        for (int j = 0; j < std::end(firingProbs) - std::begin(firingProbs); j++)
+        pattern[i] = minicolumn;
+    }
+
+    return pattern;
+}
+
+int **generateRandomSequence(int N_patterns, int N_hypercolumns, int N_minicolumns, unsigned int seed)
+{
+    int **randomSequence = new int *[N_patterns];
+    for (int i = 0; i < N_patterns; i++)
+    {
+        randomSequence[i] = generateRandomPattern(N_hypercolumns, N_minicolumns, seed);
+    }
+    return randomSequence;
+}
+
+int **generateDiagonalSequence(int N_patterns, int N_hypercolumns, int N_minicolumns)
+{
+    int **sequence = new int *[N_patterns];
+    for (int i = 0; i < N_patterns; i++)
+    {
+        sequence[i] = generateDiagonalPattern(N_hypercolumns, i);
+    }
+    return sequence;
+}
+
+void setPattern(float frequency, int *pattern)
+{
+    for (int i = 0; i < std::end(firingProbs) - std::begin(firingProbs); i++)
+    {
+        int active = pattern[i]; // active MC in current hypercolumn i
+        int mc_index;
+        for (int j = 0; j < N_minicolumns * N_pyramidal; j++)
         {
-            int local_minicolumn = j % N_minicolumns; // get local minicolumn number of global index j
-            if ((local_minicolumn >= N_minicolumns / 2) == half)
+            mc_index = j / N_pyramidal; // minicolumn index of neuron index j
+            if (mc_index == active)
             {
-                (*firingProbs[j])[i] = time_step * 1e-3 * frequency; // dT (ms) / 1000 ms * average spike frequency
+                (*firingProbs[i])[j] = time_step * 1e-3 * frequency; // dT (ms) / 1000 ms * average spike frequency
             }
             else
             {
-                (*firingProbs[j])[i] = 0.0;
+                (*firingProbs[i])[j] = 0.0;
             }
         }
-    }
-    for (int i = 0; i < std::end(pushfiringProbsToDevice) - std::begin(pushfiringProbsToDevice); i++)
-    {
-        pushfiringProbsToDevice[i](N_pyramidal);
     }
 }
 
@@ -104,9 +138,8 @@ void setGainAndKappa(float gain, float kappa)
 {
     for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
     {
-        for (int j = 0; j < N_pyramidal*N_pyramidal; j++)
+        for (int j = 0; j < (int)*maxRowLengths[i] * N_pyramidal * N_minicolumns; j++)
         {
-
             (*wGains[i])[j] = gain;
             (*kappas[i])[j] = kappa;
         }
@@ -118,7 +151,7 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_break + recall_time;
+    float sim_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
     allocateRecordingBuffers(int(sim_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -128,9 +161,13 @@ int main()
 
     for (int i = 0; i < std::end(allocatefiringProbs) - std::begin(allocatefiringProbs); i++)
     {
-        allocatefiringProbs[i](N_pyramidal);
+        allocatefiringProbs[i](N_minicolumns * N_pyramidal);
     }
     setAllStimulation(0.0);
+
+    // generate random sequence
+    // int **sequence = generateRandomSequence(N_patterns,hyper_width*hyper_height, N_minicolumns, 42);
+    int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height, N_minicolumns);
 
     initializeSparse();
 
@@ -162,42 +199,18 @@ int main()
     {
         std::cout << "Training epoch " << ep + 1 << std::endl;
 
-        // setHalfStimulation(training_freq, 1);
-        // t_start = t;
-        // while (t - t_start < pattern_time)
-        // {
-        //     stepTime();
-        // }
-
-        // t_start = t;
-        // while (t - t_start < pattern_break)
-        // {
-        //     stepTime();
-        // }
-
-        // setHalfStimulation(training_freq, 0);
-        // t_start = t;
-        // while (t - t_start < pattern_time)
-        // {
-        //     stepTime();
-        // }
-
-        // t_start = t;
-        // while (t - t_start < pattern_break)
-        // {
-        //     stepTime();
-        // }
-
-        for (int mc = 0; mc < N_minicolumns; mc++)
+        for (int pat = 0; pat < N_patterns; pat++)
         {
+            int *pattern = sequence[pat];
+
             // set training pattern
-            setOnlyBasicStimulation(training_freq, mc);
+            setPattern(training_freq, pattern);
             t_start = t;
             while (t - t_start < pattern_time)
             {
                 stepTime();
-                pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-                pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+                pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+                pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
             }
 
@@ -207,8 +220,8 @@ int main()
             while (t - t_start < pattern_break)
             {
                 stepTime();
-                pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-                pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+                pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+                pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
             }
         }
@@ -221,8 +234,8 @@ int main()
     while (t - t_start < recall_break)
     {
         stepTime();
-        pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+        pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+        pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
     }
 
@@ -233,8 +246,8 @@ int main()
     while (t - t_start < recall_time)
     {
         stepTime();
-        pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
+        pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+        pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
     }
 
@@ -242,16 +255,8 @@ int main()
     fclose(traceNmda);
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_pyramidal, int(sim_time / time_step), time_step);
+                                 N_minicolumns * N_pyramidal, int(sim_time / time_step), time_step);
     recordWeights();
 
     return 0;
 }
-
-// build simulator makefile "genn-create-user-project.sh tenLIFRing tenLIFRingSimulation.cc"
-// build simulator "make"
-// run simulator "./tenLIFModel"
-
-// todo debug: only one pattern!!
-// plot weights ampa 0_0 --> high; 0_5 --> low/negative; etc
-//

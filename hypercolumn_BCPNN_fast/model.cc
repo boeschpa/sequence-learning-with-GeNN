@@ -28,8 +28,8 @@ void modelDefinition(ModelSpec &model)
         -70.0,   // 3 - Reset voltage [mV]
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
-        150.0,   // 6 - adaption time constant [ms]
-        0.150    // 7 - adatpion current per spike [nA]  (150 pA)
+        15.0,   // 6 - adaption time constant [ms]
+        0.15    // 7 - adatpion current per spike [nA]  (150 pA)
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
@@ -45,7 +45,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
         150.0,                        // 6 - adaption time constant [ms]
-        0.15                          // 7 - adatpion current per spike [nA]
+        0.0                          // 7 - adatpion current per spike [nA]
     );
 
     SimpleAdEx::VarValues ini_basket(
@@ -92,19 +92,6 @@ void modelDefinition(ModelSpec &model)
         800.0,  // 7 - short term depression time constant
         0.1);   // 7 - depletion fraction
 
-    BCPNN::VarValues update_vars_lateral_ampa(
-        0.0,                                                // 0 - g
-        0.0,                                                // 1 - PijStar
-        0.0,                                                // Zi
-        0.0,                                                // Pi
-        0.0,                                                // Zj
-        0.0,                                                // Pj
-        lateral_ampa_conductance,                           // w_gain_base
-        0.0,                                                // w_gain
-        1.0,                                                // kappa
-        initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
-        1.0);                                               // x
-
     PostsynapticModels::ExpCond::ParamValues ps_lateral_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA
@@ -118,19 +105,6 @@ void modelDefinition(ModelSpec &model)
         0.001,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.25);  // 7 - depletion fraction
-
-    BCPNN::VarValues update_vars_lateral_nmda(
-        0.0,                                                // 0 - g
-        0.0,                                                // 1 - PijStar
-        0.0,                                                // Zi
-        0.0,                                                // Pi
-        0.0,                                                // Zj
-        0.0,                                                // Pj
-        lateral_nmda_conductance,                           // w_gain_base
-        0.0,                                                // w_gain
-        1.0,                                                // kappa
-        initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
-        1.0);                                               // x
 
     PostsynapticModels::ExpCond::ParamValues ps_lateral_nmda(
         150.0, // 0 - tau_S: decay time constant for S [ms]
@@ -169,28 +143,19 @@ void modelDefinition(ModelSpec &model)
         for (int n = 0; n < hyper_width; n++) // n = column number
         {
             // hypercolumn_m_n
-            hypercolumn_name = hypercolumn_basename + std::to_string(m) + "_" + std::to_string(n) + "_";
+            hypercolumn_name = hypercolumn_basename + std::to_string(m) + "_" + std::to_string(n);
 
             // add minicolumns
-            for (int i = 0; i < N_minicolumns; i++)
-            {
-                auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + minicolumn_basename + std::to_string(i), N_pyramidal, p_pyramidal, ini_pyramidal);
-                pop->setSpikeRecordingEnabled(true);
-            }
-
-            // add basket pop
-            auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            auto *pop = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name, N_pyramidal * N_minicolumns, p_pyramidal, ini_pyramidal);
             pop->setSpikeRecordingEnabled(true);
 
+            // add basket pop
+            auto *pop_basket = model.addNeuronPopulation<SimpleAdEx>(hypercolumn_name + baskets_name, N_basket, p_basket, ini_basket);
+            pop_basket->setSpikeRecordingEnabled(true);
+
             // add input neurons
-            for (int i = 0; i < N_minicolumns; i++)
-            {
-                if (true) // only input to minicolumns 1 in hypercolumn_0_0  // todo find way to initialize in loop or to not have to initialize
-                {
-                    auto *pop = model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, N_pyramidal, p_stim, stim_ini);
-                    pop->setSpikeRecordingEnabled(true);
-                }
-            }
+            auto *pop_input = model.addNeuronPopulation<NeuronModels::Poisson>(hypercolumn_name + input_basename, N_pyramidal * N_minicolumns, p_stim, stim_ini);
+            pop_input->setSpikeRecordingEnabled(true);
         }
     }
 
@@ -204,154 +169,121 @@ void modelDefinition(ModelSpec &model)
         for (int n = 0; n < hyper_width; n++) // n = column number
         {
             // hypercolumn_m_n
-            hypercolumn_name = hypercolumn_basename + std::to_string(m) + "_" + std::to_string(n) + "_";
+            hypercolumn_name = hypercolumn_basename + std::to_string(m) + "_" + std::to_string(n);
 
             // add WTA connections
-            for (int i = 0; i < N_minicolumns; i++)
-            {
-                // excitatory ampa pyramidal-to-basket connections
-                model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-                    hypercolumn_name + minicolumn_basename + std::to_string(i) + wta_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
-                    hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name + baskets_name,
-                    {}, s_wta_ampa,
-                    ps_wta_ampa, {},
-                    initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(wtaProb));
+            // excitatory ampa pyramidal-to-basket connections
+            model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
+                hypercolumn_name + wta_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                hypercolumn_name, hypercolumn_name + baskets_name,
+                {}, s_wta_ampa,
+                ps_wta_ampa, {},
+                initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(wtaProb));
 
-                // inhibitory gaba basekt-to-pyramidal connections
-                model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-                    wta_gaba_name + hypercolumn_name + std::to_string(i), SynapseMatrixType::SPARSE_GLOBALG, 10,
-                    hypercolumn_name + baskets_name, hypercolumn_name + minicolumn_basename + std::to_string(i),
-                    {}, s_wta_gaba,
-                    ps_wta_gaba, {},
-                    initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(wtaProb));
-            }
+            // inhibitory gaba basekt-to-pyramidal connections
+            model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
+                hypercolumn_name + wta_gaba_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                hypercolumn_name + baskets_name, hypercolumn_name,
+                {}, s_wta_gaba,
+                ps_wta_gaba, {},
+                initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(wtaProb));
 
-            // AMPA (+positive) lateral connections between hypercolumn (and within)
-            for (int i = 0; i < N_minicolumns; i++) // presynaptic index j
+            // Lateral connections between hypercolumn (and within)
+            for (int mp = 0; mp < hyper_height; mp++) // mp = postsynaptic hypercolum row number
             {
-                for (int mp = 0; mp < hyper_height; mp++) // mp = postsynaptic hypercolum row number
+                for (int np = 0; np < hyper_width; np++) // np = postsynaptic hypercolum column number
                 {
-                    for (int np = 0; np < hyper_width; np++) // np = postsynaptic hypercolum column number
+                    hypercolumn_name_post = hypercolumn_basename + std::to_string(mp) + "_" + std::to_string(np);
+                    // calculate distance dependent delay
+                    d_mean = 1 + (d_norm * sqrt((m - mp) * (m - mp) + (n - np) * (n - np))) / d_V; // ms
+                    InitVarSnippet::NormalClippedDelay::ParamValues dDist(
+                        d_mean,       // 0 - mean
+                        d_mean * 0.1, // 1 - sd
+                        0.0,          // 2 - min
+                        maxDelay);    // 3 - max
+
+                    BCPNN::VarValues update_vars_lateral_nmda(
+                        0.0,                                                // 0 - g
+                        0.00,                                                // 1 - PijStar
+                        0.0,                                                // Zi
+                        0.00,                                                // Pi
+                        0.0,                                                // Zj
+                        0.00,                                                // Pj
+                        lateral_nmda_conductance,                           // w_gain_base
+                        0.0,                                                // w_gain
+                        0.0,                                                // kappa
+                        initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
+                        1.0);                                               // x
+
+                    BCPNN::VarValues update_vars_lateral_ampa(
+                        0.0,                                                // 0 - g
+                        0.00,                                                // 1 - PijStar
+                        0.0,                                                // Zi
+                        0.00,                                                // Pi
+                        0.0,                                                // Zj
+                        0.00,                                                // Pj
+                        lateral_ampa_conductance,                           // w_gain_base
+                        0.0,                                                // w_gain
+                        0.0,                                                // kappa
+                        initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
+                        1.0);                                               // x
+
+                    if (m != mp || n != np) // if between hypercolumns
                     {
-                        hypercolumn_name_post = hypercolumn_basename + std::to_string(mp) + "_" + std::to_string(np) + "_";
-                        // calculate distance dependent delay
-                        d_mean = 1 + (d_norm * sqrt((m - mp) * (m - mp) + (n - np) * (n - np))) / d_V; // ms
-                        InitVarSnippet::NormalClippedDelay::ParamValues dDist(
-                            d_mean,       // 0 - mean
-                            d_mean * 0.1, // 1 - sd
-                            0.0,          // 2 - min
-                            maxDelay);    // 3 - max
-
-                        BCPNN::VarValues update_vars_lateral_nmda(
-                            0.0,                                                // 0 - g
-                            0.0,                                                // 1 - PijStar
-                            0.0,                                                // Zi
-                            0.0,                                                // Pi
-                            0.0,                                                // Zj
-                            0.0,                                                // Pj
-                            lateral_nmda_conductance,                           // w_gain_base
-                            0.0,                                                // w_gain
-                            1.0,                                                // kappa
-                            initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
-                            1.0);                                               // x
-
-                        BCPNN::VarValues update_vars_lateral_ampa(
-                            0.0,                                                // 0 - g
-                            0.0,                                                // 1 - PijStar
-                            0.0,                                                // Zi
-                            0.0,                                                // Pi
-                            0.0,                                                // Zj
-                            0.0,                                                // Pj
-                            lateral_ampa_conductance,                           // w_gain_base
-                            0.0,                                                // w_gain
-                            1.0,                                                // kappa
-                            initVar<InitVarSnippet::NormalClippedDelay>(dDist), // delay d
-                            1.0);                                               // x
-
-                        for (int j = 0; j < N_minicolumns; j++) // postsynaptic index i
-                        {
-                            if (m != mp || n != np || i != j) // if between hypercolumns
-                            {
-                                // AMPA recurrent
-                                auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
-                                    hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
-                                    hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
-                                    update_params_lateral_ampa, update_vars_lateral_ampa,
-                                    ps_lateral_ampa, {},
-                                    initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
-
-                                synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
-                            }
-                            else
-                            {
-                                // AMPA recurrent (no autapse)
-                                auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
-                                    hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_ampa_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
-                                    hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
-                                    update_params_lateral_ampa, update_vars_lateral_ampa,
-                                    ps_lateral_ampa, {},
-                                    initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
-                                synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
-                            }
-                        }
+                        // AMPA recurrent
+                        auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
+                            hypercolumn_name + "_to_" + hypercolumn_name_post + lateral_ampa_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
+                            hypercolumn_name, hypercolumn_name_post,
+                            update_params_lateral_ampa, update_vars_lateral_ampa,
+                            ps_lateral_ampa, {},
+                            initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
+                        synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
                     }
-                }
-            }
-
-            // NMDA (+positive) lateral connections between hypercolumn (and within)
-            for (int i = 0; i < N_minicolumns; i++) // presynaptic index i
-            {
-                for (int mp = 0; mp < hyper_height; mp++) // mp = postsynaptic hypercolum row number
-                {
-                    for (int np = 0; np < hyper_width; np++) // np = postsynaptic hypercolum column number
+                    else
                     {
-                        hypercolumn_name_post = hypercolumn_basename + std::to_string(mp) + "_" + std::to_string(np) + "_";
-
-                        for (int j = 0; j < N_minicolumns; j++) // postsynaptic index j
-                        {
-
-                            if (m != mp || n != np || i != j) // if between hypercolumns
-                            {
-                                // NMDA recurrent
-                                auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
-                                    hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_nmda_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
-                                    hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
-                                    update_params_lateral_nmda, update_vars_lateral_nmda,
-                                    ps_lateral_nmda, {},
-                                    initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
-                                synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
-                            }
-                            else
-                            {
-                                // NMDA recurrent (no autapse)
-                                auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
-                                    hypercolumn_name + "to_" + hypercolumn_name_post + minicolumn_basename + std::to_string(i) + "to_" + std::to_string(j) + "_" + lateral_nmda_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
-                                    hypercolumn_name + minicolumn_basename + std::to_string(i), hypercolumn_name_post + minicolumn_basename + std::to_string(j),
-                                    update_params_lateral_nmda, update_vars_lateral_nmda,
-                                    ps_lateral_nmda, {},
-                                    initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
-                                synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
-                            }
-                        }
+                        // AMPA recurrent (no autapse)
+                        auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
+                            hypercolumn_name + "_to_" + hypercolumn_name_post + lateral_ampa_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
+                            hypercolumn_name, hypercolumn_name_post,
+                            update_params_lateral_ampa, update_vars_lateral_ampa,
+                            ps_lateral_ampa, {},
+                            initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
+                        synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
+                    }
+                    if (m != mp || n != np) // if between hypercolumns
+                    {
+                        // NMDA recurrent
+                        auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
+                            hypercolumn_name + "_to_" + hypercolumn_name_post + lateral_nmda_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
+                            hypercolumn_name, hypercolumn_name_post,
+                            update_params_lateral_nmda, update_vars_lateral_nmda,
+                            ps_lateral_nmda, {},
+                            initConnectivity<InitSparseConnectivitySnippet::FixedProbability>(lateralProb));
+                        synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
+                    }
+                    else
+                    {
+                        // NMDA recurrent (no autapse)
+                        auto *synPop = model.addSynapsePopulation<BCPNN, PostsynapticModels::ExpCond>(
+                            hypercolumn_name + "_to_" + hypercolumn_name_post + lateral_nmda_name, SynapseMatrixType::SPARSE_INDIVIDUALG, 10,
+                            hypercolumn_name, hypercolumn_name_post,
+                            update_params_lateral_nmda, update_vars_lateral_nmda,
+                            ps_lateral_nmda, {},
+                            initConnectivity<InitSparseConnectivitySnippet::FixedProbabilityNoAutapse>(lateralProb));
+                        synPop->setMaxDendriticDelayTimesteps(std::rint(maxDelay / model.getDT()));
                     }
                 }
             }
 
             // add input synapses
 
-            for (int i = 0; i < N_minicolumns; i++)
-            {
-                // input connection
-                model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-                    hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename + "_synapse", SynapseMatrixType::SPARSE_GLOBALG, NO_DELAY,
-                    hypercolumn_name + minicolumn_basename + std::to_string(i) + "_" + input_basename, hypercolumn_name + minicolumn_basename + std::to_string(i),
-                    {}, s_input_ampa,
-                    ps_input_ampa, {},
-                    initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
-            }
+            // input connection
+            model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
+                hypercolumn_name + input_basename + "_synapse", SynapseMatrixType::SPARSE_GLOBALG, NO_DELAY,
+                hypercolumn_name + input_basename, hypercolumn_name,
+                {}, s_input_ampa,
+                ps_input_ampa, {},
+                initConnectivity<InitSparseConnectivitySnippet::OneToOne>());
         }
     }
-    // todo distribution for strength and delay, values; ask anders
-    // todo noisy neurons? ask anders
-    // todo (euclidian) delay
 }

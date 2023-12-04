@@ -61,27 +61,6 @@ time = data[:, 0]
 N= np.shape(data)[1]-1
 spikes = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
 
-# neuron id is counted through (inner to outer loop) minicolumn, hyper_width, hyper_height
-# neuron_id = minicolumn_id * N_pyarmidal + local_neuron_id
-# minicolumn_id = hypercolumn_id * n_minicolumns + local_minicolumn_id
-# todo check if time is unique to see if it is saved correctly
-
-# split data, only keep local_neuron_id
-# local_spikes = spikes % param.N_pyramidal
-# local_mini = (spikes // param.N_pyramidal) % param.N_minicolumns
-# hyper_n = (spikes // param.N_pyramidal // param.N_minicolumns) % param.hyper_width
-# hyper_m = spikes // param.N_pyramidal // param.N_minicolumns // param.hyper_width
-
-# max_spikes= np.max(np.unique((spikes // param.N_pyramidal), return_counts=True)[1])
-# spikes_new = np.empty((param.hyper_height,param.hyper_width,param.N_minicolumns,max_spikes))
-# for m in range(param.hyper_height):
-#     for n in range(param.hyper_width):
-#         for i in range(param.N_minicolumns):
-#             indices = np.where((local_mini == i) & (hyper_n == n) & (hyper_m == m))
-#             spikes_new[m,n,i,:]=spikes[indices].resize(8)
-
-#compute average firing rates per minicolumn index (local mini)
-#just one neuron for now
 i=0
 sim_time = time[-1]
 time_start = 0
