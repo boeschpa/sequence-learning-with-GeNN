@@ -20,7 +20,7 @@ const float background_freq = 350.0;
 // training params
 const float training_freq = 150.0;
 const int N_patterns = 10;
-const float pattern_time = 100.0; // (ms) 10 attr/s
+const float pattern_time = 200.0; // (ms) 10 attr/s
 const float pattern_break = 0.0; // (ms) 0 for sequence learning
 const int epochs = 2; // number of training passes
 
