@@ -43,46 +43,40 @@ cpp_param = read_file("model_param.h")
 param = parse_cpp_header(cpp_param)
 
 # Load data from the .dat file
-data = np.loadtxt(sys.argv[1])
+data = np.loadtxt(sys.argv[1],delimiter=",")
 
 # Split the data into time (first column) and voltage (subsequent N columns)
 time = data[:, 0]
 N= np.shape(data)[1]-1
-spikes = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
+traces = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
 
-# neuron id is counted through (inner to outer loop) minicolumn, hyper_width, hyper_height
-# neuron_id = minicolumn_id * N_pyarmidal + local_neuron_id
-# minicolumn_id = hypercolumn_id * n_minicolumns + local_minicolumn_id
-# todo check if time is unique to see if it is saved correctly
+figure, axes = plt.subplots(4,1,sharex = True)
+labels=["g 0-0", "g 0-0", "g 0-1", "g 0-1", "g 1-0", "g 1-0"]
+labels_p = ["pi", "pj", "pij"]
+labels_z = ["zi", "zj"]
+assert(len(labels)+len(labels_p)+len(labels_z)==N)
 
-# split data, only keep local_neuron_id
-local_spikes = spikes % param.N_pyramidal
-local_mini = (spikes // param.N_pyramidal) % param.N_minicolumns
-hyper_n = (spikes // param.N_pyramidal // param.N_minicolumns) % param.hyper_width
-hyper_m = spikes // param.N_pyramidal // param.N_minicolumns // param.hyper_width
+for i in range(len(labels)):
+    axes[0].plot(time, traces[:,i],label=labels[i])
+for i in range(len(labels_p)):
+    axes[1].plot(time, traces[:,i+len(labels)],label=labels_p[i])
+axes[2].plot(time, traces[:,0+len(labels)+len(labels_p)],label=labels_z[0])
+axes[3].plot(time, traces[:,1+len(labels)+len(labels_p)],label=labels_z[1])
 
-max_spikes= np.max(np.unique((spikes // param.N_pyramidal), return_counts=True)[1])
-spikes_new = np.empty((param.hyper_height,param.hyper_width,param.N_minicolumns,max_spikes))
-for m in range(param.hyper_height):
-    for n in range(param.hyper_width):
-        for i in range(param.N_minicolumns):
-            indices = np.where((local_mini == i) & (hyper_n == n) & (hyper_m == m))
-            spikes_new[m,n,i,:]=spikes[indices].resize(8)
+axes[0].legend()
+axes[1].legend()
+axes[2].legend()
+axes[3].legend()
 
-
-ax = plt.gca()
-
-for i in range(N):
-    plt.plot(time, spikes,".")
 
 # Add labels and a legend
 plt.xlabel('Time (ms)')
-plt.ylabel('Neuron')
-plt.title('Spikes of Neuron N vs. Time')
+#plt.ylabel('Conductance (nS)')
+#plt.title('Synapse Strenght vs. Time')
 
 
 # Show plot
-if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
+if len(sys.argv)<=3 or sys.argv[3] != "-noshow":
     plt.show()
 
-plt.savefig("plot_spikes.png")
+plt.savefig(sys.argv[2])

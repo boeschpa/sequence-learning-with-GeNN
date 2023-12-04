@@ -4,6 +4,10 @@ import sys
 
 import re
 
+# arguments: 0: file
+#            1: -noshow
+
+
 class Parameters:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -36,7 +40,7 @@ def parse_cpp_header(header_text):
 def read_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
-    
+
 cpp_param = read_file("model_param.h")
 
 # get params from model_param
@@ -44,30 +48,28 @@ param = parse_cpp_header(cpp_param)
 
 # Load data from the .dat file
 data = np.loadtxt(sys.argv[1],delimiter=",")
+N2_hyper = param.hyper_width*param.hyper_height*param.hyper_width*param.hyper_height
+data = np.reshape(data.T,(param.N_pyramidal*param.N_pyramidal,N2_hyper,param.N_minicolumns,param.N_minicolumns),order='F')
+data = np.transpose(data, (2, 3, 1, 0))
 
-# Split the data into time (first column) and voltage (subsequent N columns)
-time = data[:, 0]
-N= np.shape(data)[1]-1
-traces = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
+# make squares square
+onesquare=data[0,0,:,:]
+side = int(np.ceil(np.sqrt(param.N_pyramidal*param.N_pyramidal*N2_hyper)))
+data = np.reshape(data,(param.N_minicolumns,param.N_minicolumns,param.N_pyramidal*param.N_pyramidal*N2_hyper))
+data = np.pad(data,((0,0),(0,0),(0,side*side-(param.N_pyramidal*param.N_pyramidal*N2_hyper))))
+data = np.reshape(data,(param.N_minicolumns,param.N_minicolumns,side,side))
 
-figure, axes = plt.subplots(2,1,sharex = True)
-labels = ["Iw", "V_mem"]
-
-for i in range(len(labels)):
-    axes[i].plot(time, traces[:,i],label=labels[i])
-                 
-axes[0].legend()
-axes[1].legend()
-
-
+#plot
+grid = np.hstack(np.hstack(data))
+range = np.max([np.max(grid),-np.min(grid)])
+#range = np.max([np.max(onesquare),-np.min(onesquare)])
+im = plt.imshow(grid,cmap='RdBu',vmin = -range, vmax=range,interpolation='none')
+cbar = plt.colorbar(im, extend='both')#,orientation='horizontal')
+cbar.minorticks_on()
 # Add labels and a legend
-plt.xlabel('Time (ms)')
-#plt.ylabel('Conductance (nS)')
-#plt.title('Synapse Strenght vs. Time')
-
+plt.savefig("weights.png")
 
 # Show plot
-if len(sys.argv)<=3 or sys.argv[3] != "-noshow":
+if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
     plt.show()
 
-plt.savefig(sys.argv[2])
