@@ -226,11 +226,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_nmda(
                         0.0,                                                // 0 - g
-                        0.00,                                               // 1 - PijStar
+                        0.001,                                               // 1 - PijStar
                         0.0,                                                // Zi
-                        0.00,                                               // Pi
+                        0.001,                                               // Pi
                         0.0,                                                // Zj
-                        0.00,                                               // Pj
+                        0.001,                                               // Pj
                         lateral_nmda_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
@@ -239,11 +239,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_ampa(
                         0.0,                                                // 0 - g
-                        0.00,                                               // 1 - PijStar
+                        0.001,                                               // 1 - PijStar
                         0.0,                                                // Zi
-                        0.00,                                               // Pi
+                        0.001,                                               // Pi
                         0.0,                                                // Zj
-                        0.00,                                               // Pj
+                        0.001,                                               // Pj
                         lateral_ampa_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
