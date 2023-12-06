@@ -86,6 +86,12 @@ for i in range(param.hyper_height):
                                 "_lateral_ampa,\n"
 wGain += "};\n"
 
+biasGain = "scalar** biasGains[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        biasGain +=   "    &biasGainH" + str(i) + "_" + str(j) +",\n"
+biasGain += "};\n"
+
 kappa = "scalar** kappas[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
@@ -96,6 +102,12 @@ for i in range(param.hyper_height):
                 kappa +=   "    &kappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
                                 "_lateral_ampa,\n"
 kappa += "};\n"
+
+kappaBias = "scalar** kappasBias[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        kappaBias +=   "    &kappaH" + str(i) + "_" + str(j) +",\n"
+kappaBias += "};\n"
 
 pushwGain = "typedef void (*pushwGain)(bool); \n"
 pushwGain += "pushwGain pushwGains[] = {\n"
@@ -109,10 +121,18 @@ for i in range(param.hyper_height):
                                 "_lateral_ampaToDevice,\n"
 pushwGain += "};\n"
 
+pushbiasGain = "typedef void (*pushbiasGain)(bool); \n"
+pushbiasGain += "pushbiasGain pushbiasGains[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        pushbiasGain +=   "    pushbiasGainH" + str(i) + "_" + str(j) +"ToDevice,\n"  # add bias gain push
+pushbiasGain += "};\n"
+
 pushkappa = "typedef void (*pushkappa)(bool); \n"
 pushkappa += "pushkappa pushkappas[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
+        pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) +"ToDevice,\n"  # add bias kappa push
         for ip in range(param.hyper_height):
             for jp in range(param.hyper_width):
                 pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
@@ -120,6 +140,13 @@ for i in range(param.hyper_height):
                 pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
                                 "_lateral_ampaToDevice,\n"
 pushkappa += "};\n"
+
+pushkappaBias = "typedef void (*pushkappaBias)(bool); \n"
+pushkappaBias += "pushkappaBias pushkappasBias[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        pushkappaBias +=   "    pushkappaH" + str(i) + "_" + str(j) +"ToDevice,\n"  # add bias kappa push
+pushkappaBias += "};\n"
 
 # gH0_0_to_H0_0_M0to_0_lateral_ampa
 g_nmda = "scalar** g_nmda[] = {\n"
@@ -161,8 +188,12 @@ cpp_interface += firingProb
 cpp_interface += recordSpk
 cpp_interface += wGain
 cpp_interface += kappa
+cpp_interface += biasGain
+cpp_interface += kappaBias
 cpp_interface += pushwGain
 cpp_interface += pushkappa
+cpp_interface += pushbiasGain
+cpp_interface += pushkappaBias
 cpp_interface += g_nmda
 cpp_interface += g_ampa
 cpp_interface += maxRowLength

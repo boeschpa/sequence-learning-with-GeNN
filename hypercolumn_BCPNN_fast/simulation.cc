@@ -142,6 +142,7 @@ void setPattern(float frequency, int *pattern)
 
 void setGainAndKappa(float gain, float kappa)
 {
+    // weights
     for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
     {
         for (int j = 0; j < (int)*maxRowLengths[i] * N_pyramidal * N_minicolumns; j++)
@@ -151,6 +152,17 @@ void setGainAndKappa(float gain, float kappa)
         }
         pushwGains[i](false);
         pushkappas[i](false);
+    }
+    // bias
+    for (int i = 0; i < std::end(biasGains) - std::begin(biasGains); i++)
+    {
+        for (int j = 0; j < N_pyramidal * N_minicolumns; j++)
+        {
+            (*biasGains[i])[j] = gain;
+            (*kappasBias[i])[j] = kappa;
+        }
+        pushbiasGains[i](false);
+        pushkappasBias[i](false);
     }
 }
 

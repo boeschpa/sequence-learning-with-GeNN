@@ -32,8 +32,8 @@ public:
         {"tauZj_1", [](const std::vector<double> &pars, double){ return 1.0/ pars[1]; }}, // 1.0 / tauZj
         {"tauP_1", [](const std::vector<double> &pars, double){ return 1.0/ pars[2]; }},  // 1.0 / tauP
         {"TauX1", [](const std::vector<double> &pars, double){ return 1.0 / pars[6]; }},  // 1.0 / TauX
-        {"epsilon_pre", [](const std::vector<double> &pars, double){ return pars[5]/ pars[0]; }},   // epsilon / tauZi
-        {"epsilon_post", [](const std::vector<double> &pars, double){ return pars[5]/ pars[1]; }}});// epsilon / tauZj
+        {"epsilonPre", [](const std::vector<double> &pars, double){ return pars[5]/ pars[0]; }},   // epsilon / tauZi
+        {"epsilonPost", [](const std::vector<double> &pars, double){ return pars[5]/ pars[1]; }}});// epsilon / tauZj
 
     SET_SIM_CODE(
         "$(addToInSynDelay, $(wGain)*$(x)*$(g), $(d));\n" // (1) * (1) * uS
@@ -47,8 +47,8 @@ public:
 
     SET_SYNAPSE_DYNAMICS_CODE(
         "$(x) = $(x) + DT * $(TauX1) * (1.0 - $(x));\n"
-        "$(Zi) = $(Zi) + DT * ($(epsilon_pre) - $(Zi)*$(tauZi_1));"
-        "$(Zj) = $(Zj) + DT * ($(epsilon_post)- $(Zj)*$(tauZj_1));"
+        "$(Zi) = $(Zi) + DT * ($(epsilonPre) - $(Zi)*$(tauZi_1));"
+        "$(Zj) = $(Zj) + DT * ($(epsilonPost)- $(Zj)*$(tauZj_1));"
         "$(Pi) = $(Pi) + DT * $(kappa) * $(tauP_1) * ($(Zi) - $(Pi));"  
         "$(Pj) = $(Pj) + DT * $(kappa) * $(tauP_1) * ($(Zj) - $(Pj));"
         "$(Pij) = $(Pij) + DT * $(kappa) * $(tauP_1) * ($(Zj)*$(Zi) - $(Pij));"

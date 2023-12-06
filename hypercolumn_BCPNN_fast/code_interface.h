@@ -37,6 +37,14 @@ scalar** kappas[] = {
     &kappaH0_1_to_H0_1_lateral_nmda,
     &kappaH0_1_to_H0_1_lateral_ampa,
 };
+scalar** biasGains[] = {
+    &biasGainH0_0,
+    &biasGainH0_1,
+};
+scalar** kappasBias[] = {
+    &kappaH0_0,
+    &kappaH0_1,
+};
 typedef void (*pushwGain)(bool); 
 pushwGain pushwGains[] = {
     pushwGainH0_0_to_H0_0_lateral_nmdaToDevice,
@@ -50,14 +58,26 @@ pushwGain pushwGains[] = {
 };
 typedef void (*pushkappa)(bool); 
 pushkappa pushkappas[] = {
+    pushkappaH0_0ToDevice,
     pushkappaH0_0_to_H0_0_lateral_nmdaToDevice,
     pushkappaH0_0_to_H0_0_lateral_ampaToDevice,
     pushkappaH0_0_to_H0_1_lateral_nmdaToDevice,
     pushkappaH0_0_to_H0_1_lateral_ampaToDevice,
+    pushkappaH0_1ToDevice,
     pushkappaH0_1_to_H0_0_lateral_nmdaToDevice,
     pushkappaH0_1_to_H0_0_lateral_ampaToDevice,
     pushkappaH0_1_to_H0_1_lateral_nmdaToDevice,
     pushkappaH0_1_to_H0_1_lateral_ampaToDevice,
+};
+typedef void (*pushbiasGain)(bool); 
+pushbiasGain pushbiasGains[] = {
+    pushbiasGainH0_0ToDevice,
+    pushbiasGainH0_1ToDevice,
+};
+typedef void (*pushkappaBias)(bool); 
+pushkappaBias pushkappasBias[] = {
+    pushkappaH0_0ToDevice,
+    pushkappaH0_1ToDevice,
 };
 scalar** g_nmda[] = {
     &gH0_0_to_H0_0_lateral_nmda,

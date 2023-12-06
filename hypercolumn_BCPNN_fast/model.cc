@@ -20,6 +20,7 @@ void modelDefinition(ModelSpec &model)
     /// PARAMETERS + INITIAL VALUES
     ////////////////////////////
 
+
     SimpleAdEx::ParamValues p_pyramidal(
         0.28,    // 0 - Membrane capacitance [pF] 280 pf
         14.0e-3, // 1 - Membrane leak conductance [uS] 14 ns
@@ -27,13 +28,24 @@ void modelDefinition(ModelSpec &model)
         -70.0,   // 3 - Reset voltage [mV]
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
-        15.0,   // 6 - adaption time constant [ms]
-        0.15    // 7 - adatpion current per spike [nA]  (150 pA)
+        15.0,    // 6 - adaption time constant [ms]
+        0.15,    // 7 - adatpion current per spike [nA]  (150 pA)
+        5.0,     // TauZ
+        5000.0,  // TauP
+        epsilon,   // epsilon
+        1.0,     // deltaT
+        fMax,   // fMax
+        0.05     // biasGainBase 50 pA
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
         -70.0, // 0 - membrane potential V [mV]
-        0.0    // 1 - Iw adaption current [pA]
+        0.0,    // 1 - Iw adaption current [pA]
+        0.0,   // Zj
+        0.01,  // Pj
+        0.0,   // Ib
+        1.0,   // kappa
+        0.0    // biasGain
     );
 
     SimpleAdEx::ParamValues p_basket( // no adaption
@@ -44,12 +56,23 @@ void modelDefinition(ModelSpec &model)
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
         150.0,                        // 6 - adaption time constant [ms]
-        0.0                          // 7 - adatpion current per spike [nA]
+        0.0,                          // 7 - adatpion current per spike [nA]  (150 pA)
+        5.0,                          // TauZ
+        5000.0,                       // TauP
+        epsilon,                        // epsilon
+        1.0,                          // deltaT
+        fMax,                        // fMax
+        0.0                           // biasGainBase 50 pA
     );
 
     SimpleAdEx::VarValues ini_basket(
         -70.0, // 0 - membrane potential V [mV]
-        0.0    // 1 - Iw adaption current [pA]
+        0.0,    // 1 - Iw adaption current [pA]
+        0.0,   // Zj
+        0.01,  // Pj
+        0.0,   // Ib
+        0.0,   // kappa
+        0.0    // biasGain
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
@@ -85,9 +108,9 @@ void modelDefinition(ModelSpec &model)
         5.0,    // 0 - Time constant of presynaptic primary trace (ms)
         5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         5000.0, // 2 - Time constant of probability trace
-        100.0,   // 3 - Maximum firing frequency (Hz)
+        fMax,  // 3 - Maximum firing frequency (Hz)
         1.0,    // 5 - spike duration (ms)
-        0.001,  // 6 - epsilon
+        epsilon,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.1);   // 7 - depletion fraction
 
@@ -99,9 +122,9 @@ void modelDefinition(ModelSpec &model)
         150.0,  // 0 - Time constant of presynaptic primary trace (ms)
         5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         5000.0, // 2 - Time constant of probability trace
-        100.0,   // 3 - Maximum firing frequency (Hz)                todo set right
+        fMax,  // 3 - Maximum firing frequency (Hz)                todo set right
         1.0,    // 5 - spike duration (ms)
-        0.001,  // 6 - epsilon
+        epsilon,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.25);  // 7 - depletion fraction
 
@@ -173,7 +196,7 @@ void modelDefinition(ModelSpec &model)
             // add WTA connections
             // excitatory ampa pyramidal-to-basket connections
             model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-                hypercolumn_name + wta_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                hypercolumn_name + wta_ampa_name, SynapseMatrixType::SPARSE_GLOBALG, 1,
                 hypercolumn_name, hypercolumn_name + baskets_name,
                 {}, s_wta_ampa,
                 ps_wta_ampa, {},
@@ -181,7 +204,7 @@ void modelDefinition(ModelSpec &model)
 
             // inhibitory gaba basekt-to-pyramidal connections
             model.addSynapsePopulation<WeightUpdateModels::StaticPulse, PostsynapticModels::ExpCond>(
-                hypercolumn_name + wta_gaba_name, SynapseMatrixType::SPARSE_GLOBALG, 10,
+                hypercolumn_name + wta_gaba_name, SynapseMatrixType::SPARSE_GLOBALG, 1,
                 hypercolumn_name + baskets_name, hypercolumn_name,
                 {}, s_wta_gaba,
                 ps_wta_gaba, {},
@@ -203,11 +226,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_nmda(
                         0.0,                                                // 0 - g
-                        0.00,                                                // 1 - PijStar
+                        0.00,                                               // 1 - PijStar
                         0.0,                                                // Zi
-                        0.00,                                                // Pi
+                        0.00,                                               // Pi
                         0.0,                                                // Zj
-                        0.00,                                                // Pj
+                        0.00,                                               // Pj
                         lateral_nmda_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
@@ -216,11 +239,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_ampa(
                         0.0,                                                // 0 - g
-                        0.00,                                                // 1 - PijStar
+                        0.00,                                               // 1 - PijStar
                         0.0,                                                // Zi
-                        0.00,                                                // Pi
+                        0.00,                                               // Pi
                         0.0,                                                // Zj
-                        0.00,                                                // Pj
+                        0.00,                                               // Pj
                         lateral_ampa_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
