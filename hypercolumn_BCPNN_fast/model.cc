@@ -3,7 +3,6 @@
 #include "modelSpec.h"
 #include <neuronModels.h>
 #include "SimpleAdEx.h"
-#include "AdEx.h"
 #include "StaticPulseDendriticDelayStd.h"
 #include "model_param.h"
 #include "bcpnn.h"
@@ -28,7 +27,7 @@ void modelDefinition(ModelSpec &model)
         -70.0,   // 3 - Reset voltage [mV]
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
-        150.0,   // 6 - adaption time constant [ms]
+        15.0,   // 6 - adaption time constant [ms]
         0.15    // 7 - adatpion current per spike [nA]  (150 pA)
     );
 
@@ -86,7 +85,7 @@ void modelDefinition(ModelSpec &model)
         5.0,    // 0 - Time constant of presynaptic primary trace (ms)
         5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         5000.0, // 2 - Time constant of probability trace
-        20.0,   // 3 - Maximum firing frequency (Hz)
+        100.0,   // 3 - Maximum firing frequency (Hz)
         1.0,    // 5 - spike duration (ms)
         0.001,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant
@@ -100,7 +99,7 @@ void modelDefinition(ModelSpec &model)
         150.0,  // 0 - Time constant of presynaptic primary trace (ms)
         5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         5000.0, // 2 - Time constant of probability trace
-        20.0,   // 3 - Maximum firing frequency (Hz)                todo set right
+        100.0,   // 3 - Maximum firing frequency (Hz)                todo set right
         1.0,    // 5 - spike duration (ms)
         0.001,  // 6 - epsilon
         800.0,  // 7 - short term depression time constant

@@ -9,7 +9,7 @@
 class AdEx : public NeuronModels::Base
 {
 public:
-    DECLARE_MODEL(AdEx, 9, 2);
+    DECLARE_MODEL(AdEx, 15, 4);
 
     SET_SIM_CODE(
         "unsigned int mt;\n"
@@ -25,6 +25,8 @@ public:
 
     SET_THRESHOLD_CONDITION_CODE("$(V) >= $(Vthresh)");
 
+    SET_ADDITIONAL_INPUT_VARS({{"Sj", "scalar", 0.0}});
+
     SET_RESET_CODE(
         "$(V) = $(Vreset);\n"
         "$(Iw) = $(Iw) + $(b) ;\n");
@@ -38,7 +40,13 @@ public:
         "Vslope",     // spike upstroke slopefactor [mV]
         "TauW",       // adaption time constant [ms]
         "b",       // adaption current per spike [nA]
-        "a"});          // adaption coupling parameter a
+        "a",          // adaption coupling parameter a
+        "TauZ",
+        "TauP",
+        "epsilon",
+        "deltaT",
+        "kappa",
+        "biasGain"});
         
 
     SET_DERIVED_PARAMS({
@@ -46,7 +54,7 @@ public:
         {"Vslope1", [](const std::vector<double> &pars, double){ return 1.0 / pars[5]; }}, // Vslope^-1
         {"C1", [](const std::vector<double> &pars, double){ return 1.0 / pars[0]; }}}); // C^-1
 
-    SET_VARS({{"V", "scalar"}, {"Iw", "scalar"}});
+    SET_VARS({{"V", "scalar"}, {"Iw", "scalar"}, {"Zj", "scalar"}, {"Pj", "scalar"}});
 
     SET_NEEDS_AUTO_REFRACTORY(true);
 };

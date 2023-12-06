@@ -24,12 +24,23 @@ void modelDefinition(NNmodel &model)
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
         150.0,   // 6 - adaption time constant [ms]
-        0.150    // 7 - adatpion current per spike [nA]  (150 pA)
+        0.150,   // 7 - adatpion current per spike [nA]  (150 pA)
+        5.0,     // TauZ
+        5000.0,  // TauP
+        0.001,   // epsilon
+        1.0,     // deltaT
+        50.0,   // fMax
+        0.05      // biasGainBase 50 pA
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
         -70.0, // 0 - membrane potential V [mV]
-        0.0    // 1 - Iw adaption current [pA]
+        0.0,   // 1 - Iw adaption current [pA]
+        0.0,   // Zj
+        0.01,  // Pj
+        0.0,   // Ib
+        1.0,   // kappa
+        0.0    // biasGain
     );
 
     WeightUpdateModels::StaticPulse::VarValues staticSynapseInit(
@@ -82,27 +93,27 @@ void modelDefinition(NNmodel &model)
         0.0); // 1 - PjStar
 
     BCPNN::ParamValues bcpnn_p(
-        10.0,   // 0 - Time constant of presynaptic primary trace (ms)
-        10.0,   // 1 - Time constant of postsynaptic primary trace (ms)
+        5.0,    // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
         1000.0, // 2 - Time constant of probability trace
-        50.0,   // 3 - Maximum firing frequency (Hz)
+        100.0,  // 3 - Maximum firing frequency (Hz)
         1.0,    // 5 - spike duration (ms)
         0.01,   // 6 - epsilon
         800.0,  // 7 - short term depression time constant
         0.25);  // 7 - depletion fraction
 
     BCPNN::VarValues bcpnn_ini(
-        0.1,                                  // 0 - g
-        0.5,                                  // 1 - PijStar
-        0.1,                                  // Zi
-        0.5,                                  // Pi
-        0.1,                                  // Zj
-        0.5,                                  // Pj
-        0.00602,                              // w_gain_base
-        0.0,                                  // w_gain
-        1.0,                                  // kappa
-        0.0,                                  // delay d
-        1.0);                                 // x
+        0.0,     // 0 - g
+        0.01,    // 1 - PijStar
+        0.0,     // Zi
+        0.01,    // Pi
+        0.0,     // Zj
+        0.01,    // Pj
+        0.00602, // w_gain_base
+        0.0,     // w_gain
+        1.0,     // kappa
+        0.0,     // delay d
+        1.0);    // x
 
     // Exponential current parameters
     PostsynapticModels::ExpCond::ParamValues ps_p(
