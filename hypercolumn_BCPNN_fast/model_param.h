@@ -15,7 +15,7 @@ const float fMax = 100.0;
 const float epsilon = 0.001;
 
 // simulation params
-const float recall_time = 4000.0;
+const float recall_time = 500.0;
 const float recall_break = 100.0;
 const float background_freq = 100.0;
 
@@ -24,7 +24,7 @@ const float training_freq = 350.0;
 const int N_patterns = 5;
 const float pattern_time = 200.0; // (ms) 10 attr/s
 const float pattern_break = 0.0; // (ms) 0 for sequence learning
-const int epochs = 4; // number of training passes
+const int epochs = 1; // number of training passes
 
 
 const std::string minicolumn_basename = "M";

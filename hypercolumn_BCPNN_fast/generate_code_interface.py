@@ -132,7 +132,6 @@ pushkappa = "typedef void (*pushkappa)(bool); \n"
 pushkappa += "pushkappa pushkappas[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
-        pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) +"ToDevice,\n"  # add bias kappa push
         for ip in range(param.hyper_height):
             for jp in range(param.hyper_width):
                 pushkappa +=   "    pushkappaH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
