@@ -88,8 +88,11 @@ fig, ax = plt.subplots(2,1,sharex=True)
 fig.set_size_inches(16,16)
 
 # plot spikes
-spike_id = np.where(np.logical_and(time<sim_time, time > time_start))[0]
-ax[0].plot(time[spike_id], spikes[spike_id],".")
+if (sim_time != time[-1] and time_start != 0):
+    spike_id = np.where(np.logical_and(time<sim_time, time > time_start))[0]
+    ax[0].plot(time[spike_id], spikes[spike_id],".")
+else:
+    ax[0].plot(time, spikes,".")
 
 for i in range(param.hyper_height*param.hyper_width-1):
     ax[0].axhline(y = (i+1)*param.N_pyramidal*param.N_minicolumns, color = 'k', linestyle = '-') 
