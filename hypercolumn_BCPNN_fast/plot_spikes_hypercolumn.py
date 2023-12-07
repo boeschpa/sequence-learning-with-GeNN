@@ -85,7 +85,7 @@ for i in range(param.N_minicolumns):
 #plot
 
 fig, ax = plt.subplots(2,1,sharex=True)
-fig.set_size_inches(12,8)
+fig.set_size_inches(16,16)
 
 # plot spikes
 spike_id = np.where(np.logical_and(time<sim_time, time > time_start))[0]

@@ -8,24 +8,27 @@ const int N_minicolumns = 10;
 const int N_basket = 30;
 const int N_pyramidal = 10;
 const float wta_prob = 0.7;
-const float lateral_prob = 0.5;
+const float lateral_prob = 0.25;
 const int hyper_width = 2;
-const int hyper_height = 1;
+const int hyper_height = 2;
 const float fMax = 100.0;
 const float epsilon = 0.001;
+const float lateral_ampa_conductance = 0.00602; // 6.02 nS
+const float lateral_nmda_conductance = 0.00122; // 1.22 nS
+const float wta_gaba_conductance = 0.00602; // 1.22 nS
+const float wta_ampa_conductance = 0.00602; // 1.22 nS
 
 // simulation params
-const float recall_time = 500.0;
-const float recall_break = 100.0;
-const float background_freq = 100.0;
+const float recall_time = 5000.0;
+const float recall_break = 1000.0;
+const float background_freq = 350.0;
 
 // training params
-const float training_freq = 350.0;
+const float training_freq = 150.0;
 const int N_patterns = 5;
 const float pattern_time = 200.0; // (ms) 10 attr/s
-const float pattern_break = 0.0; // (ms) 0 for sequence learning
-const int epochs = 1; // number of training passes
-
+const float pattern_break = 0.0;  // (ms) 0 for sequence learning
+const int epochs = 5;             // number of training passes
 
 const std::string minicolumn_basename = "M";
 const std::string baskets_name = "_baskets";

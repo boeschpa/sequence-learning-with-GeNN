@@ -76,21 +76,18 @@ void modelDefinition(ModelSpec &model)
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
-        0.00602); // 0 - conductance 6.02 nS
+        wta_ampa_conductance); // 0 - conductance 6.02 nS
     PostsynapticModels::ExpCond::ParamValues ps_wta_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_gaba(
-        0.00602); // 0 - conductance TODO
+        wta_gaba_conductance); // 0 - conductance TODO
     PostsynapticModels::ExpCond::ParamValues ps_wta_gaba(
         5.0,    // 0 - tau_S: decay time constant for S [ms]
         -70.0); // 1 - Erev: Reversal potential GABA
 
     InitSparseConnectivitySnippet::FixedProbabilityNoAutapse::ParamValues wtaProb(wta_prob);
-
-    float lateral_ampa_conductance = 0.001;  // 0.00602; // 6.02 nS
-    float lateral_nmda_conductance = 0.0005; // 0.00122; // 1.22 nS
 
     // delay parameters
     float maxDelay = 20.0;
