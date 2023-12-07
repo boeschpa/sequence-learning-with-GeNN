@@ -15,7 +15,7 @@ const float fMax = 100.0;
 const float epsilon = 0.001;
 const float lateral_ampa_conductance = 0.00602; // 6.02 nS
 const float lateral_nmda_conductance = 0.00122; // 1.22 nS
-const float wta_gaba_conductance = 0.00602; // 1.22 nS
+const float wta_gaba_conductance = 0.00902; // 1.22 nS
 const float wta_ampa_conductance = 0.00602; // 1.22 nS
 const float biasBaseGain = 0.05; // 50 pA
 
