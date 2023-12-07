@@ -68,7 +68,7 @@ int *generateRandomPattern(int N_hypercolumns, int N_minicolumns, unsigned int s
     std::mt19937 gen(seed);
 
     // Create a distribution to generate random integers
-    std::uniform_int_distribution<int> distribution(0, N_minicolumns);
+    std::uniform_int_distribution<int> distribution(0, N_minicolumns-1);
 
     int *random_pattern = new int[N_hypercolumns];
 
