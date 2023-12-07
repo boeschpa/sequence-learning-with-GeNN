@@ -184,8 +184,8 @@ int main()
     setAllStimulation(0.0);
 
     // generate random sequence
-    int **sequence = generateRandomSequence(N_patterns,hyper_width*hyper_height, N_minicolumns, 42);
-    //int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height, N_minicolumns);
+    //int **sequence = generateRandomSequence(N_patterns,hyper_width*hyper_height, N_minicolumns, 42);
+    int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height, N_minicolumns);
 
     initializeSparse();
 

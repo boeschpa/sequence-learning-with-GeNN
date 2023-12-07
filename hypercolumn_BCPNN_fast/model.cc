@@ -35,7 +35,7 @@ void modelDefinition(ModelSpec &model)
         epsilon,   // epsilon
         1.0,     // deltaT
         fMax,   // fMax
-        0.05     // biasGainBase 50 pA
+        biasBaseGain     // biasGainBase 50 pA
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
@@ -55,7 +55,7 @@ void modelDefinition(ModelSpec &model)
         -70.0,                        // 3 - Reset voltage [mV]
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
-        150.0,                        // 6 - adaption time constant [ms]
+        15.0,                        // 6 - adaption time constant [ms]
         0.0,                          // 7 - adatpion current per spike [nA]  (150 pA)
         5.0,                          // TauZ
         5000.0,                       // TauP
