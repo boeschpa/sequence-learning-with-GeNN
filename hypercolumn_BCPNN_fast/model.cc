@@ -29,7 +29,7 @@ void modelDefinition(ModelSpec &model)
         -55.0,   // 4 - Spiking threshold [mV]
         3.0,     // 5 - spike upstroke slopefactor [mV]
         15.0,    // 6 - adaption time constant [ms]
-        0.15,    // 7 - adatpion current per spike [nA]  (150 pA)
+        0.05,    // 7 - adatpion current per spike [nA]  (150 pA)
         5.0,     // TauZ
         5000.0,  // TauP
         epsilon,   // epsilon
