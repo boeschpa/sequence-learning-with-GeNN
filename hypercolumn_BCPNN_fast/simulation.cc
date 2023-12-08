@@ -106,7 +106,7 @@ int **generateRandomSequence(int N_patterns, int N_hypercolumns, int N_minicolum
     return randomSequence;
 }
 
-int **generateDiagonalSequence(int N_patterns, int N_hypercolumns, int N_minicolumns)
+int **generateDiagonalSequence(int N_patterns, int N_hypercolumns)
 {
     int **sequence = new int *[N_patterns];
     for (int i = 0; i < N_patterns; i++)
@@ -170,8 +170,8 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    //float buffer_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
-    float buffer_time = std::max(std::max( N_patterns * (pattern_break + pattern_time), recall_break), recall_time);
+    float buffer_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
+    //float buffer_time = std::max(std::max( N_patterns * (pattern_break + pattern_time), recall_break), recall_time);
     allocateRecordingBuffers(int(buffer_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -187,7 +187,7 @@ int main()
 
     // generate random sequence
     int **sequence = generateRandomSequence(N_patterns,hyper_width*hyper_height, N_minicolumns, 42);
-    //int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height, N_minicolumns);
+    //int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
 
     initializeSparse();
 
@@ -234,8 +234,8 @@ int main()
                 #endif
             }
         }
-        writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
+        //writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+        //                         N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
     }
 
     // RECALL BREAK
@@ -251,8 +251,8 @@ int main()
         RECORD_TRACE;
         #endif
     }
-    writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
+    //writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+    //                             N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
 
     // RECALL
     setGainAndKappa(1.0, 0.0);          // set weight and learning rate
@@ -273,7 +273,7 @@ int main()
     #endif
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
+                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
     //recordWeights();
 
     return 0;

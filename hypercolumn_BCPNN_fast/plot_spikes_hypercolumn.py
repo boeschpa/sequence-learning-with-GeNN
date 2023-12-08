@@ -74,7 +74,8 @@ if len(sys.argv)>=5:
 spikes_per_minicolumn = spikes // param.N_pyramidal
 spikes_per_minicolumn_index = spikes_per_minicolumn % param.N_minicolumns
 
-dense_time = range(time_start,int(sim_time),1)
+stride = 10
+dense_time = range(time_start,int(sim_time),stride)
 firing_rate = np.zeros((param.N_minicolumns,len(dense_time)))
 
 for i in range(param.N_minicolumns):
@@ -111,4 +112,16 @@ plt.savefig("plot_spikes.png")
 # Show plot
 if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
     plt.show()
+
+
+
+# slow! maybe increase stride
+# ^CTraceback (most recent call last):
+#   File "/home/boeshpa/sequence-learning-with-GeNN/hypercolumn_BCPNN_fast/plot_spikes_hypercolumn.py", line 84, in <module>
+#     firing_rate[i,t_id] = calculate_firing_rate(spike_times, t, t+t_window)
+#   File "/home/boeshpa/sequence-learning-with-GeNN/hypercolumn_BCPNN_fast/plot_spikes_hypercolumn.py", line 47, in calculate_firing_rate
+#     spikes_in_window = [spike for spike in spike_times if time_window_start <= spike <= time_window_end]
+#   File "/home/boeshpa/sequence-learning-with-GeNN/hypercolumn_BCPNN_fast/plot_spikes_hypercolumn.py", line 47, in <listcomp>
+#     spikes_in_window = [spike for spike in spike_times if time_window_start <= spike <= time_window_end]
+# KeyboardInterrupt
 
