@@ -44,13 +44,14 @@ def read_file(file_path):
         return file.read()
     
 def idToPattern(spikes,sequence):
-    spikes_per_minicolumn = spikes // param.N_pyramidal  #global minicolumn index
+    spikes_per_minicolumn = spikes // param.N_pyramidal  #global minicolumn index (which mc does neuron/spike belong to)
+    spikes_local_minicoliumn = spikes_per_minicolumn % param.N_minicolumns
     spikes_per_pattern = np.zeros((param.N_patterns,len(spikes)),dtype=bool)
-    for sp_id, sp in enumerate(spikes_per_minicolumn):
-        hc = sp//param.N_minicolumns
-        for pt_id, pt in enumerate(sequence):
-            if (sp==pt[hc]):
-                spikes_per_pattern[pt_id][sp_id] = 1
+    for sp_id, sp in enumerate(spikes_per_minicolumn): # iterate through spikes (indexed by MC)
+        hc = sp//param.N_minicolumns # HC of spike
+        for pt_id, pt in enumerate(sequence): # iterate through patterns in sequence
+            if (spikes_local_minicoliumn[sp_id]==pt[hc]):  # if spike sp with hypercolumn hc is part of the current pattern pt
+                spikes_per_pattern[pt_id][sp_id] = True # set index to true for this spike in this pattern
     return spikes_per_pattern
             
 
@@ -119,6 +120,7 @@ for i in range(param.hyper_height*param.hyper_width-1):
 
 # plot firing rates
 ax[1].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T)
+ax[1].set_ylim((0,0.5))
 
 
 # Add labels and a legend
