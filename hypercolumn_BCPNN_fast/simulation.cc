@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <random>
+#include <algorithm>
 
 //#define TRACES
 
@@ -169,8 +170,9 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float sim_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
-    allocateRecordingBuffers(int(sim_time / time_step));
+    //float buffer_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
+    float buffer_time = std::max(std::max( N_patterns * (pattern_break + pattern_time), recall_break), recall_time);
+    allocateRecordingBuffers(int(buffer_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
     float t_start;
@@ -232,6 +234,8 @@ int main()
                 #endif
             }
         }
+        writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
     }
 
     // RECALL BREAK
@@ -247,6 +251,8 @@ int main()
         RECORD_TRACE;
         #endif
     }
+    writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
 
     // RECALL
     setGainAndKappa(1.0, 0.0);          // set weight and learning rate
@@ -267,7 +273,7 @@ int main()
     #endif
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(sim_time / time_step), time_step);
+                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
     recordWeights();
 
     return 0;
