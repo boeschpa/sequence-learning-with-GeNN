@@ -252,7 +252,7 @@ int main()
         #endif
     }
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
+                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
 
     // RECALL
     setGainAndKappa(1.0, 0.0);          // set weight and learning rate
@@ -273,8 +273,8 @@ int main()
     #endif
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
-    recordWeights();
+                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
+    //recordWeights();
 
     return 0;
 }
