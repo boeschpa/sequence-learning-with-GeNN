@@ -86,7 +86,7 @@ i=0
 sim_time = time[-1]
 time_start = 0
 t_window = 20.0 #ms
-stride = 10
+stride = 1
 
 if len(sys.argv)>=4:
     time_start = int(sys.argv[3])
@@ -120,7 +120,6 @@ for i in range(param.hyper_height*param.hyper_width-1):
 
 # plot firing rates
 ax[1].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T)
-ax[1].set_ylim((0,0.5))
 
 
 # Add labels and a legend
