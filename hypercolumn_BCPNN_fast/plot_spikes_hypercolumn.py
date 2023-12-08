@@ -86,7 +86,7 @@ i=0
 sim_time = time[-1]
 time_start = 0
 t_window = 20.0 #ms
-stride = 1
+stride = 10
 
 if len(sys.argv)>=4:
     time_start = int(sys.argv[3])
