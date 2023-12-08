@@ -43,6 +43,20 @@ def read_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
     
+def idToPattern(spikes,sequence):
+    spikes_per_minicolumn = spikes // param.N_pyramidal  #global minicolumn index
+    spikes_per_pattern = np.zeros((param.N_patterns,len(spikes)),dtype=bool)
+    for sp_id, sp in enumerate(spikes_per_minicolumn):
+        hc = sp//param.N_minicolumns
+        for pt_id, pt in enumerate(sequence):
+            if (sp==pt[hc]):
+                spikes_per_pattern[pt_id][sp_id] = 1
+    return spikes_per_pattern
+            
+
+
+        
+    
 def calculate_firing_rate(spike_times, time_window_start, time_window_end):
     spikes_in_window = [spike for spike in spike_times if time_window_start <= spike <= time_window_end]
     firing_rate = len(spikes_in_window) / (time_window_end - time_window_start)
@@ -56,35 +70,40 @@ param = parse_cpp_header(cpp_param)
 # Load data from the .dat file
 data = np.loadtxt(sys.argv[1])
 
+# Load sequence
+sequence = np.loadtxt("sequence.csv",delimiter=",",dtype=int)
+
 # Split the data into time (first column) and voltage (subsequent N columns)
 time = data[:, 0]
 N= np.shape(data)[1]-1
 spikes = data[:, 1:N+1]  # Assuming the voltage columns are from 1 to N+1
+spikes = spikes.astype(int)
 
+
+# get firing rates
 i=0
 sim_time = time[-1]
 time_start = 0
-t_window = 10.0 #ms
+t_window = 20.0 #ms
+stride = 10
 
 if len(sys.argv)>=4:
     time_start = int(sys.argv[3])
 if len(sys.argv)>=5:
     sim_time = int(sys.argv[4])
 
-spikes_per_minicolumn = spikes // param.N_pyramidal
-spikes_per_minicolumn_index = spikes_per_minicolumn % param.N_minicolumns
+spikes_per_pattern = idToPattern(spikes,sequence)
 
-stride = 10
 dense_time = range(time_start,int(sim_time),stride)
-firing_rate = np.zeros((param.N_minicolumns,len(dense_time)))
+firing_rate = np.zeros((param.N_patterns,len(dense_time)))
 
-for i in range(param.N_minicolumns):
+for i in range(param.N_patterns):
     for (t_id, t) in enumerate(dense_time):
-        indices = np.where(spikes_per_minicolumn_index == i)[0]
+        indices = spikes_per_pattern[i]
         spike_times = time[indices]
         firing_rate[i,t_id] = calculate_firing_rate(spike_times, t, t+t_window)
-#plot
 
+#plot
 fig, ax = plt.subplots(2,1,sharex=True)
 fig.set_size_inches(16,16)
 
@@ -99,7 +118,7 @@ for i in range(param.hyper_height*param.hyper_width-1):
     ax[0].axhline(y = (i+1)*param.N_pyramidal*param.N_minicolumns, color = 'k', linestyle = '-') 
 
 # plot firing rates
-ax[1].plot(np.tile(dense_time,(param.N_minicolumns,1)).T,firing_rate.T)
+ax[1].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T)
 
 
 # Add labels and a legend

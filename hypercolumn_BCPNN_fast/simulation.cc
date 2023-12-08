@@ -116,6 +116,23 @@ int **generateDiagonalSequence(int N_patterns, int N_hypercolumns)
     return sequence;
 }
 
+void saveSequence(int **sequence, int N_patterns, int N_hypercolumns){
+    FILE *sequenceFile = fopen("sequence.csv", "w");
+    for (int pat = 0; pat < N_patterns; pat++){
+        int *pattern = sequence[pat];
+        for (int mc = 0; mc < N_hypercolumns; mc++){
+            if (mc==0){
+                fprintf(sequenceFile, "%i", pattern[mc]);
+            }
+            else{
+                fprintf(sequenceFile, ", %i", pattern[mc]);
+            }
+        }
+        fprintf(sequenceFile, "\n");
+    }
+    fclose(sequenceFile);
+}
+
 void setPattern(float frequency, int *pattern)
 {
     for (int i = 0; i < std::end(firingProbs) - std::begin(firingProbs); i++)
@@ -188,6 +205,8 @@ int main()
     // generate random sequence
     int **sequence = generateRandomSequence(N_patterns,hyper_width*hyper_height, N_minicolumns, 42);
     //int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
+    saveSequence(sequence, N_patterns, hyper_width*hyper_height);
+
 
     initializeSparse();
 
