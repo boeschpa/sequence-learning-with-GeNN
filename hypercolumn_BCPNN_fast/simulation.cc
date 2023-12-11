@@ -22,7 +22,7 @@
 void recordVmem(FILE *traceVmem, scalar *neuron_pop)
 {
     fprintf(traceVmem, "%f", t);
-    for (int i = 0; i < N_pyramida*N_minicolumns; i++)
+    for (int i = 0; i < N_pyramidal*N_minicolumns; i++)
     {
         fprintf(traceVmem, ", %f", neuron_pop[i]);
     }
