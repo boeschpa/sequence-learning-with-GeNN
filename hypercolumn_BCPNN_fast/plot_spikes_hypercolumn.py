@@ -52,16 +52,32 @@ def idToPattern(spikes,sequence):
         for pt_id, pt in enumerate(sequence): # iterate through patterns in sequence
             if (spikes_local_minicoliumn[sp_id]==pt[hc]):  # if spike sp with hypercolumn hc is part of the current pattern pt
                 spikes_per_pattern[pt_id][sp_id] = True # set index to true for this spike in this pattern
-    return spikes_per_pattern
-            
-
-
-        
+    return spikes_per_pattern  
     
 def calculate_firing_rate(spike_times, time_window_start, time_window_end):
     spikes_in_window = [spike for spike in spike_times if time_window_start <= spike <= time_window_end]
     firing_rate = len(spikes_in_window) / (time_window_end - time_window_start)
     return firing_rate
+
+def pattern_list(firing_rates, t_window): # add pattern index to list if it stays winner for t_window 
+    # firing_rate[i,t_id]
+    patterns = []
+    winners = np.argmax(firing_rates,axis=0)
+    count = 0
+    current_num = -1
+    num_repeat = np.round(t_window)
+    for win in winners:
+        if win == current_num:
+            count+=1
+        else:
+            current_num = win
+            count = 0
+        if count == num_repeat:
+            patterns.append(current_num)
+    return patterns
+
+
+
 
 cpp_param = read_file("model_param.h")
 
@@ -86,7 +102,7 @@ i=0
 sim_time = time[-1]
 time_start = 0
 t_window = 20.0 #ms
-stride = 10
+stride = 10 #ms
 
 if len(sys.argv)>=4:
     time_start = int(sys.argv[3])
@@ -103,6 +119,10 @@ for i in range(param.N_patterns):
         indices = spikes_per_pattern[i]
         spike_times = time[indices]
         firing_rate[i,t_id] = calculate_firing_rate(spike_times, t, t+t_window)
+
+pattern_window = 10.0 / param.time_step / stride
+patterns = pattern_list(firing_rate,pattern_window)
+print(patterns)
 
 #plot
 fig, ax = plt.subplots(2,1,sharex=True)
