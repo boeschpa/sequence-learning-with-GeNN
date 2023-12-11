@@ -22,7 +22,7 @@
 void recordVmem(FILE *traceVmem, scalar *neuron_pop)
 {
     fprintf(traceVmem, "%f", t);
-    for (int i = 0; i < N_pyramidal*N_minicolumns; i++)
+    for (int i = 0; i < N_pyramidal * N_minicolumns; i++)
     {
         fprintf(traceVmem, ", %f", neuron_pop[i]);
     }
@@ -255,6 +255,7 @@ int main()
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
 #endif
+                pullH0_1StateFromDevice();
                 recordVmem(traceVmem, VH0_1);
             }
 
@@ -269,6 +270,7 @@ int main()
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
 #endif
+                pullH0_1StateFromDevice();
                 recordVmem(traceVmem, VH0_1);
             }
         }
@@ -288,6 +290,7 @@ int main()
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
 #endif
+        pullH0_1StateFromDevice();
         recordVmem(traceVmem, VH0_1);
     }
     // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
@@ -305,6 +308,7 @@ int main()
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
 #endif
+        pullH0_1StateFromDevice();
         recordVmem(traceVmem, VH0_1);
     }
 #ifdef TRACES
