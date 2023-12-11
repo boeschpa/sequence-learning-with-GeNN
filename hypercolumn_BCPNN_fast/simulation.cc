@@ -19,6 +19,8 @@
     RECORD_TRACE_AMPA; \
     RECORD_TRACE_NMDA
 
+// #define VMEM
+
 void recordVmem(FILE *traceVmem, scalar *neuron_pop)
 {
     fprintf(traceVmem, "%f", t);
@@ -224,14 +226,16 @@ int main()
 
     initializeSparse();
 
-// trace recording
+    // trace recording
 #ifdef TRACES
     FILE *traceAmpa = fopen("trace_ampa.csv", "w");
     FILE *traceNmda = fopen("trace_nmda.csv", "w");
 #endif
 
     // vmem recording
+#ifdef VMEM
     FILE *traceVmem = fopen("trace_vmem.csv", "w");
+#endif
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms
@@ -255,8 +259,10 @@ int main()
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
 #endif
+#ifdef VMEM
                 pullH0_0StateFromDevice();
                 recordVmem(traceVmem, VH0_0);
+#endif
             }
 
             // set training break
@@ -270,8 +276,10 @@ int main()
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
 #endif
+#ifdef VMEM
                 pullH0_0StateFromDevice();
                 recordVmem(traceVmem, VH0_0);
+#endif
             }
         }
         // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
@@ -290,8 +298,10 @@ int main()
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
 #endif
+#ifdef VMEM
         pullH0_0StateFromDevice();
         recordVmem(traceVmem, VH0_0);
+#endif
     }
     // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
     //                              N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
@@ -308,14 +318,18 @@ int main()
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
 #endif
+#ifdef VMEM
         pullH0_0StateFromDevice();
         recordVmem(traceVmem, VH0_0);
+#endif
     }
 #ifdef TRACES
     fclose(traceAmpa);
     fclose(traceNmda);
 #endif
+#ifdef VMEM
     fclose(traceVmem);
+#endif
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
