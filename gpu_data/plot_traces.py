@@ -48,10 +48,10 @@ data = np.loadtxt(sys.argv[1],delimiter=",")
 # Split the data into time (first column) and voltage (subsequent N columns)
 time = data[:, 0]
 N= np.shape(data)[1]-1
-traces = data[:, 1:3]  # Select number of signals
+traces = data[:, 1:5]  # Select number of signals
 
 figure, axes = plt.subplots(1,1,sharex = True)
-axes.plot(time, traces)
+axes.plot(time, traces, alpha= 0.5, linewidth = 1)
 
 
 
