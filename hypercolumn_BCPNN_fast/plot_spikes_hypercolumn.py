@@ -120,7 +120,7 @@ for i in range(param.N_patterns):
         spike_times = time[indices]
         firing_rate[i,t_id] = calculate_firing_rate(spike_times, t, t+t_window)
 
-pattern_window = 10.0 / param.time_step / stride
+pattern_window = 10.0 / stride
 patterns = pattern_list(firing_rate,pattern_window)
 print(patterns)
 
