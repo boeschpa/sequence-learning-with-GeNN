@@ -13,4 +13,4 @@
 *.csv
 *.pdf
 *.png
-hypercolumn_BCPNN_fast/output.spikes.csv
+*output.spikes.csv
