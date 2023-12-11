@@ -11,13 +11,23 @@
 #include <random>
 #include <algorithm>
 
-//#define TRACES
+// #define TRACES
 
 #define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
 #define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_lateral_nmda[10], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_0_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], PiH0_0_to_H0_0_lateral_nmda[1], PjH0_0_to_H0_0_lateral_nmda[1], PijH0_0_to_H0_0_lateral_nmda[1], ZiH0_0_to_H0_0_lateral_nmda[1], ZjH0_0_to_H0_0_lateral_nmda[1])
 #define RECORD_TRACE   \
     RECORD_TRACE_AMPA; \
     RECORD_TRACE_NMDA
+
+void recordVmem(FILE *traceVmem, scalar *neuron_pop)
+{
+    fprintf(traceVmem, "%f", t);
+    for (int i = 0; i < N_pyramida*N_minicolumns; i++)
+    {
+        fprintf(traceVmem, ", %f", neuron_pop[i]);
+    }
+    fprintf(traceVmem, "\n");
+}
 
 void recordWeights()
 {
@@ -69,7 +79,7 @@ int *generateRandomPattern(int N_hypercolumns, int N_minicolumns, unsigned int s
     std::mt19937 gen(seed);
 
     // Create a distribution to generate random integers
-    std::uniform_int_distribution<int> distribution(0, N_minicolumns-1);
+    std::uniform_int_distribution<int> distribution(0, N_minicolumns - 1);
 
     int *random_pattern = new int[N_hypercolumns];
 
@@ -101,7 +111,7 @@ int **generateRandomSequence(int N_patterns, int N_hypercolumns, int N_minicolum
     int **randomSequence = new int *[N_patterns];
     for (int i = 0; i < N_patterns; i++)
     {
-        randomSequence[i] = generateRandomPattern(N_hypercolumns, N_minicolumns, seed+i);
+        randomSequence[i] = generateRandomPattern(N_hypercolumns, N_minicolumns, seed + i);
     }
     return randomSequence;
 }
@@ -116,15 +126,20 @@ int **generateDiagonalSequence(int N_patterns, int N_hypercolumns)
     return sequence;
 }
 
-void saveSequence(int **sequence, int N_patterns, int N_hypercolumns){
+void saveSequence(int **sequence, int N_patterns, int N_hypercolumns)
+{
     FILE *sequenceFile = fopen("sequence.csv", "w");
-    for (int pat = 0; pat < N_patterns; pat++){
+    for (int pat = 0; pat < N_patterns; pat++)
+    {
         int *pattern = sequence[pat];
-        for (int mc = 0; mc < N_hypercolumns; mc++){
-            if (mc==0){
+        for (int mc = 0; mc < N_hypercolumns; mc++)
+        {
+            if (mc == 0)
+            {
                 fprintf(sequenceFile, "%i", pattern[mc]);
             }
-            else{
+            else
+            {
                 fprintf(sequenceFile, ", %i", pattern[mc]);
             }
         }
@@ -151,7 +166,7 @@ void setPattern(float frequency, int *pattern)
                 (*firingProbs[i])[j] = 0.0;
             }
         }
-    }    
+    }
     for (int i = 0; i < std::end(pushfiringProbsToDevice) - std::begin(pushfiringProbsToDevice); i++)
     {
         pushfiringProbsToDevice[i](N_minicolumns * N_pyramidal);
@@ -188,7 +203,7 @@ int main()
 {
     allocateMem(); // allocate memory for all neuron variables
     float buffer_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
-    //float buffer_time = std::max(std::max( N_patterns * (pattern_break + pattern_time), recall_break), recall_time);
+    // float buffer_time = std::max(std::max( N_patterns * (pattern_break + pattern_time), recall_break), recall_time);
     allocateRecordingBuffers(int(buffer_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -203,18 +218,20 @@ int main()
     setAllStimulation(0.0);
 
     // generate random sequence
-    int **sequence = generateRandomSequence(N_patterns,hyper_width*hyper_height, N_minicolumns, 42);
-    //int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
-    saveSequence(sequence, N_patterns, hyper_width*hyper_height);
-
+    int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, 42);
+    // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
+    saveSequence(sequence, N_patterns, hyper_width * hyper_height);
 
     initializeSparse();
 
-    // trace recording
-    #ifdef TRACES
+// trace recording
+#ifdef TRACES
     FILE *traceAmpa = fopen("trace_ampa.csv", "w");
     FILE *traceNmda = fopen("trace_nmda.csv", "w");
-    #endif
+#endif
+
+    // vmem recording
+    FILE *traceVmem = fopen("trace_vmem.csv", "w");
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms
@@ -233,11 +250,12 @@ int main()
             while (t - t_start < pattern_time)
             {
                 stepTime();
-                #ifdef TRACES
+#ifdef TRACES
                 pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
-                #endif
+#endif
+                recordVmem(traceVmem, VH0_1);
             }
 
             // set training break
@@ -246,15 +264,16 @@ int main()
             while (t - t_start < pattern_break)
             {
                 stepTime();
-                #ifdef TRACES
+#ifdef TRACES
                 pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
-                #endif
+#endif
+                recordVmem(traceVmem, VH0_1);
             }
         }
-        //writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-        //                         N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
+        // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+        //                          N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
     }
 
     // RECALL BREAK
@@ -264,14 +283,15 @@ int main()
     while (t - t_start < recall_break)
     {
         stepTime();
-        #ifdef TRACES
+#ifdef TRACES
         pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
-        #endif
+#endif
+        recordVmem(traceVmem, VH0_1);
     }
-    //writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-    //                             N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
+    // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+    //                              N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
 
     // RECALL
     setGainAndKappa(1.0, 0.0);          // set weight and learning rate
@@ -280,20 +300,22 @@ int main()
     while (t - t_start < recall_time)
     {
         stepTime();
-        #ifdef TRACES
+#ifdef TRACES
         pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
-        #endif
+#endif
+        recordVmem(traceVmem, VH0_1);
     }
-    #ifdef TRACES
+#ifdef TRACES
     fclose(traceAmpa);
     fclose(traceNmda);
-    #endif
+#endif
+    fclose(traceVmem);
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
-    //recordWeights();
+    // recordWeights();
 
     return 0;
 }
