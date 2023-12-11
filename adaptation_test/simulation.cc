@@ -125,22 +125,22 @@ int main()
     FILE *postTrace = fopen("post_trace.csv", "w");
 
     // freeze neurons and synapses
-    *biasGainPre = 1.0;
+    biasGainPre[0] = 0.0;
     pushbiasGainPreToDevice();
 
-    *kappaPre = 0.0;
+    kappaPre[0] = 0.0;
     pushkappaPreToDevice();
 
-    *wGainPreToPost = 1.0;
+    wGainPreToPost[0] = 1.0;
     pushwGainPreToPostToDevice();
 
-    *kappaPreToPost = 0.0;
+    kappaPreToPost[0] = 0.0;
     pushkappaPreToPostToDevice();
 
-    *biasGainPost = 1.0;
+    biasGainPost[0] = 0.0;
     pushbiasGainPostToDevice();
 
-    *kappaPost = 0.0;
+    kappaPost[0] = 0.0;
     pushkappaPostToDevice();
 
     // Loop through timesteps

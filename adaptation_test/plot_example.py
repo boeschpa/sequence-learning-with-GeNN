@@ -21,7 +21,7 @@ figure.set_figwidth(10)
 figure.set_figheight(6)
 
 axes[0].plot(pre_times, pre_v, label="Vmem Pre")
-axes[1].plot(pre_times, pre_iw, label="Ga Pre")
+axes[1].plot(pre_times, pre_iw, label="Iw Pre")
 axes[0].vlines(pre_spike_times, -50.0, -40.0, color="red", label="Pre spikes")
 axes[0].vlines(pre_stim_times, -40.0, -30.0, color="blue", label="Pre stimulus spikes")
 

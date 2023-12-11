@@ -255,8 +255,8 @@ int main()
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
 #endif
-                pullH0_1StateFromDevice();
-                recordVmem(traceVmem, VH0_1);
+                pullH0_0StateFromDevice();
+                recordVmem(traceVmem, VH0_0);
             }
 
             // set training break
@@ -270,8 +270,8 @@ int main()
                 pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
                 RECORD_TRACE;
 #endif
-                pullH0_1StateFromDevice();
-                recordVmem(traceVmem, VH0_1);
+                pullH0_0StateFromDevice();
+                recordVmem(traceVmem, VH0_0);
             }
         }
         // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
@@ -290,8 +290,8 @@ int main()
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
 #endif
-        pullH0_1StateFromDevice();
-        recordVmem(traceVmem, VH0_1);
+        pullH0_0StateFromDevice();
+        recordVmem(traceVmem, VH0_0);
     }
     // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
     //                              N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
@@ -308,8 +308,8 @@ int main()
         pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
         RECORD_TRACE;
 #endif
-        pullH0_1StateFromDevice();
-        recordVmem(traceVmem, VH0_1);
+        pullH0_0StateFromDevice();
+        recordVmem(traceVmem, VH0_0);
     }
 #ifdef TRACES
     fclose(traceAmpa);
