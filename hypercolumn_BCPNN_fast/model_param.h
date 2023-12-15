@@ -21,7 +21,7 @@ const float biasBaseGain = 0.05; // 50 pA
 
 // simulation params
 const float recall_time = 1000.0;
-const float recall_break = 0.0;
+const float settle_time = 1000.0;
 const float background_freq = 100.0;
 
 // training params

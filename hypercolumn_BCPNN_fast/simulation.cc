@@ -204,15 +204,14 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float buffer_time = epochs * N_patterns * (pattern_break + pattern_time) + recall_break + recall_time;
-    // float buffer_time = std::max(std::max( N_patterns * (pattern_break + pattern_time), recall_break), recall_time);
+    float buffer_time = settle_time + epochs * N_patterns * (pattern_break + pattern_time) + recall_time;
+
     allocateRecordingBuffers(int(buffer_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
     float t_start;
 
     // initialize firingProbs to 0
-
     for (int i = 0; i < std::end(allocatefiringProbs) - std::begin(allocatefiringProbs); i++)
     {
         allocatefiringProbs[i](N_minicolumns * N_pyramidal);
@@ -236,6 +235,24 @@ int main()
 #ifdef VMEM
     FILE *traceVmem = fopen("trace_vmem.csv", "w");
 #endif
+
+    // SETTLE
+    setGainAndKappa(1.0, 0.0);
+    setAllStimulation(background_freq);
+    t_start = t;
+    while (t - t_start < settle_time)
+    {
+        stepTime();
+#ifdef TRACES
+        pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+        pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
+        RECORD_TRACE;
+#endif
+#ifdef VMEM
+        pullH0_0StateFromDevice();
+        recordVmem(traceVmem, VH0_0);
+#endif
+    }
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms
@@ -282,29 +299,7 @@ int main()
 #endif
             }
         }
-        // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-        //                          N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step);
     }
-
-    // RECALL BREAK
-    setGainAndKappa(1.0, 0.0);
-    setAllStimulation(0.0);
-    t_start = t;
-    while (t - t_start < recall_break)
-    {
-        stepTime();
-#ifdef TRACES
-        pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
-        RECORD_TRACE;
-#endif
-#ifdef VMEM
-        pullH0_0StateFromDevice();
-        recordVmem(traceVmem, VH0_0);
-#endif
-    }
-    // writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-    //                              N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, true);
 
     // RECALL
     setGainAndKappa(1.0, 0.0);          // set weight and learning rate
