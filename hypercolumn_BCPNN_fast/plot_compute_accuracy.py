@@ -109,19 +109,49 @@ def sequence_list(firing_rate_mc,firing_rates,t_window):
     patterns_midpoint = patterns_start_index[0:-1]+np.divide(patterns_start_index[1:]-patterns_start_index[0:-1],2)
     
     #discard learning epochs and 5 "transition" patterns
-    patterns=patterns[param.N_epochs*param.N_patterns+4:]
-    patterns_midpoint=patterns_midpoint[param.N_epochs*param.N_patterns+4:]
+    #patterns=patterns[param.epochs*param.N_patterns+4:]
+    #patterns_midpoint=patterns_midpoint[param.epochs*param.N_patterns+4:]
+    patterns = np.delete(patterns,4)
+    patterns_midpoint= np.delete(patterns_midpoint,4)
+    print(patterns)
 
     # find one cycle (pattern 0 to pattern 0)
     cycle_start = -1
     cycle_end = -1
     for pat_id, pat in enumerate(patterns):
-        if(cycle_start!=-1 and pat==0):
+        if(cycle_start==-1 and pat==0):
             cycle_start = pat_id
-        elif(cycle_end!=-1 and pat==0):
+        elif(cycle_end==-1 and pat==0):
             cycle_end = pat_id
+    patterns=patterns[cycle_start:cycle_end]
+    patterns_midpoint=patterns_midpoint[cycle_start:cycle_end]
 
-    return patterns
+    #build recall sequence
+    offset = 0
+    recall_sequence = np.zeros((param.N_patterns,N_hypercolumns),dtype=int)-1
+    for pat_id in range(param.N_patterns):
+        if pat_id >= len(patterns_midpoint):
+            print("unmatched sequence (missing end)")
+            offset += 1
+            continue
+        if patterns[pat_id-offset]==pat_id:
+            for hc in range(N_hypercolumns):
+                recall_sequence[pat_id,hc] = np.argmax(firing_rate_mc[hc*param.N_minicolumns:(hc+1)*param.N_minicolumns,round(patterns_midpoint[pat_id-offset])])
+        else:
+            print("unmatched sequence number")
+            offset += 1
+    if offset != 0:
+        print("sequence:")
+        print(sequence)
+        print("recall sequence:")
+        print(recall_sequence)
+        print("patterns:")
+        print(patterns)
+    return recall_sequence
+
+def recall_accuracy(recall_sequence, sequence):
+    return (recall_sequence == sequence).mean()
+
 
 cpp_param = read_file("model_param.h")
 
@@ -182,28 +212,30 @@ for i in range(param.hyper_height*param.hyper_width*param.N_minicolumns):
         firing_rate_mc[i,t_id] = calculate_firing_rate(spike_times, t, t+t_window)
 
 sequence_recall = sequence_list(firing_rate_mc,firing_rate,pattern_window)
+accuracy = recall_accuracy(sequence_recall, sequence)
+print("accuracy: "+str(accuracy))
 
-#plot
-fig, ax = plt.subplots(1+param.hyper_height*param.hyper_width,1,sharex=True)
-fig.set_size_inches(16,10)
+# #plot
+# fig, ax = plt.subplots(1+param.hyper_height*param.hyper_width,1,sharex=True)
+# fig.set_size_inches(16,10)
 
-# plot firing rates per pattern
-ax[0].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T)
-# Add labels and a legend
-ax[-1].set_xlabel('Time (ms)')
-ax[0].set_ylabel('Firing rate per Pattern')
-ax[0].title.set_text('Firing rates')
+# # plot firing rates per pattern
+# ax[0].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T)
+# # Add labels and a legend
+# ax[-1].set_xlabel('Time (ms)')
+# ax[0].set_ylabel('Firing rate per Pattern')
+# ax[0].title.set_text('Firing rates')
 
-# plot firing rates per mc
-for i in range(N_hypercolumns):
-    ax[i+1].plot(np.tile(dense_time,(param.N_minicolumns,1)).T,firing_rate_mc[param.N_minicolumns*i:param.N_minicolumns*(i+1)].T)
-    ax[i+1].set_ylabel("Firing rate per minicolum in hypercolum "+str(i+1))
+# # plot firing rates per mc
+# for i in range(N_hypercolumns):
+#     ax[i+1].plot(np.tile(dense_time,(param.N_minicolumns,1)).T,firing_rate_mc[param.N_minicolumns*i:param.N_minicolumns*(i+1)].T)
+#     ax[i+1].set_ylabel("Firing rate per minicolum in hypercolum "+str(i+1))
 
-plt.savefig("plot_rates.png")
+# plt.savefig("plot_rates.png")
 
-# Show plot
-if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
-    plt.show()
+# # Show plot
+# if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
+#     plt.show()
 
 
 
