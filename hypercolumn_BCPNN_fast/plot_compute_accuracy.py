@@ -120,11 +120,12 @@ def sequence_list(firing_rate_mc,firing_rates,t_window):
             if (patterns[cycle_start:cycle_end]==list(range(param.N_patterns))):
                 patterns=patterns[cycle_start:]
                 patterns_midpoint=patterns_midpoint[cycle_start:]
+                print("found first epoch")
                 break
             else:
                 cycle_start = -1
                 cycle_end = -1
-                
+    print(patterns)  
     #discard learning epochs and 5 "transition" patterns
     patterns=patterns[param.epochs*param.N_patterns+4:]
     patterns_midpoint=patterns_midpoint[param.epochs*param.N_patterns+4:]
