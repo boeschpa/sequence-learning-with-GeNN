@@ -109,11 +109,8 @@ def sequence_list(firing_rate_mc,firing_rates,t_window):
     patterns_midpoint = patterns_start_index[0:-1]+np.divide(patterns_start_index[1:]-patterns_start_index[0:-1],2)
     
     #discard learning epochs and 5 "transition" patterns
-    #patterns=patterns[param.epochs*param.N_patterns+4:]
-    #patterns_midpoint=patterns_midpoint[param.epochs*param.N_patterns+4:]
-    patterns = np.delete(patterns,4)
-    patterns_midpoint= np.delete(patterns_midpoint,4)
-    print(patterns)
+    patterns=patterns[param.epochs*param.N_patterns+4:]
+    patterns_midpoint=patterns_midpoint[param.epochs*param.N_patterns+4:]
 
     # find one cycle (pattern 0 to pattern 0)
     cycle_start = -1
