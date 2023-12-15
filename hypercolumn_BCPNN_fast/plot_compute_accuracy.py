@@ -108,6 +108,23 @@ def sequence_list(firing_rate_mc,firing_rates,t_window):
     patterns_start_index = np.array(patterns_start_index)
     patterns_midpoint = patterns_start_index[0:-1]+np.divide(patterns_start_index[1:]-patterns_start_index[0:-1],2)
     
+    #discard settle random patterns by finding the first correct sequence (training epoch 1)
+    cycle_start = -1
+    cycle_end = -1
+    for pat_id, pat in enumerate(patterns):
+        if(cycle_start==-1 and pat==0):
+            cycle_start = pat_id
+        elif(cycle_end==-1 and pat==0):
+            cycle_end = pat_id
+            # check if pattern was found
+            if (patterns[cycle_start:cycle_end]==list(range(param.N_patterns))):
+                patterns=patterns[cycle_start:]
+                patterns_midpoint=patterns_midpoint[cycle_start:]
+                break
+            else:
+                cycle_start = -1
+                cycle_end = -1
+                
     #discard learning epochs and 5 "transition" patterns
     patterns=patterns[param.epochs*param.N_patterns+4:]
     patterns_midpoint=patterns_midpoint[param.epochs*param.N_patterns+4:]
