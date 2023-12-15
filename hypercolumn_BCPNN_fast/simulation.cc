@@ -237,7 +237,7 @@ int main()
 #endif
 
     // SETTLE
-    setGainAndKappa(1.0, 0.0);
+    setGainAndKappa(0.0, 1.0);
     setAllStimulation(background_freq);
     t_start = t;
     while (t - t_start < settle_time)
