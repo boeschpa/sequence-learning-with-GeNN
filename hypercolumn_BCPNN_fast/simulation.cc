@@ -219,116 +219,120 @@ int main()
     setAllStimulation(0.0);
 
     // generate random sequence
-    int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, 42);
-    // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
+    // int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, 42);
+    int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
     saveSequence(sequence, N_patterns, hyper_width * hyper_height);
 
-    initializeSparse();
-
-    // trace recording
-#ifdef TRACES
-    FILE *traceAmpa = fopen("trace_ampa.csv", "w");
-    FILE *traceNmda = fopen("trace_nmda.csv", "w");
-#endif
-
-    // vmem recording
-#ifdef VMEM
-    FILE *traceVmem = fopen("trace_vmem.csv", "w");
-#endif
-
-    // SETTLE
-    setGainAndKappa(0.0, 1.0);
-    setAllStimulation(background_freq);
-    t_start = t;
-    while (t - t_start < settle_time)
+    for (int rep = 0; rep < 2; rep++)
     {
-        stepTime();
+
+        initializeSparse();
+
+        // trace recording
 #ifdef TRACES
-        pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
-        RECORD_TRACE;
+        FILE *traceAmpa = fopen("trace_ampa.csv", "w");
+        FILE *traceNmda = fopen("trace_nmda.csv", "w");
 #endif
+
+        // vmem recording
 #ifdef VMEM
-        pullH0_0StateFromDevice();
-        recordVmem(traceVmem, VH0_0);
+        FILE *traceVmem = fopen("trace_vmem.csv", "w");
 #endif
-    }
 
-    // TRAINING
-    // t is current simulation time provided by GeNN in ms
-    setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
-    for (int ep = 0; ep < epochs; ep++)
-    {
-        std::cout << "Training epoch " << ep + 1 << std::endl;
-
-        for (int pat = 0; pat < N_patterns; pat++)
+        // SETTLE
+        setGainAndKappa(0.0, 1.0);
+        setAllStimulation(background_freq);
+        t_start = t;
+        while (t - t_start < settle_time)
         {
-            int *pattern = sequence[pat];
-
-            // set training pattern
-            setPattern(training_freq, pattern);
-            t_start = t;
-            while (t - t_start < pattern_time)
-            {
-                stepTime();
+            stepTime();
 #ifdef TRACES
-                pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
-                pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
-                RECORD_TRACE;
+            pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+            pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
+            RECORD_TRACE;
 #endif
 #ifdef VMEM
-                pullH0_0StateFromDevice();
-                recordVmem(traceVmem, VH0_0);
+            pullH0_0StateFromDevice();
+            recordVmem(traceVmem, VH0_0);
 #endif
-            }
+        }
 
-            // set training break
-            setAllStimulation(0);
-            t_start = t;
-            while (t - t_start < pattern_break)
+        // TRAINING
+        // t is current simulation time provided by GeNN in ms
+        setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
+        for (int ep = 0; ep < epochs; ep++)
+        {
+            std::cout << "Training epoch " << ep + 1 << std::endl;
+
+            for (int pat = 0; pat < N_patterns; pat++)
             {
-                stepTime();
+                int *pattern = sequence[pat];
+
+                // set training pattern
+                setPattern(training_freq, pattern);
+                t_start = t;
+                while (t - t_start < pattern_time)
+                {
+                    stepTime();
 #ifdef TRACES
-                pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
-                pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
-                RECORD_TRACE;
+                    pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+                    pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
+                    RECORD_TRACE;
 #endif
 #ifdef VMEM
-                pullH0_0StateFromDevice();
-                recordVmem(traceVmem, VH0_0);
+                    pullH0_0StateFromDevice();
+                    recordVmem(traceVmem, VH0_0);
 #endif
+                }
+
+                // set training break
+                setAllStimulation(0);
+                t_start = t;
+                while (t - t_start < pattern_break)
+                {
+                    stepTime();
+#ifdef TRACES
+                    pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+                    pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
+                    RECORD_TRACE;
+#endif
+#ifdef VMEM
+                    pullH0_0StateFromDevice();
+                    recordVmem(traceVmem, VH0_0);
+#endif
+                }
             }
         }
-    }
 
-    // RECALL
-    setGainAndKappa(1.0, 0.0);          // set weight and learning rate
-    setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
-    t_start = t;
-    while (t - t_start < recall_time)
-    {
-        stepTime();
+        // RECALL
+        setGainAndKappa(1.0, 0.0);          // set weight and learning rate
+        setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
+        t_start = t;
+        while (t - t_start < recall_time)
+        {
+            stepTime();
 #ifdef TRACES
-        pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
-        RECORD_TRACE;
+            pullH0_0_to_H0_0_lateral_ampaStateFromDevice();
+            pullH0_0_to_H0_0_lateral_nmdaStateFromDevice();
+            RECORD_TRACE;
 #endif
 #ifdef VMEM
-        pullH0_0StateFromDevice();
-        recordVmem(traceVmem, VH0_0);
+            pullH0_0StateFromDevice();
+            recordVmem(traceVmem, VH0_0);
 #endif
+        }
+#ifdef TRACES
+        fclose(traceAmpa);
+        fclose(traceNmda);
+#endif
+#ifdef VMEM
+        fclose(traceVmem);
+#endif
+        pullRecordingBuffersFromDevice();
+        writeTextSpikeArrayRecording("output.spikes_"+std::to_string(rep)+".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+                                     N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
+        // recordWeights();
     }
-#ifdef TRACES
-    fclose(traceAmpa);
-    fclose(traceNmda);
-#endif
-#ifdef VMEM
-    fclose(traceVmem);
-#endif
-    pullRecordingBuffersFromDevice();
-    writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
-                                 N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
-    // recordWeights();
 
     return 0;
 }
