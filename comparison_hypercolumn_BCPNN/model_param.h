@@ -12,6 +12,7 @@ const float lateral_prob = 0.20;
 const int hyper_width = 2;
 const int hyper_height = 1;
 const float fMax = 25.0;
+const float fDesired = 0.5;
 const float epsilon = 0.001;
 const float lateral_ampa_conductance = 0.00602; // 6.02 nS
 const float lateral_nmda_conductance = 0.00122; // 1.22 nS
@@ -22,7 +23,7 @@ const float biasBaseGain = 0.05; // 50 pA
 // simulation params
 const float recall_time = 500.0;
 const float settle_time = 500.0;
-const float background_freq = 10.0;
+const float background_freq = 50.0;
 
 // training params
 const float training_freq = 350.0;

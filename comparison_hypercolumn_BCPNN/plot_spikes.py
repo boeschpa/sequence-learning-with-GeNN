@@ -142,8 +142,8 @@ print("pyramidal rate: " + str(pyramidal_rate) + " Hz")
 
 indices = spikes_per_pattern[0]
 spike_times = time[indices]
-pattern_rate = 1000.0*len(timeBasket[np.where(np.logical_and(spike_times<param.settle_time+param.pattern_time, spike_times > param.settle_time))])/(param.N_basket*param.hyper_height*param.hyper_width*param.settle_time)
-print("pattern rate: " + str(pattern_rate) + " Hz")
+#pattern_rate = 1000.0*len(timeBasket[np.where(np.logical_and(spike_times<param.settle_time+param.pattern_time, spike_times > param.settle_time))[0]])/(param.N_basket*param.hyper_height*param.hyper_width*param.settle_time)
+#print("pattern rate: " + str(pattern_rate) + " Hz")
 
 # plot
 fig, ax = plt.subplots(3,1,sharex=True)

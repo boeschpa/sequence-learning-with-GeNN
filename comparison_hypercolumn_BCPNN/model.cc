@@ -20,32 +20,31 @@ void modelDefinition(ModelSpec &model)
     /// PARAMETERS + INITIAL VALUES
     ////////////////////////////
 
-
     SimpleAdEx::ParamValues p_pyramidal(
-        0.28,    // 0 - Membrane capacitance [pF] 280 pf
-        14.0e-3, // 1 - Membrane leak conductance [uS] 14 ns
-        -70.0,   // 2 - Resting membrane potential [mV]
-        -70.0,   // 3 - Reset voltage [mV]
-        -55.0,   // 4 - Spiking threshold [mV]
-        3.0,     // 5 - spike upstroke slopefactor [mV]
-        150.0,    // 6 - adaption time constant [ms]
-        0.15,    // 7 - adatpion current per spike [nA]  (150 pA)
-        5.0,     // TauZ
-        5000.0,  // TauP
-        epsilon,   // epsilon
-        1.0,     // deltaT
-        fMax,   // fMax
-        biasBaseGain     // biasGainBase 50 pA
+        0.28,        // 0 - Membrane capacitance [pF] 280 pf
+        14.0e-3,     // 1 - Membrane leak conductance [uS] 14 ns
+        -70.0,       // 2 - Resting membrane potential [mV]
+        -70.0,       // 3 - Reset voltage [mV]
+        -55.0,       // 4 - Spiking threshold [mV]
+        3.0,         // 5 - spike upstroke slopefactor [mV]
+        150.0,       // 6 - adaption time constant [ms]
+        0.15,        // 7 - adatpion current per spike [nA]  (150 pA)
+        5.0,         // TauZ
+        5000.0,      // TauP
+        epsilon,     // epsilon
+        1.0,         // deltaT
+        fMax,        // fMax
+        biasBaseGain // biasGainBase 50 pA
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
-        -70.0, // 0 - membrane potential V [mV]
-        0.0,    // 1 - Iw adaption current [pA]
-        0.0,   // Zj
-        0.01,  // Pj
-        0.0,   // Ib
-        1.0,   // kappa
-        0.0    // biasGain
+        -70.0,           // 0 - membrane potential V [mV]
+        0.0,             // 1 - Iw adaption current [pA]
+        0.0,             // Zj
+        fDesired / fMax, // Pj
+        0.0,             // Ib
+        1.0,             // kappa
+        0.0              // biasGain
     );
 
     SimpleAdEx::ParamValues p_basket( // no adaption
@@ -55,24 +54,24 @@ void modelDefinition(ModelSpec &model)
         -70.0,                        // 3 - Reset voltage [mV]
         -55.0,                        // 4 - Spiking threshold [mV]
         3.0,                          // 5 - spike upstroke slopefactor [mV]
-        15.0,                        // 6 - adaption time constant [ms]
+        15.0,                         // 6 - adaption time constant [ms]
         0.0,                          // 7 - adatpion current per spike [nA]  (150 pA)
         5.0,                          // TauZ
         5000.0,                       // TauP
-        epsilon,                        // epsilon
+        epsilon,                      // epsilon
         1.0,                          // deltaT
-        fMax,                        // fMax
+        fMax,                         // fMax
         0.0                           // biasGainBase 50 pA
     );
 
     SimpleAdEx::VarValues ini_basket(
-        -70.0, // 0 - membrane potential V [mV]
-        0.0,    // 1 - Iw adaption current [pA]
-        0.0,   // Zj
-        0.01,  // Pj
-        0.0,   // Ib
-        0.0,   // kappa
-        0.0    // biasGain
+        -70.0,           // 0 - membrane potential V [mV]
+        0.0,             // 1 - Iw adaption current [pA]
+        0.0,             // Zj
+        fDesired / fMax, // Pj
+        0.0,             // Ib
+        0.0,             // kappa
+        0.0              // biasGain
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
@@ -102,28 +101,28 @@ void modelDefinition(ModelSpec &model)
         maxDelay);    // 3 - max
 
     BCPNN::ParamValues update_params_lateral_ampa(
-        5.0,    // 0 - Time constant of presynaptic primary trace (ms)
-        5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
-        5000.0, // 2 - Time constant of probability trace
-        fMax,  // 3 - Maximum firing frequency (Hz)
-        1.0,    // 5 - spike duration (ms)
-        epsilon,  // 6 - epsilon
-        800.0,  // 7 - short term depression time constant
-        0.1);   // 7 - depletion fraction
+        5.0,     // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,     // 1 - Time constant of postsynaptic primary trace (ms)
+        5000.0,  // 2 - Time constant of probability trace
+        fMax,    // 3 - Maximum firing frequency (Hz)
+        1.0,     // 5 - spike duration (ms)
+        epsilon, // 6 - epsilon
+        800.0,   // 7 - short term depression time constant
+        0.1);    // 7 - depletion fraction
 
     PostsynapticModels::ExpCond::ParamValues ps_lateral_ampa(
         5.0,  // 0 - tau_S: decay time constant for S [ms]
         0.0); // 1 - Erev: Reversal potential AMPA
 
     BCPNN::ParamValues update_params_lateral_nmda(
-        150.0,  // 0 - Time constant of presynaptic primary trace (ms)
-        5.0,    // 1 - Time constant of postsynaptic primary trace (ms)
-        5000.0, // 2 - Time constant of probability trace
-        fMax,  // 3 - Maximum firing frequency (Hz)                todo set right
-        1.0,    // 5 - spike duration (ms)
-        epsilon,  // 6 - epsilon
-        800.0,  // 7 - short term depression time constant
-        0.25);  // 7 - depletion fraction
+        150.0,   // 0 - Time constant of presynaptic primary trace (ms)
+        5.0,     // 1 - Time constant of postsynaptic primary trace (ms)
+        5000.0,  // 2 - Time constant of probability trace
+        fMax,    // 3 - Maximum firing frequency (Hz)                todo set right
+        1.0,     // 5 - spike duration (ms)
+        epsilon, // 6 - epsilon
+        800.0,   // 7 - short term depression time constant
+        0.25);   // 7 - depletion fraction
 
     PostsynapticModels::ExpCond::ParamValues ps_lateral_nmda(
         150.0, // 0 - tau_S: decay time constant for S [ms]
@@ -223,11 +222,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_nmda(
                         0.0,                                                // 0 - g
-                        0.00,                                               // 1 - PijStar
+                        fDesired / fMax / fMax,                             // 1 - PijStar
                         0.0,                                                // Zi
-                        0.00,                                               // Pi
+                        fDesired / fMax,                                    // Pi
                         0.0,                                                // Zj
-                        0.00,                                               // Pj
+                        fDesired / fMax,                                    // Pj
                         lateral_nmda_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
@@ -236,11 +235,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_ampa(
                         0.0,                                                // 0 - g
-                        0.00,                                               // 1 - PijStar
+                        fDesired / fMax / fMax,                             // 1 - PijStar
                         0.0,                                                // Zi
-                        0.00,                                               // Pi
+                        fDesired / fMax,                                    // Pi
                         0.0,                                                // Zj
-                        0.00,                                               // Pj
+                        fDesired / fMax,                                    // Pj
                         lateral_ampa_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
