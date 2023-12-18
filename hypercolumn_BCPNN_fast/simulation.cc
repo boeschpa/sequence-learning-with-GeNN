@@ -128,9 +128,9 @@ int **generateDiagonalSequence(int N_patterns, int N_hypercolumns)
     return sequence;
 }
 
-void saveSequence(int **sequence, int N_patterns, int N_hypercolumns)
+void saveSequence(int **sequence, int N_patterns, int N_hypercolumns, std::string file_name = "sequence.csv")
 {
-    FILE *sequenceFile = fopen("sequence.csv", "w");
+    FILE *sequenceFile = fopen(file_name.c_str(), "w");
     for (int pat = 0; pat < N_patterns; pat++)
     {
         int *pattern = sequence[pat];
@@ -238,7 +238,7 @@ int main(int argc, char **argv)
     // generate random sequence
     int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
     // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
-    saveSequence(sequence, N_patterns, hyper_width * hyper_height);
+    saveSequence(sequence, N_patterns, hyper_width * hyper_height,"sequence" + output_name + ".csv");
 
     initializeSparse();
 

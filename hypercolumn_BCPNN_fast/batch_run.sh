@@ -8,7 +8,7 @@ for l in {5..5..30}; do
         start=$SECONDS;
         ./hypercolumn "$i" "$l"
         loop_time=$((SECONDS-start))
-        echo ">>> Sequence length $(l), iteration ${i} (${loop_time}s)";
+        echo ">>> Sequence length ${l}, iteration ${i} (${loop_time}s)";
     done
 done
 echo ">>> simulation time: ${SECONDS}s";
