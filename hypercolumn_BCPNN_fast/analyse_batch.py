@@ -307,7 +307,10 @@ for file in output_file_list:
     plt.tight_layout()
     plt.savefig("spikes_seed"+str(seed)+"_len"+str(sequence_length)+".png")
 
+# save dataframe in csv
+df.to_csv('accuracies.csv', index=False)
 print(df)
+
 
 
 
