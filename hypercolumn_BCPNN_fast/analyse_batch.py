@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 import re
+import pandas as pd
 
 # arguments: 0: file
 #            1: -noshow
@@ -103,6 +104,94 @@ def extract_seed_and_length(input_string):
         # Return None if no match is found
         return None
 
+def idToMC(spikes):
+    spikes_per_minicolumn = spikes // param.N_pyramidal  #global minicolumn index (which mc does neuron/spike belong to)
+    spikes_per_minicolumn = spikes_per_minicolumn.flatten() #remove extra dimension
+    N_global_mc=param.hyper_height*param.hyper_width*param.N_minicolumns
+    return np.eye(N_global_mc,dtype=bool)[spikes_per_minicolumn].T # from index vector to onehot encoded matrix
+    
+def sequence_list(firing_rate_mc,firing_rates,t_window):
+    # first find pattern transition times
+    patterns = []
+    patterns_start_index = []
+    winners = np.argmax(firing_rates,axis=0)
+    count = 0
+    current_num = -1
+    current_start_index = 0
+    num_repeat = np.round(t_window)
+    for win_id, win in enumerate(winners):
+        if win == current_num:
+            count+=1
+        else:
+            current_num = win
+            current_start_index = win_id
+            count = 0
+        if count == num_repeat:
+            patterns.append(current_num)
+            patterns_start_index.append(current_start_index)
+    
+    # compute pattern mid point
+    patterns_start_index.append(len(winners)-1)
+    patterns_start_index = np.array(patterns_start_index)
+    patterns_midpoint = patterns_start_index[0:-1]+np.divide(patterns_start_index[1:]-patterns_start_index[0:-1],2)
+    
+    #discard settle random patterns by finding the first correct sequence (training epoch 1)
+    cycle_start = -1
+    cycle_end = -1
+    for pat_id, pat in enumerate(patterns):
+        if(cycle_start==-1 and pat==0):
+            cycle_start = pat_id
+        elif(cycle_end==-1 and pat==0):
+            cycle_end = pat_id
+            # check if pattern was found
+            if (patterns[cycle_start:cycle_end]==list(range(param.N_patterns))):
+                patterns=patterns[cycle_start:]
+                patterns_midpoint=patterns_midpoint[cycle_start:]
+                break
+            else:
+                cycle_start = -1
+                cycle_end = -1
+    #discard learning epochs and 5 "transition" patterns
+    patterns=patterns[param.epochs*param.N_patterns+4:]
+    patterns_midpoint=patterns_midpoint[param.epochs*param.N_patterns+4:]
+
+    # find one cycle (pattern 0 to pattern 0)
+    cycle_start = -1
+    cycle_end = -1
+    for pat_id, pat in enumerate(patterns):
+        if(cycle_start==-1 and pat==0):
+            cycle_start = pat_id
+        elif(cycle_end==-1 and pat==0):
+            cycle_end = pat_id
+    patterns=patterns[cycle_start:cycle_end]
+    patterns_midpoint=patterns_midpoint[cycle_start:cycle_end]
+
+    #build recall sequence
+    offset = 0
+    recall_sequence = np.zeros((param.N_patterns,N_hypercolumns),dtype=int)-1
+    for pat_id in range(param.N_patterns):
+        if pat_id >= len(patterns_midpoint):
+            print("unmatched sequence (missing end)")
+            offset += 1
+            continue
+        if patterns[pat_id-offset]==pat_id:
+            for hc in range(N_hypercolumns):
+                recall_sequence[pat_id,hc] = np.argmax(firing_rate_mc[hc*param.N_minicolumns:(hc+1)*param.N_minicolumns,round(patterns_midpoint[pat_id-offset])])
+        else:
+            print("unmatched sequence number")
+            offset += 1
+    if True or offset != 0:
+        print("sequence:")
+        print(sequence)
+        print("recall sequence:")
+        print(recall_sequence)
+        print("patterns:")
+        print(patterns)
+    return recall_sequence
+
+def recall_accuracy(recall_sequence, sequence):
+    return (recall_sequence == sequence).mean()
+
 
 
 cpp_param = read_file("model_param.h")
@@ -113,6 +202,9 @@ param = parse_cpp_header(cpp_param)
 # get all pyramidal output files in the folder
 output_file_list = find_output_files()
 
+# dataframe to save all results
+df = pd.DataFrame(columns=['accuracy', 'seed', 'sequence_length'])
+
 # iterate over files
 for file in output_file_list:
     seed, sequence_length = extract_seed_and_length(file)
@@ -122,7 +214,7 @@ for file in output_file_list:
     dataBasket = np.loadtxt("output.basketSpikes_seed"+str(seed)+"_len"+str(sequence_length)+".csv")
 
     # Load sequence
-    sequence = np.loadtxt("sequence"+str(seed)+"_len"+str(sequence_length)+".csv",delimiter=",",dtype=int,ndmin=2)
+    sequence = np.loadtxt("sequence_seed"+str(seed)+"_len"+str(sequence_length)+".csv",delimiter=",",dtype=int,ndmin=2)
 
     # Split the data into time (first column) and spikes 
     time = data[:, 0]
@@ -142,17 +234,6 @@ for file in output_file_list:
     stride = 20 #ms
     dense_time = range(time_start,int(sim_time),stride)
 
-    # firing rate of all pyramidal neurons
-    firing_rate_pyramidal = np.zeros((len(dense_time)))
-    for (t_id, t) in enumerate(dense_time):
-            firing_rate_pyramidal[t_id] = calculate_firing_rate(time, t, t+t_window, param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width)
-
-    # firing rate of all basket neurons
-    firing_rate_basket = np.zeros((len(dense_time)))
-    for (t_id, t) in enumerate(dense_time):
-            firing_rate_basket[t_id] = calculate_firing_rate(timeBasket, t, t+t_window, param.N_basket*param.hyper_height*param.hyper_width)
-
-
     # firing rate per pattern in pyramidal neurons
     spikes_per_pattern = idToPattern(spikes,sequence)
     firing_rate = np.zeros((param.N_patterns,len(dense_time)))
@@ -167,18 +248,29 @@ for file in output_file_list:
     patterns = pattern_list(firing_rate,min_pattern_length)
     print("patterns: "+ str(patterns))
 
-    # get longterm firing rates
-    basket_rate = 1000.0*len(timeBasket[np.where(timeBasket < param.settle_time)])/(param.N_basket*param.hyper_height*param.hyper_width*param.settle_time)
-    pyramidal_rate = 1000.0*len(time[np.where(time < param.settle_time)])/(param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width*param.settle_time)
-    print("basket rate: " + str(basket_rate) + " Hz")
-    print("pyramidal rate: " + str(pyramidal_rate) + " Hz")
+    # get firing rates per minicolumn
+    spikes_per_mc = idToMC(spikes)
+    N_hypercolumns = param.hyper_height*param.hyper_width
 
-    indices = spikes_per_pattern[0]
-    spike_times = time[indices]
-    pattern_rate = 1000.0*len(spike_times[np.where(np.logical_and(spike_times<param.settle_time+param.pattern_time, spike_times > param.settle_time))])/(param.N_basket*param.hyper_height*param.hyper_width*param.pattern_time)
-    print("pattern rate: " + str(pattern_rate) + " Hz")
+    dense_time = range(time_start,int(sim_time),stride)
+    firing_rate_mc = np.zeros((N_hypercolumns*param.N_minicolumns,len(dense_time)))
 
-    # plot
+    for i in range(param.hyper_height*param.hyper_width*param.N_minicolumns):
+        for (t_id, t) in enumerate(dense_time):
+            indices = spikes_per_mc[i]
+            spike_times = time[indices]
+            firing_rate_mc[i,t_id] = calculate_firing_rate(spike_times, t, t+t_window, param.N_pyramidal)
+
+    sequence_recall = sequence_list(firing_rate_mc,firing_rate,min_pattern_length)
+    accuracy = recall_accuracy(sequence_recall, sequence)
+    print("accuracy: "+str(accuracy))
+    # Adding a new row to the DataFrame
+    new_row_data = {'accuracy': accuracy, 'seed': seed, 'sequence_length': sequence_length}
+    df = df.append(new_row_data, ignore_index=True)
+
+    #############################
+    # PLOT
+    #############################
     fig, ax = plt.subplots(3,1,sharex=True)
     fig.set_size_inches(12,8)
 
@@ -197,22 +289,25 @@ for file in output_file_list:
         ax[1].axhline(y = (i+1)*param.N_basket, color = 'k', linestyle = '-') 
 
     # plot firing rates
-    ax[2].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T,label="pattern")
-    ax[2].plot(dense_time,firing_rate_basket,label="basket",color='r')
-    ax[2].plot(dense_time,firing_rate_pyramidal,label="pyramidal",color='b')
+    ax[2].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T)
+    # ax[2].plot(dense_time,firing_rate_basket,label="basket",color='r')
+    # ax[2].plot(dense_time,firing_rate_pyramidal,label="pyramidal",color='b')
 
 
 
     # Add labels and a legend
     ax[2].set_xlabel('Time (ms)')
-    ax[0].set_ylabel('Pyramidal Neuron id')
-    ax[1].set_ylabel('Basket Neuron id')
-    ax[0].title.set_text('Spikes of Neuron N vs. Time')
+    ax[0].set_ylabel('Neuron index')
+    ax[1].set_ylabel('Neuron index')
+    ax[0].title.set_text('Pyramidal Neuron Spikes')
+    ax[1].title.set_text('Basket Neuron Spikes')
+    ax[2].title.set_text('Average Neuron Firing Rate Per Pattern')
     ax[2].grid()
-    ax[2].legend()
 
     plt.tight_layout()
-    plt.savefig("plot_spikes.png")
+    plt.savefig("spikes_seed"+str(seed)+"_len"+str(sequence_length)+".png")
+
+print(df)
 
 
 
