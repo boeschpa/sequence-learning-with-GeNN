@@ -3,8 +3,8 @@ cd $(dirname $0)
 
 echo ">>> start simulation";
 SECONDS=0;
-for l in {5..5..30}; do
-    for i in {0..9}; do
+for l in {5..30..5}; do
+    for i in {0..2}; do
         start=$SECONDS;
         ./hypercolumn "$i" "$l"
         loop_time=$((SECONDS-start))
