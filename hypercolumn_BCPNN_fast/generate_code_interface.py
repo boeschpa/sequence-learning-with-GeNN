@@ -75,6 +75,12 @@ for i in range(param.hyper_height):
         recordSpk += "    &recordSpkH" + str(i) + "_" + str(j) + ",\n"
 recordSpk += "};\n"
 
+recordBasketSpk = "uint32_t** recordBasketSpkArray[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        recordBasketSpk += "    &recordSpkH" + str(i) + "_" + str(j) + "_baskets,\n"
+recordBasketSpk += "};\n"
+
 wGain = "scalar** wGains[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
@@ -185,6 +191,7 @@ cpp_interface += allocatefiringProb
 cpp_interface += pushfiringProbToDevice
 cpp_interface += firingProb
 cpp_interface += recordSpk
+cpp_interface += recordBasketSpk
 cpp_interface += wGain
 cpp_interface += kappa
 cpp_interface += biasGain

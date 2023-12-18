@@ -201,17 +201,26 @@ void setGainAndKappa(float gain, float kappa)
     }
 }
 
-
-// takes argument seed
-int main(int argc, char** argv)
+// takes arguments: (0) seed, (1) sequence_length
+int main(int argc, char **argv)
 {
     allocateMem(); // allocate memory for all neuron variables
     float buffer_time = settle_time + epochs * N_patterns * (pattern_break + pattern_time) + recall_time;
-    int seed=0;
+    int seed = 0;
+    int sequence_length = N_patterns;
+    std::string output_name = "";
 
-    if (argc>1){
+    if (argc > 1)
+    {
         std::string seed_string = argv[1];
         seed = std::stoi(seed_string);
+        output_name = "_seed" + std::to_string(seed);
+    }
+    if (argc > 2)
+    {
+        std::string sequence_length_string = argv[2];
+        sequence_length = std::stoi(sequence_length_string);
+        output_name += "_len" + std::to_string(sequence_length);
     }
 
     allocateRecordingBuffers(int(buffer_time / time_step));
@@ -334,8 +343,10 @@ int main(int argc, char** argv)
     fclose(traceVmem);
 #endif
     pullRecordingBuffersFromDevice();
-    writeTextSpikeArrayRecording("output.spikes_"+std::to_string(seed)+".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+    writeTextSpikeArrayRecording("output.spikes" + output_name + ".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
+    writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
+                                 N_basket, int(buffer_time / time_step), time_step, " ", false, false);
     // recordWeights();
 
     return 0;

@@ -12,6 +12,7 @@ const float lateral_prob = 0.28;
 const int hyper_width = 3;
 const int hyper_height = 3;
 const float fMax = 25.0;
+const float fDesired = 1.0;
 const float epsilon = 0.001;
 const float lateral_ampa_conductance = 0.00602; // 6.02 nS
 const float lateral_nmda_conductance = 0.00122; // 1.22 nS
