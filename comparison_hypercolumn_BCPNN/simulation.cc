@@ -150,7 +150,7 @@ void saveSequence(int **sequence, int N_patterns, int N_hypercolumns)
     fclose(sequenceFile);
 }
 
-void setPattern(float frequency, int *pattern)
+void setPattern(float frequency, int *pattern, float background_freq=0.0)
 {
     for (int i = 0; i < std::end(firingProbs) - std::begin(firingProbs); i++)
     {
@@ -164,8 +164,8 @@ void setPattern(float frequency, int *pattern)
                 (*firingProbs[i])[j] = time_step * 1e-3 * frequency; // dT (ms) / 1000 ms * average spike frequency
             }
             else
-            {
-                (*firingProbs[i])[j] = 0.0;
+            {   
+                (*firingProbs[i])[j] = time_step * 1e-3 * background_freq;
             }
         }
     }
@@ -245,7 +245,7 @@ int main(int argc, char** argv)
 #endif
 
     // SETTLE
-    setGainAndKappa(0.0, 1.0);
+    setGainAndKappa(0.0, 0.0);
     setAllStimulation(background_freq);
     t_start = t;
     while (t - t_start < settle_time)
@@ -264,7 +264,7 @@ int main(int argc, char** argv)
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms
-    setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
+    setGainAndKappa(0.0, 0.0); // set weight and learning rate - training
     for (int ep = 0; ep < epochs; ep++)
     {
         std::cout << "Training epoch " << ep + 1 << std::endl;
@@ -274,7 +274,7 @@ int main(int argc, char** argv)
             int *pattern = sequence[pat];
 
             // set training pattern
-            setPattern(training_freq, pattern);
+            setPattern(training_freq, pattern, background_freq);
             t_start = t;
             while (t - t_start < pattern_time)
             {
@@ -310,7 +310,7 @@ int main(int argc, char** argv)
     }
 
     // RECALL
-    setGainAndKappa(1.0, 0.0);          // set weight and learning rate
+    setGainAndKappa(0.0, 0.0);          // set weight and learning rate
     setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
     t_start = t;
     while (t - t_start < recall_time)

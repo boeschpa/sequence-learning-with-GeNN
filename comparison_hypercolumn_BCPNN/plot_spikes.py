@@ -142,8 +142,8 @@ print("pyramidal rate: " + str(pyramidal_rate) + " Hz")
 
 indices = spikes_per_pattern[0]
 spike_times = time[indices]
-#pattern_rate = 1000.0*len(timeBasket[np.where(np.logical_and(spike_times<param.settle_time+param.pattern_time, spike_times > param.settle_time))[0]])/(param.N_basket*param.hyper_height*param.hyper_width*param.settle_time)
-#print("pattern rate: " + str(pattern_rate) + " Hz")
+pattern_rate = 1000.0*len(spike_times[np.where(np.logical_and(spike_times<param.settle_time+param.pattern_time, spike_times > param.settle_time))])/(param.N_basket*param.hyper_height*param.hyper_width*param.pattern_time)
+print("pattern rate: " + str(pattern_rate) + " Hz")
 
 # plot
 fig, ax = plt.subplots(3,1,sharex=True)
@@ -173,7 +173,7 @@ ax[2].plot(dense_time,firing_rate_pyramidal,label="pyramidal",color='b')
 # Add labels and a legend
 ax[2].set_xlabel('Time (ms)')
 ax[0].set_ylabel('Pyramidal Neuron id')
-ax[0].set_ylabel('Basket Neuron id')
+ax[1].set_ylabel('Basket Neuron id')
 ax[0].title.set_text('Spikes of Neuron N vs. Time')
 ax[2].grid()
 ax[2].legend()

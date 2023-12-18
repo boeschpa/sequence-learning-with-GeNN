@@ -16,14 +16,14 @@ const float fDesired = 0.5;
 const float epsilon = 0.001;
 const float lateral_ampa_conductance = 0.00602; // 6.02 nS
 const float lateral_nmda_conductance = 0.00122; // 1.22 nS
-const float wta_ampa_conductance = 0.00122; // 6.02 nS
+const float wta_ampa_conductance = 0.00222; // 6.02 nS
 const float wta_gaba_conductance = 0.00602; // 6.02 nS
 const float biasBaseGain = 0.05; // 50 pA
 
 // simulation params
 const float recall_time = 500.0;
 const float settle_time = 500.0;
-const float background_freq = 50.0;
+const float background_freq = 15.0;
 
 // training params
 const float training_freq = 350.0;
