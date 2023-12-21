@@ -25,6 +25,12 @@ uint32_t** recordSpkArray[] = {
     &recordSpkH1_0,
     &recordSpkH1_1,
 };
+uint32_t** recordBasketSpkArray[] = {
+    &recordSpkH0_0_baskets,
+    &recordSpkH0_1_baskets,
+    &recordSpkH1_0_baskets,
+    &recordSpkH1_1_baskets,
+};
 scalar** wGains[] = {
     &wGainH0_0_to_H0_0_lateral_nmda,
     &wGainH0_0_to_H0_0_lateral_ampa,

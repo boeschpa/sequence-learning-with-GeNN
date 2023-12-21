@@ -11,9 +11,10 @@
 #include <random>
 #include <algorithm>
 
-// #define TRACES
+#define TRACES
 
-#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
+//#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
+#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * IbH0_0[0], 1000.0 * IbH0_0[1], 1000.0 * IbH0_0[2], 1000.0 * IbH0_0[3], 1000.0 * IbH0_0[4], 1000.0 * IbH0_0[5], PjH0_0[0], PjH0_0[1], PjH0_0[2], ZjH0_0[0], ZjH0_0[1])
 #define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_lateral_nmda[10], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_0_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], PiH0_0_to_H0_0_lateral_nmda[1], PjH0_0_to_H0_0_lateral_nmda[1], PijH0_0_to_H0_0_lateral_nmda[1], ZiH0_0_to_H0_0_lateral_nmda[1], ZjH0_0_to_H0_0_lateral_nmda[1])
 #define RECORD_TRACE   \
     RECORD_TRACE_AMPA; \
@@ -236,8 +237,8 @@ int main(int argc, char **argv)
     setAllStimulation(0.0);
 
     // generate random sequence
-    int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
-    // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
+    // int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
+    int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
     saveSequence(sequence, N_patterns, hyper_width * hyper_height,"sequence" + output_name + ".csv");
 
     initializeSparse();
@@ -347,7 +348,7 @@ int main(int argc, char **argv)
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
     writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
                                  N_basket, int(buffer_time / time_step), time_step, " ", false, false);
-    // recordWeights();
+    recordWeights();
 
     return 0;
 }

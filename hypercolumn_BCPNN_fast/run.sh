@@ -21,7 +21,10 @@ SECONDS=0;
 echo ">>> simulation time: ${SECONDS}s";
 python3 plot_spikes_hypercolumn.py output.spikes.csv -noshow
 #python3 plot_traces.py trace_vmem.csv plot_traces_vmem.png
-#python3 plot_traces.py trace_nmda.csv plot_traces_nmda.png -noshow
+python3 plot_traces.py trace_nmda.csv plot_traces_nmda.png -noshow
+python3 plot_traces.py trace_ampa.csv plot_traces_ampa.png -noshow
+# python3 plot_weights_hypercolumn.py weights_nmda.csv -noshow
 code -r plot_spikes.png;
-code -r plot_traces_vmem.png;
-#code -r plot_traces_nmda.png;
+#code -r plot_traces_vmem.png;
+code -r plot_traces_nmda.png;
+code -r plot_traces_ampa.png;
