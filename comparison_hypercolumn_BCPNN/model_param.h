@@ -16,17 +16,17 @@ const float fDesired = 1.0;
 const float epsilon = 0.001;
 const float lateral_ampa_conductance = 0.00602; // 6.02 nS
 const float lateral_nmda_conductance = 0.00122; // 1.22 nS
-const float wta_ampa_conductance = 0.00222; // 6.02 nS
-const float wta_gaba_conductance = 0.00602; // 6.02 nS
+const float wta_ampa_conductance = 0.0005; // 6.02 nS
+const float wta_gaba_conductance = 0.001002; // 6.02 nS
 const float biasBaseGain = 0.05; // 50 pA
 
 // simulation params
 const float recall_time = 500.0;
 const float settle_time = 500.0;
-const float background_freq = 15.0;
+const float background_freq = 25.0;
 
 // training params
-const float training_freq = 350.0;
+const float training_freq = 150.0;
 const int N_patterns = 1;
 const float pattern_time = 200.0; // (ms) 10 attr/s
 const float pattern_break = 0.0;  // (ms) 0 for sequence learning
