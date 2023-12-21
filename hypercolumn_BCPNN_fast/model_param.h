@@ -8,17 +8,17 @@ const int N_minicolumns = 10;
 const int N_basket = 30;
 const int N_pyramidal = 30;
 const float wta_prob = 0.7;
-const float lateral_prob = 0.28;
-const int hyper_width = 3;
-const int hyper_height = 3;
+const float lateral_prob = 0.20;
+const int hyper_width = 2;
+const int hyper_height = 2;
 const float fMax = 25.0;
-const float fDesired = 1.0;
-const float epsilon = 0.001;
-const float lateral_ampa_conductance = 0.00602; // 6.02 nS
-const float lateral_nmda_conductance = 0.00122; // 1.22 nS
+const float fDesired = 0.0;
+const float epsilon = 0.0001;
+const float lateral_ampa_conductance = 0.000602; // 6.02 nS
+const float lateral_nmda_conductance = 0.000122; // 1.22 nS
 const float wta_gaba_conductance = 0.00602; // 1.22 nS
 const float wta_ampa_conductance = 0.00602; // 1.22 nS
-const float biasBaseGain = 0.05; // 50 pA
+const float biasBaseGain = 0.00; // 50 pA
 
 // simulation params
 const float recall_time = 5000.0;
