@@ -291,7 +291,7 @@ int main(int argc, char** argv)
             }
 
             // set training break
-            setAllStimulation(0);
+            setAllStimulation(background_freq);
             t_start = t;
             while (t - t_start < pattern_break)
             {
@@ -310,7 +310,7 @@ int main(int argc, char** argv)
     }
 
     // RECALL
-    setGainAndKappa(1.0, 0.0);          // set weight and learning rate
+    setGainAndKappa(0.0, 0.0);          // set weight and learning rate
     setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
     t_start = t;
     while (t - t_start < recall_time)
