@@ -11,10 +11,9 @@
 #include <random>
 #include <algorithm>
 
-#define TRACES
+// #define TRACES
 
-//#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
-#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * IbH0_0[0], 1000.0 * IbH0_0[1], 1000.0 * IbH0_0[2], 1000.0 * IbH0_0[3], 1000.0 * IbH0_0[4], 1000.0 * IbH0_0[5], PjH0_0[0], PjH0_0[1], PjH0_0[2], ZjH0_0[0], ZjH0_0[1])
+#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
 #define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_lateral_nmda[10], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_0_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], 1000.0 * gH0_1_to_H0_0_lateral_nmda[maxRowLengthH0_0_to_H0_0_lateral_nmda], PiH0_0_to_H0_0_lateral_nmda[1], PjH0_0_to_H0_0_lateral_nmda[1], PijH0_0_to_H0_0_lateral_nmda[1], ZiH0_0_to_H0_0_lateral_nmda[1], ZjH0_0_to_H0_0_lateral_nmda[1])
 #define RECORD_TRACE   \
     RECORD_TRACE_AMPA; \
@@ -129,9 +128,9 @@ int **generateDiagonalSequence(int N_patterns, int N_hypercolumns)
     return sequence;
 }
 
-void saveSequence(int **sequence, int N_patterns, int N_hypercolumns, std::string file_name = "sequence.csv")
+void saveSequence(int **sequence, int N_patterns, int N_hypercolumns)
 {
-    FILE *sequenceFile = fopen(file_name.c_str(), "w");
+    FILE *sequenceFile = fopen("sequence.csv", "w");
     for (int pat = 0; pat < N_patterns; pat++)
     {
         int *pattern = sequence[pat];
@@ -202,26 +201,17 @@ void setGainAndKappa(float gain, float kappa)
     }
 }
 
-// takes arguments: (0) seed, (1) sequence_length
-int main(int argc, char **argv)
+
+// takes argument seed
+int main(int argc, char** argv)
 {
     allocateMem(); // allocate memory for all neuron variables
     float buffer_time = settle_time + epochs * N_patterns * (pattern_break + pattern_time) + recall_time;
-    int seed = 0;
-    int sequence_length = N_patterns;
-    std::string output_name = "";
+    int seed=0;
 
-    if (argc > 1)
-    {
+    if (argc>1){
         std::string seed_string = argv[1];
         seed = std::stoi(seed_string);
-        output_name = "_seed" + std::to_string(seed);
-    }
-    if (argc > 2)
-    {
-        std::string sequence_length_string = argv[2];
-        sequence_length = std::stoi(sequence_length_string);
-        output_name += "_len" + std::to_string(sequence_length);
     }
 
     allocateRecordingBuffers(int(buffer_time / time_step));
@@ -237,9 +227,9 @@ int main(int argc, char **argv)
     setAllStimulation(0.0);
 
     // generate random sequence
-    // int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
-    int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
-    saveSequence(sequence, N_patterns, hyper_width * hyper_height,"sequence" + output_name + ".csv");
+    int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
+    // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
+    saveSequence(sequence, N_patterns, hyper_width * hyper_height);
 
     initializeSparse();
 
@@ -344,11 +334,9 @@ int main(int argc, char **argv)
     fclose(traceVmem);
 #endif
     pullRecordingBuffersFromDevice();
-    writeTextSpikeArrayRecording("output.spikes" + output_name + ".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
+    writeTextSpikeArrayRecording("output.spikes_"+std::to_string(seed)+".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
-    writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
-                                 N_basket, int(buffer_time / time_step), time_step, " ", false, false);
-    recordWeights();
+    // recordWeights();
 
     return 0;
 }
