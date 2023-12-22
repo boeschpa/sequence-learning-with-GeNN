@@ -21,7 +21,7 @@ const float wta_ampa_conductance = 0.00602; // 1.22 nS
 const float biasBaseGain = 0.00; // 50 pA
 
 // simulation params
-const float recall_time = 5000.0;
+const float recall_time = 2000.0;
 const float settle_time = 500.0;
 const float background_freq = 100.0;
 
