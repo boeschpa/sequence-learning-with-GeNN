@@ -239,7 +239,7 @@ int main(int argc, char **argv)
     // generate random sequence
     int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
     // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
-    saveSequence(sequence, N_patterns, hyper_width * hyper_height);
+    saveSequence(sequence, N_patterns, hyper_width * hyper_height,"sequence" + output_name + ".csv");
 
     initializeSparse();
 
