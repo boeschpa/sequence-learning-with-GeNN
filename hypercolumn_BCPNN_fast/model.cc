@@ -38,13 +38,13 @@ void modelDefinition(ModelSpec &model)
     );
 
     SimpleAdEx::VarValues ini_pyramidal(
-        -70.0, // 0 - membrane potential V [mV]
-        0.0,   // 1 - Iw adaption current [pA]
-        0.0,   // Zj
-        0.01,  // Pj
-        0.0,   // Ib
-        1.0,   // kappa
-        0.0    // biasGain
+        -70.0,           // 0 - membrane potential V [mV]
+        0.0,             // 1 - Iw adaption current [pA]
+        0.0,             // Zj
+        fDesired / fMax, // Pj
+        0.0,             // Ib
+        1.0,             // kappa
+        0.0              // biasGain
     );
 
     SimpleAdEx::ParamValues p_basket( // no adaption
@@ -65,13 +65,13 @@ void modelDefinition(ModelSpec &model)
     );
 
     SimpleAdEx::VarValues ini_basket(
-        -70.0, // 0 - membrane potential V [mV]
-        0.0,   // 1 - Iw adaption current [pA]
-        0.0,   // Zj
-        0.01,  // Pj
-        0.0,   // Ib
-        0.0,   // kappa
-        0.0    // biasGain
+        -70.0,           // 0 - membrane potential V [mV]
+        0.0,             // 1 - Iw adaption current [pA]
+        0.0,             // Zj
+        fDesired / fMax, // Pj
+        0.0,             // Ib
+        0.0,             // kappa
+        0.0              // biasGain
     );
 
     WeightUpdateModels::StaticPulse::VarValues s_wta_ampa(
