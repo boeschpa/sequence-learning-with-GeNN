@@ -101,8 +101,8 @@ spikes = spikes.astype(int)
 i=0
 sim_time = time[-1]
 time_start = 0
-t_window = 20.0 #ms
-stride = 10 #ms
+t_window = 200.0 #ms
+stride = 100 #ms
 
 if len(sys.argv)>=4:
     time_start = int(sys.argv[3])
