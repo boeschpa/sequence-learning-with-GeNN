@@ -346,9 +346,9 @@ int main(int argc, char **argv)
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes" + output_name + ".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
-    writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
-                                 N_basket, int(buffer_time / time_step), time_step, " ", false, false);
-    recordWeights();
+    //writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
+    //                             N_basket, int(buffer_time / time_step), time_step, " ", false, false);
+    //recordWeights();
 
     return 0;
 }
