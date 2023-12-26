@@ -206,11 +206,11 @@ void setGainAndKappa(float gain, float kappa)
 int main(int argc, char **argv)
 {
     allocateMem(); // allocate memory for all neuron variables
-    float buffer_time = settle_time + epochs * N_patterns * (pattern_break + pattern_time) + recall_time;
     int seed = 0;
     int sequence_length = N_patterns;
     std::string output_name = "";
 
+    // process arguments
     if (argc > 1)
     {
         std::string seed_string = argv[1];
@@ -224,6 +224,8 @@ int main(int argc, char **argv)
         output_name += "_len" + std::to_string(sequence_length);
     }
 
+    // allocate recording buffer
+    float buffer_time = settle_time + epochs * sequence_length * (pattern_break + pattern_time) + recall_time;
     allocateRecordingBuffers(int(buffer_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -237,9 +239,9 @@ int main(int argc, char **argv)
     setAllStimulation(0.0);
 
     // generate random sequence
-    int **sequence = generateRandomSequence(N_patterns, hyper_width * hyper_height, N_minicolumns, seed);
-    // int **sequence = generateDiagonalSequence(N_patterns, hyper_width * hyper_height);
-    saveSequence(sequence, N_patterns, hyper_width * hyper_height,"sequence" + output_name + ".csv");
+    int **sequence = generateRandomSequence(sequence_length, hyper_width * hyper_height, N_minicolumns, seed);
+    // int **sequence = generateDiagonalSequence(sequence_length, hyper_width * hyper_height);
+    saveSequence(sequence, sequence_length, hyper_width * hyper_height,"sequence" + output_name + ".csv");
 
     initializeSparse();
 
@@ -279,7 +281,7 @@ int main(int argc, char **argv)
     {
         std::cout << "Training epoch " << ep + 1 << std::endl;
 
-        for (int pat = 0; pat < N_patterns; pat++)
+        for (int pat = 0; pat < sequence_length; pat++)
         {
             int *pattern = sequence[pat];
 
