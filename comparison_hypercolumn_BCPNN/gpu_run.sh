@@ -19,4 +19,4 @@ echo ">>> start simulation";
 SECONDS=0;
 ./hypercolumn;
 echo ">>> simulation time: ${SECONDS}s";
-python3 plot_spikes.py -noshow
+# python3 plot_spikes.py -noshow

@@ -14,11 +14,11 @@ const int hyper_height = 4;
 const float fMax = 25.0;
 const float fDesired = 1.0;
 const float epsilon = 0.001;
-const float lateral_ampa_conductance = 0.0060; // 6.02 nS
-const float lateral_nmda_conductance = 0.0010; // 1.22 nS
-const float wta_ampa_conductance = 0.0010; // 6.02 nS
-const float wta_gaba_conductance = 0.0090; // 6.02 nS
-const float biasBaseGain = 0.05; // 50 pA
+const float lateral_ampa_conductance = 0.00; // 6.02 nS
+const float lateral_nmda_conductance = 0.00; // 1.22 nS
+const float wta_ampa_conductance = 0.001; // 6.02 nS
+const float wta_gaba_conductance = 0.020; // 6.02 nS
+const float biasBaseGain = 0.0; // 50 pA
 
 // simulation params
 const float recall_time = 1000.0;
@@ -26,7 +26,7 @@ const float settle_time = 1000.0;
 const float background_freq = 17.0;
 
 // training params
-const float training_freq = 400.0;
+const float training_freq = 450.0;
 const int N_patterns = 3;
 const float pattern_time = 200.0; // (ms) 10 attr/s
 const float pattern_break = 200.0;  // (ms) 0 for sequence learning
