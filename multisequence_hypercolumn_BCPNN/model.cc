@@ -222,11 +222,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_nmda(
                         0.0,                                                // 0 - g
-                        fDesired / fMax / fMax,                             // 1 - PijStar
+                        0.00,                             // 1 - PijStar
                         0.0,                                                // Zi
-                        fDesired / fMax,                                    // Pi
+                        0.00,                                    // Pi
                         0.0,                                                // Zj
-                        fDesired / fMax,                                    // Pj
+                        0.00,                                    // Pj
                         lateral_nmda_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
@@ -235,11 +235,11 @@ void modelDefinition(ModelSpec &model)
 
                     BCPNN::VarValues update_vars_lateral_ampa(
                         0.0,                                                // 0 - g
-                        fDesired / fMax / fMax,                             // 1 - PijStar
+                        0.00,                             // 1 - PijStar
                         0.0,                                                // Zi
-                        fDesired / fMax,                                    // Pi
+                        0.00,                                    // Pi
                         0.0,                                                // Zj
-                        fDesired / fMax,                                    // Pj
+                        0.00,                                    // Pj
                         lateral_ampa_conductance,                           // w_gain_base
                         0.0,                                                // w_gain
                         0.0,                                                // kappa
