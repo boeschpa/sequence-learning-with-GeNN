@@ -48,18 +48,18 @@ data = np.loadtxt(sys.argv[1],delimiter=",")
 # Split the data into time (first column) and voltage (subsequent N columns)
 time = data[:, 0]
 N= np.shape(data)[1]-1
-traces = data[:, 1:3]  # Select number of signals
+traces = data[:, 1]  # Select number of signals
+mean_trace = np.mean(data[:,1:31], axis = 1)
 
-figure, axes = plt.subplots(1,1,sharex = True)
-axes.plot(time, traces)
-
-
-
-# Add labels and a legend
+figure, axes = plt.subplots(2,1,sharex = True)
+axes[0].plot(time, traces)
+axes[0].set_title("Membrane Potential")
 plt.xlabel('Time (ms)')
 plt.ylabel('Vmem (mV)')
-#plt.title('')
-
+axes[1].plot(time, mean_trace)
+axes[1].set_title("Average Membrane Potential in a Minicolumn")
+plt.xlabel('Time (ms)')
+plt.ylabel('Vmem (mV)')
 
 # Show plot
 if len(sys.argv)<=3 or sys.argv[3] != "-noshow":
