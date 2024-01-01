@@ -47,14 +47,14 @@ df["pattern_accuracy"]=""
 # iterate through rows
 for index, row in df.iterrows():
     # find last sequence
-    cycle_start = -1
+    cycle_start = 0
     cycle_end = -1
     # backwards go from 0 to 0 in sequence list (if no 0 is present, try 1,2,3...)
     start_pattern = row['sequence'][-2]
     for pat_id, pat in reversed(list(enumerate(row['sequence']))):
         if(cycle_end==-1 and pat==start_pattern):
             cycle_end = pat_id
-        elif(cycle_start==-1 and pat==start_pattern):
+        elif(cycle_start==0 and pat==start_pattern):
             cycle_start = pat_id
 
     df.at[index,'sequence_short']=row['sequence'][cycle_start:cycle_end]

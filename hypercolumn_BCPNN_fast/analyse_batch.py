@@ -174,7 +174,7 @@ def sequence_list(firing_rate_mc,firing_rates,t_window,length):
                 patterns_midpoint=patterns_midpoint[cycle_start:]
                 break
             else:
-                cycle_start = -1
+                cycle_start = pat_id
                 cycle_end = -1
     #discard learning epochs
     patterns=patterns[param.epochs*sequence_length:]

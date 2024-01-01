@@ -141,9 +141,9 @@ dense_time = range(time_start,int(sim_time),bin_size)
 
 # firing rate per pattern in pyramidal neurons
 spikes_per_pattern = idToPattern(spikes,sequence)
-firing_rate = np.zeros((param.N_patterns,len(dense_time)))
+firing_rate = np.zeros((param.N_patterns*param.N_sequences,len(dense_time)))
 
-for i in range(param.N_patterns):
+for i in range(param.N_patterns*param.N_sequences):
     indices = spikes_per_pattern[i]
     spike_times = time[indices]
     firing_rate[i,:] = compute_rolling_average_spike_rate(spike_times,sim_time,bin_size,int(t_window/bin_size),param.N_pyramidal*param.hyper_height*param.hyper_width)
@@ -151,10 +151,6 @@ for i in range(param.N_patterns):
 min_pattern_length = 50.0 / bin_size
 patterns = pattern_list(firing_rate,min_pattern_length)
 print("patterns: "+ str(patterns))
-
-pattern_window = 10.0 / bin_size
-patterns = pattern_list(firing_rate,pattern_window)
-print(patterns)
 
 #plot
 fig, ax = plt.subplots(2,1,sharex=True)
