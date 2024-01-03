@@ -113,7 +113,7 @@ void setGainAndKappa(float gain, float kappa)
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_break + recall_time;
+    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_time;
     allocateRecordingBuffers(int(sim_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -136,43 +136,14 @@ int main()
     {
         std::cout << "Training epoch " << ep + 1 << std::endl;
 
-        // setHalfStimulation(training_freq, 1);
-        // t_start = t;
-        // while (t - t_start < pattern_time)
-        // {
-        //     stepTime();
-        // }
-
-        // t_start = t;
-        // while (t - t_start < pattern_break)
-        // {
-        //     stepTime();
-        // }
-
-        // setHalfStimulation(training_freq, 0);
-        // t_start = t;
-        // while (t - t_start < pattern_time)
-        // {
-        //     stepTime();
-        // }
-
-        // t_start = t;
-        // while (t - t_start < pattern_break)
-        // {
-        //     stepTime();
-        // }
-
         for (int mc = 0; mc < N_minicolumns; mc++)
         {
             // set training pattern
-            //setOnlyBasicStimulation(training_freq, mc);
-            setAllStimulation(training_freq);
+            setOnlyBasicStimulation(training_freq, mc);
             t_start = t;
             while (t - t_start < pattern_time)
             {
                 stepTime();
-                pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-                pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
             }
 
             // set training break
@@ -181,21 +152,8 @@ int main()
             while (t - t_start < pattern_break)
             {
                 stepTime();
-                pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-                pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
             }
         }
-    }
-
-    // RECALL BREAK
-    setGainAndKappa(1.0, 0.0);
-    setAllStimulation(0.0);
-    t_start = t;
-    while (t - t_start < recall_break)
-    {
-        stepTime();
-        pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
     }
 
     // RECALL
@@ -205,8 +163,6 @@ int main()
     while (t - t_start < recall_time)
     {
         stepTime();
-        pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
-        pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
     }
 
     pullRecordingBuffersFromDevice();
