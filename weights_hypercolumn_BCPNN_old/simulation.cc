@@ -8,12 +8,6 @@
 #include "spikeArrayRecorder.h"
 #include <iostream>
 
-#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_ampa[1], PiH0_0_to_H0_0_M0to_0_lateral_ampa[1], PjH0_0_to_H0_0_M0to_0_lateral_ampa[1], PijH0_0_to_H0_0_M0to_0_lateral_ampa[1], ZiH0_0_to_H0_0_M0to_0_lateral_ampa[1], ZjH0_0_to_H0_0_M0to_0_lateral_ampa[1])
-#define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_nmda[1], PiH0_0_to_H0_0_M0to_0_lateral_nmda[1], PjH0_0_to_H0_0_M0to_0_lateral_nmda[1], PijH0_0_to_H0_0_M0to_0_lateral_nmda[1], ZiH0_0_to_H0_0_M0to_0_lateral_nmda[1], ZjH0_0_to_H0_0_M0to_0_lateral_nmda[1])
-#define RECORD_TRACE   \
-    RECORD_TRACE_AMPA; \
-    RECORD_TRACE_NMDA
-
 
 void recordWeights(){
     FILE *weightsAmpa = fopen("weights_ampa.csv", "w");
@@ -135,27 +129,6 @@ int main()
 
     initializeSparse();
 
-    // trace recording
-    FILE *traceAmpa = fopen("trace_ampa.csv", "w");
-    FILE *traceNmda = fopen("trace_nmda.csv", "w");
-
-    // // RECALL before training
-    // setGainAndKappa(1.0, 0.0);          // set weight and learning rate
-    // setAllStimulation(background_freq); // set recall frequencies               todo save and load training state
-    // t_start = t;
-    // while (t - t_start < recall_time)
-    // {
-    //     stepTime();
-    // }
-
-    // // RECALL BREAK
-    // setAllStimulation(0.0);
-    // t_start = t;
-    // while (t - t_start < recall_break)
-    // {
-    //     stepTime();
-    // }
-
     // TRAINING
     // t is current simulation time provided by GeNN in ms
     setGainAndKappa(0.0, 1.0); // set weight and learning rate - training
@@ -200,7 +173,6 @@ int main()
                 stepTime();
                 pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
                 pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
-                RECORD_TRACE;
             }
 
             // set training break
@@ -211,7 +183,6 @@ int main()
                 stepTime();
                 pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
                 pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
-                RECORD_TRACE;
             }
         }
     }
@@ -225,7 +196,6 @@ int main()
         stepTime();
         pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
         pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
-        RECORD_TRACE;
     }
 
     // RECALL
@@ -237,11 +207,8 @@ int main()
         stepTime();
         pullH0_0_to_H0_0_M0to_0_lateral_ampaStateFromDevice();
         pullH0_0_to_H0_0_M0to_0_lateral_nmdaStateFromDevice();
-        RECORD_TRACE;
     }
 
-    fclose(traceAmpa);
-    fclose(traceNmda);
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes.csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_pyramidal, int(sim_time / time_step), time_step);
