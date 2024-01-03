@@ -43,7 +43,7 @@ cpp_param = read_file("model_param.h")
 param = parse_cpp_header(cpp_param)
 
 # Load data from the .dat file
-data = np.loadtxt(sys.argv[1],delimiter=",")
+data = np.loadtxt('trace_vmem.csv',delimiter=",")
 
 # Split the data into time (first column) and voltage (subsequent N columns)
 time = data[:, 0]
@@ -61,8 +61,5 @@ axes[1].set_title("Average Membrane Potential in a Minicolumn")
 plt.xlabel('Time (ms)')
 plt.ylabel('Vmem (mV)')
 
-# Show plot
-if len(sys.argv)<=3 or sys.argv[3] != "-noshow":
-    plt.show()
-
-plt.savefig(sys.argv[2])
+plt.savefig('vmem.png')
+plt.show()
