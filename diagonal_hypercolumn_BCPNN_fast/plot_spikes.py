@@ -4,11 +4,6 @@ import sys
 
 import re
 
-# arguments: 0: file
-#            1: -noshow
-#            2: time window start
-#            3: time window stop
-
 
 class Parameters:
     def __init__(self, **kwargs):
@@ -111,7 +106,7 @@ param = parse_cpp_header(cpp_param)
 
 # Load data from the .dat file
 data = np.loadtxt("output.spikes.csv")
-dataBasket = np.loadtxt("output.spikes.csv") #np.loadtxt("output.basketSpikes.csv")
+dataBasket = np.loadtxt("output.basketSpikes.csv")
 
 # Load sequence
 sequence = np.loadtxt("sequence.csv",delimiter=",",dtype=int,ndmin=2)
@@ -132,15 +127,7 @@ time_start = 0
 t_window = 50.0 #ms
 bin_size = 10 #ms
 dense_time = range(time_start,int(sim_time),bin_size)
-
-# firing rate per pattern in pyramidal neurons
 sequence_length= param.N_patterns
-spikes_per_pattern = idToPattern(spikes,sequence,sequence_length)
-
-firing_rate_pyramidal = compute_rolling_average_spike_rate(time,sim_time,bin_size,int(t_window/bin_size),param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width)
-firing_rate_basket = compute_rolling_average_spike_rate(timeBasket,sim_time,bin_size,int(t_window/bin_size),param.N_basket*param.hyper_height*param.hyper_width)
-firing_rate_pyramidal = compute_rolling_average_spike_rate(time,sim_time,bin_size,int(t_window/bin_size),param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width)
-
 
 # firing rate per pattern in pyramidal neurons
 spikes_per_pattern = idToPattern(spikes,sequence)
@@ -154,17 +141,6 @@ for i in range(sequence_length):
 min_pattern_length = 50.0 / bin_size
 patterns = pattern_list(firing_rate,min_pattern_length)
 print("patterns: "+ str(patterns))
-
-# get longterm firing rates
-basket_rate = 1000.0*len(timeBasket[np.where(timeBasket < param.settle_time)])/(param.N_basket*param.hyper_height*param.hyper_width*param.settle_time)
-pyramidal_rate = 1000.0*len(time[np.where(time < param.settle_time)])/(param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width*param.settle_time)
-print("basket rate: " + str(basket_rate) + " Hz")
-print("pyramidal rate: " + str(pyramidal_rate) + " Hz")
-
-indices = spikes_per_pattern[0]
-spike_times = time[indices]
-pattern_rate = 1000.0*len(spike_times[np.where(np.logical_and(spike_times<param.settle_time+param.pattern_time, spike_times > param.settle_time))])/(param.N_basket*param.hyper_height*param.hyper_width*param.pattern_time)
-print("pattern rate: " + str(pattern_rate) + " Hz")
 
 # plot
 fig, ax = plt.subplots(3,1,sharex=True)
@@ -186,10 +162,6 @@ for i in range(param.hyper_height*param.hyper_width-1):
 
 # plot firing rates
 ax[2].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T,label="pattern")
-ax[2].plot(dense_time,firing_rate_basket,label="basket",color='r')
-ax[2].plot(dense_time,firing_rate_pyramidal,label="pyramidal",color='b')
-
-
 
 # Add labels and a legend
 ax[2].set_xlabel('Time (ms)')
@@ -197,7 +169,6 @@ ax[0].set_ylabel('Pyramidal Neuron id')
 ax[1].set_ylabel('Basket Neuron id')
 ax[0].title.set_text('Spikes of Neuron N vs. Time')
 ax[2].grid()
-ax[2].legend()
 
 plt.tight_layout()
 plt.savefig("plot_spikes.png")
