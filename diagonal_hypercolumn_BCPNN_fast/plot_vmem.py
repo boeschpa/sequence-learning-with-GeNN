@@ -136,7 +136,7 @@ timeBasket, spikesBasket = zip(*[(spike_time, spike) for spike_time, spike in zi
 
 # get firing rates
 i=0
-sim_time = time[-1]
+sim_time = np.max(timeBasket)
 time_start = 0
 t_window = 20.0 #ms
 bin_size = 5 #ms
@@ -144,27 +144,6 @@ dense_time = range(time_start,int(sim_time),bin_size)
 sequence_length= param.N_patterns
 
 firing_rate_basket = compute_rolling_average_spike_rate(timeBasket,sim_time,bin_size,int(t_window/bin_size),param.N_basket)
-
-
-# firing rate per pattern in pyramidal neurons
-# spikes_per_pattern = idToPattern(spikes,sequence)
-# firing_rate = np.zeros((param.N_patterns,len(dense_time)))
-
-# for i in range(sequence_length):
-#     indices = spikes_per_pattern[i]
-#     spike_times = time[indices]
-#     firing_rate[i,:] = compute_rolling_average_spike_rate(spike_times,sim_time,bin_size,int(t_window/bin_size),param.N_pyramidal*param.hyper_height*param.hyper_width)
-
-# min_pattern_length = 50.0 / bin_size
-# patterns = pattern_list(firing_rate,min_pattern_length)
-# print("patterns: "+ str(patterns))
-
-
-
-
-
-
-
 
 ## PLOT
 figure, ax = plt.subplots(4,1,sharex = True)
@@ -180,11 +159,11 @@ plt.ylabel('Vmem (mV)')
 
 # plot spikes
 colors = np.asarray([int(spike // 30) for spike in spikes])
-ax[2].scatter(time, spikes, s=1.0, c=colors, cmap="tab10",edgecolor='none')
+ax[2].scatter(time, spikes, s=2, c=colors, cmap="tab10",edgecolor='none')
 ax[2].set_ylabel('Pyramidal neuron index')
 
 # plot basket raster and firing rate
-ax[3].scatter(timeBasket, spikesBasket, s=1 ,c = 'k',edgecolor='none')
+ax[3].scatter(timeBasket, spikesBasket, s=2 ,c = 'k',edgecolor='none')
 ax[3].set_ylabel('Basket neuron index')
 ax2 = ax[3].twinx()  # instantiate a second axes that shares the same x-axis
 ax2.set_ylabel('Average firing rate', color='r')  # we already handled the x-label with ax1
@@ -197,10 +176,10 @@ ax[3].set_ylabel('Basket Neuron id')
 #ax[0].title.set_text('Spikes of Neuron N vs. Time')
 
 #set range and ticks
-range = (12400,12900)
-ax[3].set_xlim(range)
-ax[3].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
-ax[3].xaxis.set_minor_locator(ticker.AutoMinorLocator())
+# range = (7380,7620)
+# ax[3].set_xlim(range)
+# ax[3].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
+# ax[3].xaxis.set_minor_locator(ticker.AutoMinorLocator())
 
 for axis in ax:
     axis.tick_params(which='major', axis='x', length=7)
