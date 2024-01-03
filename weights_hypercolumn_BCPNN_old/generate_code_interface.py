@@ -156,6 +156,49 @@ for mp in range(param.N_minicolumns):
                                         "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
 g_ampa += "};\n"
 
+maxRowLength = "const unsigned int* maxRowLengths[] = {\n"
+for mp in range(param.N_minicolumns):
+    for m in range(param.N_minicolumns):        
+        for i in range(param.hyper_height):
+            for j in range(param.hyper_width):
+                for ip in range(param.hyper_height):
+                    for jp in range(param.hyper_width):
+                        maxRowLength +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_nmda,\n"
+                        maxRowLength +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                        "_M" + str(m) + "to_" + str(mp) + "_lateral_ampa,\n"
+maxRowLength += "};\n"
+
+biasGain = "scalar** biasGains[] = {\n"
+for m in range(param.N_minicolumns):  
+    for i in range(param.hyper_height):
+        for j in range(param.hyper_width):
+            biasGain +=   "    &biasGainH" + str(i) + "_" + str(j) + "_M" + str(m) + ",\n"
+biasGain += "};\n"
+
+kappaBias = "scalar** kappasBias[] = {\n"
+for m in range(param.N_minicolumns):  
+    for i in range(param.hyper_height):
+        for j in range(param.hyper_width):
+            kappaBias +=   "    &kappaH" + str(i) + "_" + str(j) + "_M" + str(m) + ",\n"
+kappaBias += "};\n"
+
+pushbiasGain = "typedef void (*pushbiasGain)(bool); \n"
+pushbiasGain += "pushbiasGain pushbiasGains[] = {\n"
+for m in range(param.N_minicolumns):  
+    for i in range(param.hyper_height):
+        for j in range(param.hyper_width):
+            pushbiasGain +=   "    pushbiasGainH" + str(i) + "_" + str(j) + "_M" + str(m) + "ToDevice,\n"  # add bias gain push
+pushbiasGain += "};\n"
+
+pushkappaBias = "typedef void (*pushkappaBias)(bool); \n"
+pushkappaBias += "pushkappaBias pushkappasBias[] = {\n"
+for m in range(param.N_minicolumns):  
+    for i in range(param.hyper_height):
+        for j in range(param.hyper_width):
+            pushkappaBias +=   "    pushkappaH" + str(i) + "_" + str(j) + "_M" + str(m) + "ToDevice,\n"  # add bias kappa push
+pushkappaBias += "};\n"
+
 
 
 cpp_interface += cpp_interface_head
@@ -169,6 +212,11 @@ cpp_interface += pushwGain
 cpp_interface += pushkappa
 cpp_interface += g_nmda
 cpp_interface += g_ampa
+cpp_interface += maxRowLength
+cpp_interface += biasGain
+cpp_interface += kappaBias
+cpp_interface += pushbiasGain
+cpp_interface += pushkappaBias
 
 
 

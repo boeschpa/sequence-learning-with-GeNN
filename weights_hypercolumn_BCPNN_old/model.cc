@@ -372,7 +372,4 @@ void modelDefinition(ModelSpec &model)
             }
         }
     }
-    // todo distribution for strength and delay, values; ask anders
-    // todo noisy neurons? ask anders
-    // todo (euclidian) delay
 }

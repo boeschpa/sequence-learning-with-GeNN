@@ -4,7 +4,7 @@
 
 // model params
 const float time_step = 0.05;
-const int N_minicolumns = 3;
+const int N_minicolumns = 10;
 const int N_basket = 30;
 const int N_pyramidal = 30;
 const float wta_prob = 0.7;
@@ -30,7 +30,7 @@ const float background_freq = 100.0;
 const float training_freq = 150.0;
 const float pattern_time = 200.0; // (ms) 10 attr/s
 const float pattern_break = 0.0; // (ms) 0 for sequence learning
-const int epochs = 2; // number of training passes
+const int epochs = 3; // number of training passes
 
 
 const std::string minicolumn_basename = "M";

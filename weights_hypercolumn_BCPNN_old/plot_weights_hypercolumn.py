@@ -49,7 +49,7 @@ param = parse_cpp_header(cpp_param)
 # Load data from the .dat file
 data = np.loadtxt(sys.argv[1],delimiter=",")
 N2_hyper = param.hyper_width*param.hyper_height*param.hyper_width*param.hyper_height
-data = np.reshape(data.T,(param.N_pyramidal*param.N_pyramidal,N2_hyper,param.N_minicolumns,param.N_minicolumns),order='F')
+data = np.reshape(data.T,(param.N_pyramidal*param.N_pyramidal,N2_hyper,param.N_minicolumns,param.N_minicolumns),order='F') # max row length??
 data = np.transpose(data, (2, 3, 1, 0))
 
 # make squares square

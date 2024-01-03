@@ -14,7 +14,7 @@ void recordWeights(){
     FILE *weightsNmda = fopen("weights_nmda.csv", "w");
     for (int i = 0; i < std::end(g_nmda) - std::begin(g_nmda); i++)
     {
-        for (int j = 0; j < N_pyramidal*N_pyramidal; j++)
+        for (int j = 0; j < (int)*maxRowLengths[i]*N_pyramidal; j++)  //(int)*maxRowLengths[i]
         {
             if(j==0){
                 fprintf(weightsNmda, "%f",1000.0*(*g_nmda[i])[j]);
@@ -97,9 +97,10 @@ void setHalfStimulation(float frequency, bool half)
 
 void setGainAndKappa(float gain, float kappa)
 {
+    // weights
     for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
     {
-        for (int j = 0; j < N_pyramidal*N_pyramidal; j++)
+        for (int j = 0; j < (int)*maxRowLengths[i] * N_pyramidal; j++)
         {
 
             (*wGains[i])[j] = gain;
@@ -108,12 +109,23 @@ void setGainAndKappa(float gain, float kappa)
         pushwGains[i](false);
         pushkappas[i](false);
     }
+    // bias
+    for (int i = 0; i < std::end(biasGains) - std::begin(biasGains); i++)
+    {
+        for (int j = 0; j < N_pyramidal; j++)
+        {
+            (*biasGains[i])[j] = gain;
+            (*kappasBias[i])[j] = kappa;
+        }
+        pushbiasGains[i](false);
+        pushkappasBias[i](false);
+    }
 }
 
 int main()
 {
     allocateMem(); // allocate memory for all neuron variables
-    float sim_time = epochs * N_minicolumns * (pattern_break + pattern_time) + recall_time;
+    float sim_time = settle_time+ epochs * N_minicolumns * (pattern_break + pattern_time) + recall_time;
     allocateRecordingBuffers(int(sim_time / time_step));
 
     initialize(); // initialize variables and start cpu/gpu kernel
@@ -128,6 +140,16 @@ int main()
     setAllStimulation(0.0);
 
     initializeSparse();
+
+    // SETTLE
+    setGainAndKappa(0.0, 1.0);
+    setAllStimulation(background_freq);
+    t_start = t;
+    while (t - t_start < settle_time)
+    {
+        stepTime();
+    }
+
 
     // TRAINING
     // t is current simulation time provided by GeNN in ms

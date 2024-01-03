@@ -19,7 +19,7 @@ echo ">>> start simulation";
 SECONDS=0;
 ./hypercolumn;
 echo ">>> simulation time: ${SECONDS}s";
-#python3 plot_spikes_hypercolumn.py output.spikes.csv -noshow
+python3 plot_spikes_hypercolumn.py output.spikes.csv -noshow
 #python3 plot_traces.py trace_ampa.csv plot_traces_ampa.png -noshow
 #python3 plot_traces.py trace_nmda.csv plot_traces_nmda.png -noshow
 #code -r plot_spikes.png;
