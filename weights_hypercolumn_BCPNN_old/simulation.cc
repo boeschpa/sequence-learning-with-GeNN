@@ -6,6 +6,7 @@
 #include "model_param.h"
 #include "spikeRecorder.h"
 #include "spikeArrayRecorder.h"
+#include <iostream>
 
 #define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_ampa[1], PiH0_0_to_H0_0_M0to_0_lateral_ampa[1], PjH0_0_to_H0_0_M0to_0_lateral_ampa[1], PijH0_0_to_H0_0_M0to_0_lateral_ampa[1], ZiH0_0_to_H0_0_M0to_0_lateral_ampa[1], ZjH0_0_to_H0_0_M0to_0_lateral_ampa[1])
 #define RECORD_TRACE_NMDA fprintf(traceNmda, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_M0to_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M0to_0_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_M0to_1_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M0to_1_lateral_nmda[1], 1000.0 * gH0_0_to_H0_0_M1to_0_lateral_nmda[1], 1000.0 * gH0_1_to_H0_0_M1to_0_lateral_nmda[1], PiH0_0_to_H0_0_M0to_0_lateral_nmda[1], PjH0_0_to_H0_0_M0to_0_lateral_nmda[1], PijH0_0_to_H0_0_M0to_0_lateral_nmda[1], ZiH0_0_to_H0_0_M0to_0_lateral_nmda[1], ZjH0_0_to_H0_0_M0to_0_lateral_nmda[1])
