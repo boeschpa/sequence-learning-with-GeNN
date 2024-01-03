@@ -22,7 +22,6 @@ def compute_rolling_average_spike_rate(spikes, time_window, bin_size, rolling_wi
     # rolling_window: number of bins for the rolling average
     # Calculate the number of bins
     num_bins = int(time_window / bin_size)+1
-
     # Create an array to store spike counts in each bin
     spike_counts = np.zeros(num_bins)
 
@@ -127,20 +126,20 @@ spikesBasket = spikesBasket.astype(int)
 
 # get firing rates
 i=0
-sim_time = time[-1]
+sim_time = np.max(time)
+sim_time_basket = np.max(timeBasket)
 time_start = 0
 t_window = 50.0 #ms
 bin_size = 10 #ms
 dense_time = range(time_start,int(sim_time),bin_size)
+dense_time_basket = range(time_start,int(sim_time_basket),bin_size)
 
 # firing rate per pattern in pyramidal neurons
 sequence_length= param.N_patterns
-spikes_per_pattern = idToPattern(spikes,sequence,sequence_length)
+spikes_per_pattern = idToPattern(spikes,sequence)
 
 firing_rate_pyramidal = compute_rolling_average_spike_rate(time,sim_time,bin_size,int(t_window/bin_size),param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width)
-firing_rate_basket = compute_rolling_average_spike_rate(timeBasket,sim_time,bin_size,int(t_window/bin_size),param.N_basket*param.hyper_height*param.hyper_width)
-firing_rate_pyramidal = compute_rolling_average_spike_rate(time,sim_time,bin_size,int(t_window/bin_size),param.N_pyramidal*param.N_minicolumns*param.hyper_height*param.hyper_width)
-
+firing_rate_basket = compute_rolling_average_spike_rate(timeBasket,sim_time_basket,bin_size,int(t_window/bin_size),param.N_basket*param.hyper_height*param.hyper_width)
 
 # firing rate per pattern in pyramidal neurons
 spikes_per_pattern = idToPattern(spikes,sequence)
@@ -186,7 +185,7 @@ for i in range(param.hyper_height*param.hyper_width-1):
 
 # plot firing rates
 ax[2].plot(np.tile(dense_time,(param.N_patterns,1)).T,firing_rate.T,label="pattern")
-ax[2].plot(dense_time,firing_rate_basket,label="basket",color='r')
+ax[2].plot(dense_time_basket,firing_rate_basket,label="basket",color='r')
 ax[2].plot(dense_time,firing_rate_pyramidal,label="pyramidal",color='b')
 
 

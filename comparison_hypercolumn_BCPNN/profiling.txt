@@ -1,0 +1,5 @@
+Training epoch 1
+
+real	2m36,389s
+user	1m18,248s
+sys	1m18,080s
