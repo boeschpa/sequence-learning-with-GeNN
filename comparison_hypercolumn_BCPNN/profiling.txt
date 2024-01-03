@@ -4,7 +4,9 @@ commmand time make:
     (0avgtext+0avgdata 9793172maxresident)k
     0inputs+1393336outputs (0major+6293783minor)pagefaults 0swaps
 time make:
-
+    real	8m45,870s
+    user	8m31,128s
+    sys	0m14,077s
 
 
 
@@ -14,3 +16,7 @@ time ./hypercolumn
     real	2m36,389s
     user	1m18,248s
     sys	1m18,080s
+
+command time ./hypercolumn
+    77.34user 79.12system 2:36.47elapsed 99%CPU (0avgtext+0avgdata 1469448maxresident)k
+    0inputs+1608outputs (0major+362414minor)pagefaults 0swaps
