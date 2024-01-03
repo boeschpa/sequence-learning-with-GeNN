@@ -1,5 +1,16 @@
-Training epoch 1
+compile: 
+commmand time make:
+    510.45user 15.64system 8:46.86elapsed 99%CPU 
+    (0avgtext+0avgdata 9793172maxresident)k
+    0inputs+1393336outputs (0major+6293783minor)pagefaults 0swaps
+time make:
 
-real	2m36,389s
-user	1m18,248s
-sys	1m18,080s
+
+
+
+
+Training epoch 1
+time ./hypercolumn
+    real	2m36,389s
+    user	1m18,248s
+    sys	1m18,080s
