@@ -138,8 +138,8 @@ timeBasket, spikesBasket = zip(*[(spike_time, spike) for spike_time, spike in zi
 i=0
 sim_time = np.max(timeBasket)
 time_start = 0
-t_window = 20.0 #ms
-bin_size = 5 #ms
+t_window = 10.0 #ms
+bin_size = 2 #ms
 dense_time = range(time_start,int(sim_time),bin_size)
 sequence_length= param.N_patterns
 
@@ -159,20 +159,20 @@ plt.ylabel('Vmem (mV)')
 
 # plot spikes
 colors = np.asarray([int(spike // 30) for spike in spikes])
-ax[2].scatter(time, spikes, s=2, c=colors, cmap="tab10",edgecolor='none')
+ax[2].scatter(time, spikes, s=4, c=colors, cmap="tab10",edgecolor='none')
 ax[2].set_ylabel('Pyramidal neuron index')
 
 # plot basket raster and firing rate
-ax[3].scatter(timeBasket, spikesBasket, s=2 ,c = 'k',edgecolor='none')
+ax[3].scatter(timeBasket, spikesBasket, s=4 ,c = 'k',edgecolor='none')
 ax[3].set_ylabel('Basket neuron index')
 ax2 = ax[3].twinx()  # instantiate a second axes that shares the same x-axis
 ax2.set_ylabel('Average firing rate', color='r')  # we already handled the x-label with ax1
 ax2.tick_params(axis='y', labelcolor='r')
-ax2.plot(dense_time,firing_rate_basket,color='r')
+ax2.plot(np.asarray(dense_time),firing_rate_basket,color='r')
 
 # Add labels and a legend
 ax[3].set_xlabel('Time (ms)')
-ax[3].set_ylabel('Basket Neuron id')
+ax[3].set_ylabel('Basket neuron index')
 #ax[0].title.set_text('Spikes of Neuron N vs. Time')
 
 #set range and ticks

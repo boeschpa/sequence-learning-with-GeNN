@@ -172,16 +172,71 @@ for i in range(param.hyper_height):
                             "_lateral_ampa,\n"
 g_ampa += "};\n"
 
-maxRowLength = "const unsigned int* maxRowLengths[] = {\n"
+maxRowLengthNmda = "const unsigned int* maxRowLengthNmdas[] = {\n"
 for i in range(param.hyper_height):
     for j in range(param.hyper_width):
         for ip in range(param.hyper_height):
             for jp in range(param.hyper_width):
-                maxRowLength +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                maxRowLengthNmda +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
                                 "_lateral_nmda,\n"
-                maxRowLength +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+maxRowLengthNmda += "};\n"
+
+maxRowLengthAmpa = "const unsigned int* maxRowLengthAmpas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                maxRowLengthAmpa +=   "    &maxRowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
                                 "_lateral_ampa,\n"
-maxRowLength += "};\n"
+maxRowLengthAmpa += "};\n"
+
+pullState = "typedef void (*pullState)(); \n"
+pullState += "pullState pullStates[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                pullState +=   "    &pullH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_nmdaStateFromDevice,\n"
+                pullState +=   "    &pullH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                                "_lateral_ampaStateFromDevice,\n"
+pullState += "};\n"
+
+rowLengthAmpa = "unsigned int** rowLengthAmpas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                rowLengthAmpa +=   "    &rowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                            "_lateral_ampa,\n"
+rowLengthAmpa += "};\n"
+
+indAmpa = "uint32_t** indAmpas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                indAmpa +=   "    &indH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                            "_lateral_ampa,\n"
+indAmpa += "};\n"
+
+rowLengthNmda = "unsigned int** rowLengthNmdas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                rowLengthNmda +=   "    &rowLengthH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                            "_lateral_nmda,\n"
+rowLengthNmda += "};\n"
+
+indNmda = "uint32_t** indNmdas[] = {\n"
+for i in range(param.hyper_height):
+    for j in range(param.hyper_width):
+        for ip in range(param.hyper_height):
+            for jp in range(param.hyper_width):
+                indNmda +=   "    &indH" + str(i) + "_" + str(j) + "_to_H" + str(ip) + "_" + str(jp) + \
+                            "_lateral_nmda,\n"
+indNmda += "};\n"
 
 
 
@@ -202,7 +257,13 @@ cpp_interface += pushbiasGain
 cpp_interface += pushkappaBias
 cpp_interface += g_nmda
 cpp_interface += g_ampa
-cpp_interface += maxRowLength
+cpp_interface += maxRowLengthAmpa
+cpp_interface += maxRowLengthNmda
+cpp_interface += pullState
+cpp_interface += rowLengthAmpa
+cpp_interface += rowLengthNmda
+cpp_interface += indAmpa
+cpp_interface += indNmda
 
 
 

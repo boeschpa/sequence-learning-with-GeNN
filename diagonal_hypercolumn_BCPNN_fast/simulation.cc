@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <random>
 #include <algorithm>
+#include <iostream>
+#include <vector>
 
 //#define TRACES
 
@@ -34,28 +36,74 @@ void recordVmem(FILE *traceVmem, scalar *neuron_pop)
 
 void recordWeights()
 {
-    FILE *weightsAmpa = fopen("weights_ampa.csv", "w");
-    FILE *weightsNmda = fopen("weights_nmda.csv", "w");
+    for (int i = 0; i < std::end(pullStates) - std::begin(pullStates); i++){
+        pullStates[i]();
+    }
+
+    // matrix of all minicolumn combinations containing a vector for storing all corresponding weights
+    std::vector<std::vector<std::vector<float>>> weightsAmpa(N_minicolumns, std::vector<std::vector<float>>(N_minicolumns));
+    std::vector<std::vector<std::vector<float>>> weightsNmda(N_minicolumns, std::vector<std::vector<float>>(N_minicolumns));
+
     for (int i = 0; i < std::end(g_nmda) - std::begin(g_nmda); i++) // iterate through HC connections
     {
-        for (int j = 0; j < N_minicolumns * N_pyramidal * N_minicolumns * N_pyramidal; j++)  // iterate through minicolumns and neurons --> bad
+        int maxRowAmpa = *maxRowLengthAmpas[i];
+        for (int j = 0; j <  N_minicolumns*N_pyramidal; j++)  // iterate through minicolumns and neurons (rows)
         {
-            if (j == 0)
-            {
-                fprintf(weightsNmda, "%f", 1000.0 * (*g_nmda[i])[j]); // zeroes interleaved or not?
-                fprintf(weightsAmpa, "%f", 1000.0 * (*g_ampa[i])[j]);
-            }
-            else
-            {
-                fprintf(weightsNmda, ", %f", 1000.0 * (*g_nmda[i])[j]);
-                fprintf(weightsAmpa, ", %f", 1000.0 * (*g_ampa[i])[j]);
+            int rowlen = (*rowLengthAmpas[i])[j];
+            for (int k = 0; k< rowlen; k++){ // iterate inside row
+                int id = k + maxRowAmpa*j; // k + offset
+                float g = 1000.0 * (*g_ampa[i])[id];
+                int ind = (*indAmpas[i])[id];
+
+                int preId = j/N_pyramidal; // presynaptic (row) minicolumn index
+                int postId = ind/N_pyramidal; // postsynaptic/target minicolumn index
+                
+                // add weight to matrix
+                weightsAmpa[preId][postId].push_back(g);
             }
         }
-        fprintf(weightsNmda, "\n");
-        fprintf(weightsAmpa, "\n");
+
+        int maxRowNmda = *maxRowLengthNmdas[i];
+        for (int j = 0; j <  N_minicolumns*N_pyramidal; j++)  // iterate through minicolumns and neurons (rows)
+        {
+            int rowlen = (*rowLengthNmdas[i])[j];
+            for (int k = 0; k< rowlen; k++){ // iterate inside row
+                int id = k + maxRowNmda*j; // k + offset
+                float g = 1000.0 * (*g_nmda[i])[id];
+                int ind = (*indNmdas[i])[id];
+
+                int preId = j/N_pyramidal; // presynaptic (row) minicolumn index
+                int postId = ind/N_pyramidal; // postsynaptic/target minicolumn index
+                
+                // add weight to matrix
+                weightsNmda[preId][postId].push_back(g);
+            }
+        }
+
     }
-    fclose(weightsNmda);
-    fclose(weightsAmpa);
+
+    // save data to csv
+    FILE *fileWeightsAmpa = fopen("weights_ampa.csv", "w");
+    FILE *fileWeightsNmda = fopen("weights_nmda.csv", "w");
+
+    for (int i = 0; i < N_minicolumns; ++i) {
+        for (int j = 0; j < N_minicolumns; ++j) {
+            for (int k = 0; k < weightsAmpa[i][j].size(); ++k) {
+                if (k==0) fprintf(fileWeightsAmpa, "%f", weightsAmpa[i][j][k]);
+                else fprintf(fileWeightsAmpa, ", %f", weightsAmpa[i][j][k]);
+            }
+            fprintf(fileWeightsAmpa, "\n");
+        }
+    }
+    for (int i = 0; i < N_minicolumns; ++i) {
+        for (int j = 0; j < N_minicolumns; ++j) {
+            for (int k = 0; k < weightsNmda[i][j].size(); ++k) {
+                if (k==0) fprintf(fileWeightsNmda, "%f", weightsNmda[i][j][k]);
+                else fprintf(fileWeightsNmda, ", %f", weightsNmda[i][j][k]);
+            }
+            fprintf(fileWeightsNmda, "\n");
+        }
+    }
 }
 
 void setAllStimulation(float frequency)
@@ -181,7 +229,14 @@ void setGainAndKappa(float gain, float kappa)
     // weights
     for (int i = 0; i < std::end(wGains) - std::begin(wGains); i++)
     {
-        for (int j = 0; j < (int)*maxRowLengths[i] * N_pyramidal * N_minicolumns; j++)
+        int maxRow;
+        if (i%2==0){
+            maxRow = (int)*maxRowLengthNmdas[i/2];
+        }
+        else{
+            maxRow = (int)*maxRowLengthAmpas[i/2];
+        }
+        for (int j = 0; j <  maxRow * N_pyramidal * N_minicolumns; j++)
         {
             (*wGains[i])[j] = gain;
             (*kappas[i])[j] = kappa;
@@ -350,7 +405,8 @@ int main(int argc, char **argv)
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
     writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
                                  N_basket, int(buffer_time / time_step), time_step, " ", false, false);
-    //recordWeights();
+    
+    recordWeights();
 
     return 0;
 }

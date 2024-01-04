@@ -93,13 +93,50 @@ scalar** g_ampa[] = {
     &gH0_1_to_H0_0_lateral_ampa,
     &gH0_1_to_H0_1_lateral_ampa,
 };
-const unsigned int* maxRowLengths[] = {
-    &maxRowLengthH0_0_to_H0_0_lateral_nmda,
+const unsigned int* maxRowLengthAmpas[] = {
     &maxRowLengthH0_0_to_H0_0_lateral_ampa,
-    &maxRowLengthH0_0_to_H0_1_lateral_nmda,
     &maxRowLengthH0_0_to_H0_1_lateral_ampa,
-    &maxRowLengthH0_1_to_H0_0_lateral_nmda,
     &maxRowLengthH0_1_to_H0_0_lateral_ampa,
-    &maxRowLengthH0_1_to_H0_1_lateral_nmda,
     &maxRowLengthH0_1_to_H0_1_lateral_ampa,
+};
+const unsigned int* maxRowLengthNmdas[] = {
+    &maxRowLengthH0_0_to_H0_0_lateral_nmda,
+    &maxRowLengthH0_0_to_H0_1_lateral_nmda,
+    &maxRowLengthH0_1_to_H0_0_lateral_nmda,
+    &maxRowLengthH0_1_to_H0_1_lateral_nmda,
+};
+typedef void (*pullState)(); 
+pullState pullStates[] = {
+    &pullH0_0_to_H0_0_lateral_nmdaStateFromDevice,
+    &pullH0_0_to_H0_0_lateral_ampaStateFromDevice,
+    &pullH0_0_to_H0_1_lateral_nmdaStateFromDevice,
+    &pullH0_0_to_H0_1_lateral_ampaStateFromDevice,
+    &pullH0_1_to_H0_0_lateral_nmdaStateFromDevice,
+    &pullH0_1_to_H0_0_lateral_ampaStateFromDevice,
+    &pullH0_1_to_H0_1_lateral_nmdaStateFromDevice,
+    &pullH0_1_to_H0_1_lateral_ampaStateFromDevice,
+};
+unsigned int** rowLengthAmpas[] = {
+    &rowLengthH0_0_to_H0_0_lateral_ampa,
+    &rowLengthH0_0_to_H0_1_lateral_ampa,
+    &rowLengthH0_1_to_H0_0_lateral_ampa,
+    &rowLengthH0_1_to_H0_1_lateral_ampa,
+};
+unsigned int** rowLengthNmdas[] = {
+    &rowLengthH0_0_to_H0_0_lateral_nmda,
+    &rowLengthH0_0_to_H0_1_lateral_nmda,
+    &rowLengthH0_1_to_H0_0_lateral_nmda,
+    &rowLengthH0_1_to_H0_1_lateral_nmda,
+};
+uint32_t** indAmpas[] = {
+    &indH0_0_to_H0_0_lateral_ampa,
+    &indH0_0_to_H0_1_lateral_ampa,
+    &indH0_1_to_H0_0_lateral_ampa,
+    &indH0_1_to_H0_1_lateral_ampa,
+};
+uint32_t** indNmdas[] = {
+    &indH0_0_to_H0_0_lateral_nmda,
+    &indH0_0_to_H0_1_lateral_nmda,
+    &indH0_1_to_H0_0_lateral_nmda,
+    &indH0_1_to_H0_1_lateral_nmda,
 };
