@@ -87,8 +87,8 @@ params = {'legend.fontsize': 'large',
          'ytick.labelsize':'large'}
 pylab.rcParams.update(params)
 
-figure, ax = plt.subplots(3,1,sharex = True, sharey = True)
-figure.set_size_inches(6,9)
+figure, ax = plt.subplots(1,3,sharex = True, sharey = True)
+figure.set_size_inches(12,4)
 
 # Plotting the mean and standard deviation
 
@@ -100,22 +100,22 @@ ax[2].errorbar(dist_grouped_df[2]['sequence_length'], dist_grouped_df[2]['sequen
              yerr=dist_grouped_df[2]['sequence_edit_distance']['std'], fmt='o-')
 
 for axis in ax:
-    axis.set_ylabel('Edit distance')
+    axis.set_xlabel('Sequence length')
     axis.grid(axis='y', linestyle='--')
     axis.xaxis.set_tick_params(labelbottom=True)
-ax[2].set_xlabel('Sequence length')
+ax[0].set_ylabel('Edit distance')
 
 # add letters
-ax[0].annotate("A", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
-ax[1].annotate("B", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
-ax[2].annotate("C", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+# ax[0].annotate("A", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+# ax[1].annotate("B", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+# ax[2].annotate("C", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
 
 ax[0].set_title("9 Hypercolumns", fontweight = 'bold') 
 ax[1].set_title("16 Hypercolumns", fontweight = 'bold')
 ax[2].set_title("25 Hypercolumns", fontweight = 'bold') 
 
 plt.tight_layout()
-plt.savefig("edit_distance.png")
+plt.savefig("edit_distance_horizontal.png")
 
 # plt.figure(1)
 # plt.errorbar(acc_grouped_df['sequence_length'], acc_grouped_df['pattern_accuracy']['mean'],
