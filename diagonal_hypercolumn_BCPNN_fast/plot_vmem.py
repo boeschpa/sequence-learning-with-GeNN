@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import sys
 from matplotlib import cm
 import matplotlib.ticker as ticker
+import matplotlib.pylab as pylab
 
 import re
 
@@ -109,7 +110,7 @@ traceData = np.loadtxt('trace_vmem.csv',delimiter=",")
 # Split the data into time (first column) and voltage (subsequent N columns)
 traceTime = traceData[:, 0]
 N= np.shape(traceData)[1]-1
-traces = traceData[:, 1]  # Select number of signals
+traces = traceData[:, 5]  # Select number of signals
 mean_trace = np.mean(traceData[:,1:31], axis = 1)
 
 ## RASTER + FIRNG RATE
@@ -146,46 +147,58 @@ sequence_length= param.N_patterns
 firing_rate_basket = compute_rolling_average_spike_rate(timeBasket,sim_time,bin_size,int(t_window/bin_size),param.N_basket)
 
 ## PLOT
+params = {'legend.fontsize': 'large',
+         'axes.labelsize': 'large',
+         'axes.titlesize':'large',
+         'xtick.labelsize':'large',
+         'ytick.labelsize':'large'}
+pylab.rcParams.update(params)
+
 figure, ax = plt.subplots(4,1,sharex = True)
 figure.set_size_inches(10,10)
 ax[0].plot(traceTime, traces)
-ax[0].set_ylabel("Membrane potential")
+ax[0].set_ylabel("Membrane\npotential (mV)")
 plt.xlabel('Time (ms)')
-plt.ylabel('Vmem (mV)')
 ax[1].plot(traceTime, mean_trace)
-ax[1].set_ylabel("Average Membrane Potential")
+ax[1].set_ylabel("Average Membrane\nPotential (mV)")
 plt.xlabel('Time (ms)')
-plt.ylabel('Vmem (mV)')
 
 # plot spikes
 colors = np.asarray([int(spike // 30) for spike in spikes])
 ax[2].scatter(time, spikes, s=4, c=colors, cmap="tab10",edgecolor='none')
-ax[2].set_ylabel('Pyramidal neuron index')
+ax[2].set_ylabel('Pyramidal\nneuron index')
 
 # plot basket raster and firing rate
 ax[3].scatter(timeBasket, spikesBasket, s=4 ,c = 'k',edgecolor='none')
-ax[3].set_ylabel('Basket neuron index')
+ax[3].set_ylabel('Basket\nneuron index')
 ax2 = ax[3].twinx()  # instantiate a second axes that shares the same x-axis
-ax2.set_ylabel('Average firing rate', color='r')  # we already handled the x-label with ax1
+ax2.set_ylabel('Average firing\nrate (Hz)', color='r')  # we already handled the x-label with ax1
 ax2.tick_params(axis='y', labelcolor='r')
 ax2.plot(np.asarray(dense_time),firing_rate_basket,color='r')
 
 # Add labels and a legend
 ax[3].set_xlabel('Time (ms)')
-ax[3].set_ylabel('Basket neuron index')
-#ax[0].title.set_text('Spikes of Neuron N vs. Time')
+ax[3].set_ylabel('Basket\nneuron index')
 
 #set range and ticks
-# range = (7380,7620)
+# range = (8280,8620)
 # ax[3].set_xlim(range)
 # ax[3].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
 # ax[3].xaxis.set_minor_locator(ticker.AutoMinorLocator())
 
-for axis in ax:
-    axis.tick_params(which='major', axis='x', length=7)
-    axis.tick_params(which='minor', length=3)
+# for axis in ax:
+#     axis.tick_params(which='major', axis='x', length=7)
+#     axis.tick_params(which='minor', length=3)
+
+# add letters
+ax[0].annotate("A", xy=(0, 0), xytext=(-0.1, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+ax[1].annotate("B", xy=(0, 0), xytext=(-0.1, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+ax[2].annotate("C", xy=(0, 0), xytext=(-0.1, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+ax[3].annotate("D", xy=(0, 0), xytext=(-0.1, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
+
+
 
 plt.tight_layout()
-plt.savefig("vmem.png")
+plt.savefig("vmem.png",dpi=600)
 
 plt.show()

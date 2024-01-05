@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import math
+import matplotlib.pylab as pylab
 
 import re
 
@@ -97,6 +98,13 @@ for row in range(param.N_minicolumns):
         
 
 #plot
+params = {'legend.fontsize': 'large',
+         'axes.labelsize': 'large',
+         'axes.titlesize':'large',
+         'xtick.labelsize':'large',
+         'ytick.labelsize':'large'}
+pylab.rcParams.update(params)
+
 grid1 = np.hstack(np.hstack(grid_ampa))
 grid2 = np.hstack(np.hstack(grid_nmda))
 range1 = np.max([ np.max(grid1), -np.min(grid1) ])
@@ -107,19 +115,21 @@ figure.set_size_inches(10,6)
 
 im0 = ax[0].imshow(-grid1,cmap='RdBu',vmin = -range1, vmax=range1,interpolation='none')
 im1 = ax[1].imshow(-grid2,cmap='RdBu',vmin = -range2, vmax=range2,interpolation='none')
+
 # add colorbars
-cbar0 = plt.colorbar(im0, orientation='horizontal')
+cbar0 = plt.colorbar(im0, orientation='horizontal', label="Synapse conductivity (nS)")
 cbar0.minorticks_on()
-cbar1 = plt.colorbar(im1, orientation='horizontal')
+cbar1 = plt.colorbar(im1, orientation='horizontal', label="Synapse conductivity (nS)")
 cbar1.minorticks_on()
+
 # add grid lines
 for i in range(param.N_minicolumns-1):
-    ax[0].axhline(y = (i+1)*square_side, color = 'k', linestyle = '-') # todo thinner
-    ax[1].axhline(y = (i+1)*square_side, color = 'k', linestyle = '-') 
-    ax[0].axvline(x = (i+1)*square_side, color = 'k', linestyle = '-')
-    ax[1].axvline(x = (i+1)*square_side, color = 'k', linestyle = '-') 
+    ax[0].axhline(y = (i+1)*square_side-0.5, color = 'k', linestyle = '-', linewidth = 1) # todo thinner
+    ax[1].axhline(y = (i+1)*square_side-0.5, color = 'k', linestyle = '-', linewidth = 1) 
+    ax[0].axvline(x = (i+1)*square_side-0.5, color = 'k', linestyle = '-', linewidth = 1)
+    ax[1].axvline(x = (i+1)*square_side-0.5, color = 'k', linestyle = '-', linewidth = 1) 
 
-# todo ticks every square_side in range(param.N_minicolumns)
+#ticks every square_side in range(param.N_minicolumns)
 ax[0].set_xticks(range(square_side//2, square_side*param.N_minicolumns+square_side//2, square_side),range(param.N_minicolumns))
 ax[1].set_xticks(range(square_side//2, square_side*param.N_minicolumns+square_side//2, square_side),range(param.N_minicolumns))
 ax[0].set_yticks(range(square_side//2, square_side*param.N_minicolumns+square_side//2, square_side),range(param.N_minicolumns))
@@ -129,10 +139,10 @@ ax[0].set_xlabel("Target minicolumn index")
 ax[1].set_xlabel("Target minicolumn index")
 ax[0].set_ylabel("Projecting minicolumn index")
 ax[1].set_ylabel("Projecting minicolumn index")
-ax[0].set_ylim((param.N_minicolumns*square_side,0))
-ax[1].set_ylim((param.N_minicolumns*square_side,0))
-ax[0].set_xlim((0,param.N_minicolumns*square_side))
-ax[1].set_xlim((0,param.N_minicolumns*square_side))
+ax[0].set_ylim((param.N_minicolumns*square_side-0.5,0-0.5))
+ax[1].set_ylim((param.N_minicolumns*square_side-0.5,0-0.5))
+ax[0].set_xlim((0-0.5,param.N_minicolumns*square_side-0.5))
+ax[1].set_xlim((0-0.5,param.N_minicolumns*square_side-0.5))
 
 ax[0].set_title("AMPA") # title??
 ax[1].set_title("NMDA") # title??
@@ -143,7 +153,7 @@ ax[1].annotate("B", xy=(0, 0), xytext=(-15, -15), ha='right', va='top', fontsize
 plt.tight_layout()
 
 # Add labels and a legend
-plt.savefig("weights.png")
+plt.savefig("weights.png",dpi=600)
 
 # Show plot
 if len(sys.argv)<=2 or sys.argv[2] != "-noshow":
