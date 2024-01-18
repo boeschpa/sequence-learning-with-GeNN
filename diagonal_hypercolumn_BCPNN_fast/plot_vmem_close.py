@@ -181,14 +181,14 @@ ax[3].set_xlabel('Time (ms)')
 ax[3].set_ylabel('Basket\nneuron index')
 
 #set range and ticks
-# range = (8280,8620)
-# ax[3].set_xlim(range)
-# ax[3].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
-# ax[3].xaxis.set_minor_locator(ticker.AutoMinorLocator())
+range = (8280,8620)
+ax[3].set_xlim(range)
+ax[3].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
+ax[3].xaxis.set_minor_locator(ticker.AutoMinorLocator())
 
-# for axis in ax:
-#     axis.tick_params(which='major', axis='x', length=7)
-#     axis.tick_params(which='minor', length=3)
+for axis in ax:
+    axis.tick_params(which='major', axis='x', length=7)
+    axis.tick_params(which='minor', length=3)
 
 # add letters
 ax[0].annotate("A", xy=(0, 0), xytext=(-0.1, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
@@ -199,6 +199,6 @@ ax[3].annotate("D", xy=(0, 0), xytext=(-0.1, 1.05), xycoords='axes fraction', ha
 
 
 plt.tight_layout()
-plt.savefig("vmem.png",dpi=600)
+plt.savefig("vmem_close.png",dpi=600)
 
 plt.show()

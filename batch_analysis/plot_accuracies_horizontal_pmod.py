@@ -29,7 +29,7 @@ def edit_distance(seq1, seq2):
 
     return dp[len_seq1][len_seq2]
 
-dataframes = ["data_3.pkl","data_4.pkl","data_5.pkl"]
+dataframes = ["data_5.pkl","data_pmod.pkl"]
 dist_grouped_df = []
 acc_grouped_df = []
 
@@ -37,6 +37,9 @@ for id, dfFile in enumerate(dataframes):
         
     # Load accuracies into a DataFrame
     df = pd.read_pickle(dfFile)
+
+    if(id==1): #duplicate df to plot n=1 data
+        df = pd.concat([df, df], ignore_index=True)
 
     df["sequence_short"]=""
     df["mini_sequence_recall_short"]=""
@@ -87,17 +90,16 @@ params = {'legend.fontsize': 'large',
          'ytick.labelsize':'large'}
 pylab.rcParams.update(params)
 
-figure, ax = plt.subplots(1,3,sharex = True, sharey = True)
-figure.set_size_inches(12,4)
+figure, ax = plt.subplots(1,1,sharex = True, sharey = True)
+ax=[ax]
+figure.set_size_inches(6,4)
 
 # Plotting the mean and standard deviation
 
 ax[0].errorbar(dist_grouped_df[0]['sequence_length'], dist_grouped_df[0]['sequence_edit_distance']['mean'],
-             yerr=dist_grouped_df[0]['sequence_edit_distance']['std'], fmt='o-')
-ax[1].errorbar(dist_grouped_df[1]['sequence_length'], dist_grouped_df[1]['sequence_edit_distance']['mean'],
-             yerr=dist_grouped_df[1]['sequence_edit_distance']['std'], fmt='o-')
-ax[2].errorbar(dist_grouped_df[2]['sequence_length'], dist_grouped_df[2]['sequence_edit_distance']['mean'],
-             yerr=dist_grouped_df[2]['sequence_edit_distance']['std'], fmt='o-')
+             yerr=dist_grouped_df[0]['sequence_edit_distance']['std'], fmt='o-', label=r'$\tau_p=5 s$ (N=5)')
+ax[0].errorbar(dist_grouped_df[1]['sequence_length'], dist_grouped_df[1]['sequence_edit_distance']['mean'],
+             yerr=dist_grouped_df[1]['sequence_edit_distance']['std'], fmt='o-', label=r'$\tau_p=20 s$ (N=1)')
 
 for axis in ax:
     axis.set_xlabel('Sequence length')
@@ -105,28 +107,21 @@ for axis in ax:
     axis.xaxis.set_tick_params(labelbottom=True)
 ax[0].set_ylabel('Edit distance')
 
+ax[0].legend()
+
 # add letters
 # ax[0].annotate("A", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
 # ax[1].annotate("B", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
 # ax[2].annotate("C", xy=(0, 0), xytext=(-0.08, 1.1), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
 
-ax[0].set_title("9 Hypercolumns", fontweight = 'bold') 
-ax[1].set_title("16 Hypercolumns", fontweight = 'bold')
-ax[2].set_title("25 Hypercolumns", fontweight = 'bold') 
+# ax[0].set_title("\tau_p=5 s (N=5)", fontweight = 'bold') 
+# ax[1].set_title("\tau_p=20 s (N=1)", fontweight = 'bold')
 
-figure.set_facecolor("none")
+#figure.set_facecolor("none")
 
 plt.tight_layout()
-plt.savefig("edit_distance_horizontal.png")
+plt.savefig("taup_edit_distance.png")
 
-# plt.figure(1)
-# plt.errorbar(acc_grouped_df['sequence_length'], acc_grouped_df['pattern_accuracy']['mean'],
-#              yerr=acc_grouped_df['pattern_accuracy']['std'], fmt='o-', label='Pattern Accuracy Mean with Std Dev')
-
-# plt.xlabel('Sequence Length')
-# plt.ylabel('Pattern Accuracy')
-# plt.title(f"Pattern Accuracy Distance with Standard Deviation (N={acc_grouped_df.iloc[0]['pattern_accuracy']['count']})")
-# plt.savefig("accuracy.png")
 plt.show()
 
 

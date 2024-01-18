@@ -88,7 +88,7 @@ params = {'legend.fontsize': 'large',
 pylab.rcParams.update(params)
 
 figure, ax = plt.subplots(3,1,sharex = True, sharey = True)
-figure.set_size_inches(6,9)
+figure.set_size_inches(6,10)
 
 # Plotting the mean and standard deviation
 

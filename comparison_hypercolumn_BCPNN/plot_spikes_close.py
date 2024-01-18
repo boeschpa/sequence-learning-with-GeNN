@@ -209,14 +209,14 @@ ax[2].grid()
 ax[2].legend()
 
 #set range and ticks
-# range = (8280,8620)
-# ax[3].set_xlim(range)
-# ax[3].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
-# ax[3].xaxis.set_minor_locator(ticker.AutoMinorLocator())
+range = (950,1250)
+ax[2].set_xlim(range)
+ax[2].xaxis.set_major_locator(ticker.MultipleLocator(base=50)) 
+ax[2].xaxis.set_minor_locator(ticker.AutoMinorLocator())
 
-# for axis in ax:
-#     axis.tick_params(which='major', axis='x', length=7)
-#     axis.tick_params(which='minor', length=3)
+for axis in ax:
+    axis.tick_params(which='major', axis='x', length=7)
+    axis.tick_params(which='minor', length=3)
 
 # add letters
 ax[0].annotate("A", xy=(0, 0), xytext=(-0.07, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
@@ -224,7 +224,7 @@ ax[1].annotate("B", xy=(0, 0), xytext=(-0.07, 1.05), xycoords='axes fraction', h
 ax[2].annotate("C", xy=(0, 0), xytext=(-0.07, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig("plot_spikes.png",dpi=600)
+plt.savefig("plot_spikes_close.png",dpi=600)
 
 # Show plot
 if len(sys.argv)<=1 or sys.argv[1] != "-noshow":

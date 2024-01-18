@@ -14,3 +14,7 @@
 *.pdf
 *.png
 *output.spikes.csv
+batch_analysis/batch_202*
+batch_analysis/3x3/
+batch_analysis/4x4/
+batch_analysis/5x5/
