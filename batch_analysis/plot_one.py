@@ -308,7 +308,8 @@ for file in output_file_list:
         ax[0].annotate("A", xy=(0, 0), xytext=(-0.07, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
         ax[1].annotate("B", xy=(0, 0), xytext=(-0.07, 1.05), xycoords='axes fraction', ha='right', va='top', fontsize=14, fontweight='bold')
 
-        figure.set_facecolor("none")
+        # transparent background
+        #figure.set_facecolor("none")
 
         plt.tight_layout()
         plt.savefig("plot_3x3_sequence.png",dpi=600)

@@ -1,0 +1,4 @@
+- Run analyse_batch.py inside each batch simulation folder to extract the data pickle file
+- Modify plot_accuracies to read the relevant pickle files and plot a number of baches
+- "*_horizontal.py" scripts output plots that are optimised for slides
+- "plot_one.py" plots spikes of a single simulation specified by seed and sequence length when run inside a batch folder
