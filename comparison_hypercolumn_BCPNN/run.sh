@@ -1,27 +1,15 @@
 #!/bin/bash
 cd $(dirname $0)
-# rm -r hypercolumn_CODE
-# rm generator
-# rm generator.d
-# rm hypercolumn
-# rm Makefile
-# rm output.spikes.csv
-# rm code_interface.h
 
-genn-buildmodel.sh -cf model.cc;
-python3 generate_code_interface.py
-genn-create-user-project.sh hypercolumn simulation.cc;
+genn-buildmodel.sh -cf model.cc; # build model, generates CPU code in *_CODE folder (GeNN)
+python3 generate_code_interface.py # generate custom variable and function pointer interface (allows parametrized model architecture)
+genn-create-user-project.sh hypercolumn simulation.cc; # create simulator makefile
 echo ">>> start compilation";
-SECONDS=0;
-make;
-echo ">>> compile time: ${SECONDS}s";
+SECONDS=0; # measure time
+make; # compile
+echo ">>> compile time: ${SECONDS}s"; # output compile time
 echo ">>> start simulation";
-SECONDS=0;
-./hypercolumn;
-echo ">>> simulation time: ${SECONDS}s";
+SECONDS=0; # measure time
+./hypercolumn; # run
+echo ">>> simulation time: ${SECONDS}s"; # output simulation time
 python3 plot_spikes.py
-#python3 plot_traces.py trace_vmem.csv plot_traces_vmem.png
-#python3 plot_traces.py trace_nmda.csv plot_traces_nmda.png -noshow
-code -r plot_spikes.png;
-#code -r plot_traces_vmem.png;
-#code -r plot_traces_nmda.png;

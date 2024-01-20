@@ -1,3 +1,5 @@
+// adapted from GeNN spikeRecorder to record from lists of neuron groups
+
 #pragma once
 
 // Standard C++ includes

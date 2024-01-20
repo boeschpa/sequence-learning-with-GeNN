@@ -3,7 +3,6 @@
 #include "modelSpec.h"
 #include <neuronModels.h>
 #include "SimpleAdEx.h"
-#include "StaticPulseDendriticDelayStd.h"
 #include "model_param.h"
 #include "bcpnn.h"
 

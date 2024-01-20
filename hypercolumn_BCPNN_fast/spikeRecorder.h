@@ -1,3 +1,5 @@
+// copied from GeNN installation due to include issues
+
 #pragma once
 
 // Standard C++ includes

@@ -1,0 +1,3 @@
+- build, compile and run simulation with run.sh or gpu_run.sh, see scripts for more explanation and commands
+- run plot_weights.py to plot learned plot_weights
+- run plot_vmem.py to plot spikes and v_mem

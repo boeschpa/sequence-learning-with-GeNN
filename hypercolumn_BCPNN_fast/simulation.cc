@@ -11,6 +11,7 @@
 #include <random>
 #include <algorithm>
 
+// if defined, saves traces defined in RECORD_TRACES_* macros 
 #define TRACES
 
 //#define RECORD_TRACE_AMPA fprintf(traceAmpa, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, 1000.0 * gH0_0_to_H0_0_lateral_ampa[1], 1000.0 * gH0_1_to_H0_0_lateral_ampa[1], 1000.0 * gH0_0_to_H0_0_lateral_ampa[10], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_0_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], 1000.0 * gH0_1_to_H0_0_lateral_ampa[maxRowLengthH0_0_to_H0_0_lateral_ampa], PiH0_0_to_H0_0_lateral_ampa[1], PjH0_0_to_H0_0_lateral_ampa[1], PijH0_0_to_H0_0_lateral_ampa[1], ZiH0_0_to_H0_0_lateral_ampa[1], ZjH0_0_to_H0_0_lateral_ampa[1])
@@ -20,6 +21,7 @@
     RECORD_TRACE_AMPA; \
     RECORD_TRACE_NMDA
 
+// if defined, saves VMEM traces
 // #define VMEM
 
 void recordVmem(FILE *traceVmem, scalar *neuron_pop)
@@ -348,9 +350,6 @@ int main(int argc, char **argv)
     pullRecordingBuffersFromDevice();
     writeTextSpikeArrayRecording("output.spikes" + output_name + ".csv", recordSpkArray, std::end(recordSpkArray) - std::begin(recordSpkArray),
                                  N_minicolumns * N_pyramidal, int(buffer_time / time_step), time_step, " ", false, false);
-    //writeTextSpikeArrayRecording("output.basketSpikes" + output_name + ".csv", recordBasketSpkArray, std::end(recordBasketSpkArray) - std::begin(recordBasketSpkArray),
-    //                             N_basket, int(buffer_time / time_step), time_step, " ", false, false);
-    //recordWeights();
 
     return 0;
 }
