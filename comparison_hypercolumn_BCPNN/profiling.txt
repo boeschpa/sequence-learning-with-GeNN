@@ -1,17 +1,16 @@
+### GPU ###
+
 compile: 
-commmand time make:
+command time make:
     510.45user 15.64system 8:46.86elapsed 99%CPU 
     (0avgtext+0avgdata 9793172maxresident)k
-    0inputs+1393336outputs (0major+6293783minor)pagefaults 0swaps
+    0inputs+1393336outputs 
+    (0major+6293783minor)pagefaults 0swaps
 time make:
     real	8m45,870s
     user	8m31,128s
     sys	0m14,077s
 
-
-
-
-Training epoch 1
 time ./hypercolumn
     real	2m36,389s
     user	1m18,248s
@@ -20,3 +19,13 @@ time ./hypercolumn
 command time ./hypercolumn
     77.34user 79.12system 2:36.47elapsed 99%CPU (0avgtext+0avgdata 1469448maxresident)k
     0inputs+1608outputs (0major+362414minor)pagefaults 0swaps
+
+### CPU ###
+command time make:
+    11.07user 1.01system 0:12.25elapsed 98%CPU 
+    (0avgtext+0avgdata 641464maxresident)k
+    0inputs+66984outputs 
+    (0major+361629minor)pagefaults 0swaps
+
+command time ./hypercolumn
+    > 10'000 s

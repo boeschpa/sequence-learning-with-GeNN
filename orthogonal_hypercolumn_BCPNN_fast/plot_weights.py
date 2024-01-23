@@ -117,9 +117,9 @@ im0 = ax[0].imshow(-grid1,cmap='RdBu',vmin = -range1, vmax=range1,interpolation=
 im1 = ax[1].imshow(-grid2,cmap='RdBu',vmin = -range2, vmax=range2,interpolation='none')
 
 # add colorbars
-cbar0 = plt.colorbar(im0, orientation='horizontal', label="Synapse conductivity (nS)")
+cbar0 = plt.colorbar(im0, orientation='horizontal', label="Synaptic conductance (nS)")
 cbar0.minorticks_on()
-cbar1 = plt.colorbar(im1, orientation='horizontal', label="Synapse conductivity (nS)")
+cbar1 = plt.colorbar(im1, orientation='horizontal', label="Synaptic conductance (nS)")
 cbar1.minorticks_on()
 
 # add grid lines
